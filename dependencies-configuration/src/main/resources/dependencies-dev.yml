@@ -1,0 +1,16 @@
+# Local server
+server:
+   # port is used by spring-boot-admin
+  port: 8383
+  contextPath: /dependencies
+   # context-path: for spring-boot-admin (AdminClientProperties)
+  context-path: /dependencies
+
+# Microservices
+admin:
+  url: http://esrvj6d1.web.bc:22081/admin
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://esrvj6d1.web.bc:22141/serviceregistry/eureka/

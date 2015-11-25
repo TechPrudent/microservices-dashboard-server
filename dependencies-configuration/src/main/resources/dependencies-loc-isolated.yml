@@ -1,0 +1,24 @@
+server:
+  port: 8989
+  servletPath: /*
+  contextPath:
+
+spring:
+  boot:
+    admin:
+      url: http://localhost:8085
+      period: 360000
+  jmx:
+    default-domain: dependencies
+eureka:
+  instance:
+    appGroupName: microservices
+  client:
+    enabled: false
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+endpoints:
+  jmx:
+    uniqueNames: true
+

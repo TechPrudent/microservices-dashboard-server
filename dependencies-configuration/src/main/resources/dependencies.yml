@@ -1,0 +1,37 @@
+# Local server
+server:
+  port: 8383
+  servletPath: /*
+  contextPath:
+
+endpoints:
+  # For multiple microservices on the same container
+  jmx:
+    uniqueNames: true
+
+esb:
+  url: http://soassgi.bc:11002/SSG/services/ServiceRouterPort
+  username: ID994445
+  password: Test23+22=45
+
+spring:
+  jackson:
+    mapper:
+      DEFAULT_VIEW_INCLUSION: true
+  boot:
+    admin.url: ${admin.url}
+  jmx:
+    default-domain: dependencies
+  aop:
+    proxyTargetClass: true
+
+# Microservices
+admin:
+  url: http://localhost:8085
+
+eureka:
+  instance:
+    appGroupName: microservices
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

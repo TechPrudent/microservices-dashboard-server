@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+
+	<ear-subdeployments-isolated>true</ear-subdeployments-isolated>
+	<deployment>
+		<dependencies>
+			<module name="org.jboss.vfs" />
+		</dependencies>
+		<exclude-subsystems>
+			<subsystem name="jpa" />
+			<subsystem name="jaxrs" />
+		</exclude-subsystems>
+		<exclusions>
+			<module name="javaee.api" />
+			<module name="org.slf4j.impl" />
+			<module name="org.apache.log4j" />
+		</exclusions>
+	</deployment>
+	<sub-deployment name="dependencies.war">
+		<dependencies>
+			<module name="org.jboss.vfs" />
+			<module name="org.jboss.as.jaxrs"/>
+			<module name="javax.xml.bind.api"/>
+		</dependencies>
+		<exclude-subsystems>
+			<subsystem name="jpa" />
+			<subsystem name="jaxrs" />
+		</exclude-subsystems>
+		<exclusions>
+			<module name="javaee.api" />
+			<module name="org.slf4j.impl" />
+			<module name="org.apache.log4j" />
+		</exclusions>
+	</sub-deployment>
+</jboss-deployment-structure>

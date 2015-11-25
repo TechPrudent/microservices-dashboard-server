@@ -1,0 +1,11 @@
+dependencies-configuration/.classpath
+dependencies-configuration/.settings/
+dependencies-configuration/.project
+dependencies-configuration/target/
+dependencies-ear/target/
+dependencies/.settings/
+dependencies-ear/.settings/
+dependencies/.classpath
+dependencies/.project
+dependencies/target/
+dependencies-ear/.project
