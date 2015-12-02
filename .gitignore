@@ -9,3 +9,4 @@ dependencies/.classpath
 dependencies/.project
 dependencies/target/
 dependencies-ear/.project
+*.iml

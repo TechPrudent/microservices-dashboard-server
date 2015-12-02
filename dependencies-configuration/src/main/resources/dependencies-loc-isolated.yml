@@ -11,12 +11,9 @@ spring:
   jmx:
     default-domain: dependencies
 eureka:
-  instance:
-    appGroupName: microservices
   client:
-    enabled: false
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://esrvj6d1.web.bc:22141/serviceregistry/eureka/
 
 endpoints:
   jmx:

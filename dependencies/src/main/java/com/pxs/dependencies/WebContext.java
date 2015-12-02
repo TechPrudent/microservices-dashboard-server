@@ -1,7 +1,5 @@
 package com.pxs.dependencies;
 
-import static com.pxs.dependencies.NameSpaceConstants.HELLO_CURI_NAMESPACE;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import com.pxs.utilities.filters.ShallowEtagHeaderExclHystrixFilterRegistrationBean;
 
@@ -19,16 +17,8 @@ import com.pxs.utilities.resolvers.locale.ApplicationLanguageAndAcceptHeaderLoca
 @Configuration
 public class WebContext {
 
-	@Value("${server.contextPath}")
-	private String contextPath;
-
 	@Autowired
 	private ShallowEtagHeaderExclHystrixFilterRegistrationBean shallowEtagHeaderExclHystrixFilterRegistrationBean;
-
-	@Bean
-	public CurieProvider curieProvider() {
-		return new DefaultCurieProvider(HELLO_CURI_NAMESPACE, new UriTemplate(contextPath + "/generated-docs/api-guide.html#resources-{rel}"));
-	}
 
 	@Bean
 	public LocaleResolver localeResolver() {
