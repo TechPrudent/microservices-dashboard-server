@@ -19,6 +19,28 @@
 		<url>http://el2604.bc:8585/ms-toolbox/dependencies.git/</url>
 		<tag>HEAD</tag>
 	</scm>
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<artifact-packaging>jar</artifact-packaging>
+			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>javax.transaction</groupId>
+					<artifactId>transaction-api</artifactId>
+					<version>1.1</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 
 	<distributionManagement>
 		<repository>
