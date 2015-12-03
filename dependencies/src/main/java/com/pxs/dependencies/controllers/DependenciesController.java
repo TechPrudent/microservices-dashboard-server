@@ -20,7 +20,9 @@ public class DependenciesController {
 
 	@RequestMapping(value = "/dependencies/graph", produces="application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
-		return ok().body(dependenciesResourceService.getDependenciesGraphResourceJson());
+		return ok()
+				.header("Access-Control-Allow-Origin", "*")
+				.body(dependenciesResourceService.getDependenciesGraphResourceJson());
 
 	}
 

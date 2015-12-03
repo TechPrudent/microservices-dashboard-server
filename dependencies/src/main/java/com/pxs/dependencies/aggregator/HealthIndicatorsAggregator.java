@@ -23,7 +23,8 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Map<String, O
 	private static final long TIMEOUT = 17000L;
 
 	public Map<String, Map<String, Object>> fetchCombinedDependencies() {
-		return buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
+		Map<String, Map<String, Object>> taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
+		return taskResponses;
 	}
 
 	private Map<String, Map<String, Object>> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Map<String, Object>>> tasks) {

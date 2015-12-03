@@ -6,11 +6,6 @@ server:
    # context-path: for spring-boot-admin (AdminClientProperties)
   context-path: /dependencies
 
-esb:
-  url: http://soassga.bc:10000/SSG/services/ServiceRouterPort
-  username: ID994444
-  password: Msps10+20=30
-
 # Microservices
 admin:
   url: http://jba-a1-ext.web.bc:10060/admin/

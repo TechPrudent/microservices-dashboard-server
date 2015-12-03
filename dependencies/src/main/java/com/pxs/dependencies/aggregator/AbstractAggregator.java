@@ -7,7 +7,6 @@ import java.util.concurrent.FutureTask;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public abstract class AbstractAggregator<T> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractAggregator.class);
-	private static final String HYSTRIX_ID = "hystrix";
-	private static final String EUREKA_ID = "eureka";
-	private static final String ADMIN_ID = "admin";
 	private static final String ZUUL_ID = "zuul";
 	private static final int CORE_POOL_SIZE = 30;
 	private static final int MAX_POOL_SIZE = 50;
@@ -53,9 +49,6 @@ public abstract class AbstractAggregator<T> {
 	private List<String> getIdsFromOnlineServices() {
 		List<String> serviceIds = discoveryClient.getServices();
 		serviceIds.remove(ZUUL_ID);
-		serviceIds.remove(HYSTRIX_ID);
-		serviceIds.remove(EUREKA_ID);
-		serviceIds.remove(ADMIN_ID);
 		return serviceIds;
 	}
 
