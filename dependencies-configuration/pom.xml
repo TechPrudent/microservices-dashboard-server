@@ -4,13 +4,13 @@
 
 	<groupId>com.pxs.dependencies</groupId>
 	<artifactId>dependencies-configuration</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<scm>
 		<connection>scm:git:http://el2604.bc:8585/ms-toolbox/dependencies.git</connection>
 		<developerConnection>scm:git:ssh://el2604.bc/ms-toolbox/dependencies.git</developerConnection>
 		<url>http://el2604.bc:8585/ms-toolbox/dependencies.git/</url>
-		<tag>HEAD</tag>
+		<tag>dependencies-configuration-1.0.0</tag>
 	</scm>
 
 	<distributionManagement>
