@@ -37,17 +37,17 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	public void testBuild() throws Exception {
 		Map<String, Map<String, Object>> map = new HashMap<>();
 		Map<String, Object> innermap1 = new HashMap<>();
-		innermap1.put("1a", 123);
-		innermap1.put("1b", "test");
-		innermap1.put("1c", asList(123, 234, 345, 456));
+		innermap1.put("1a", null);
+		innermap1.put("1b", null);
+		innermap1.put("1c", null);
 		Map<String, Object> innermap2 = new HashMap<>();
-		innermap2.put("2a", true);
+		innermap2.put("2a", null);
 		innermap2.put("2b", null);
-		innermap2.put("2c", asList("test1", "test2", "test3", "test4"));
+		innermap2.put("2c", null);
 		Map<String, Object> innermap3 = new HashMap<>();
-		innermap3.put("3a", asList("test1", "test2", "test3", "test4").toArray());
-		innermap3.put("3b", asList(123, 234, 345, 456).toArray());
-		innermap3.put("3c", 123L);
+		innermap3.put("3a", null);
+		innermap3.put("3b", null);
+		innermap3.put("3c", null);
 		map.put("key1", innermap1);
 		map.put("key2", innermap2);
 		map.put("key3", innermap3);
@@ -58,8 +58,10 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
 		assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
 
-		List<Map<String, String>> expectedNodeList = getExpectedNodesList();
+		List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
+		System.out.println(expectedNodeList);
 		List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
+		System.out.println(returnedNodeList);
 
 		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
 
@@ -70,32 +72,56 @@ public class DependenciesGraphResourceJsonBuilderTest {
 
 	}
 
-	private List<Map<String, String>> getExpectedNodesList() {
-		List<Map<String, String>> expectedNodeList = new ArrayList<>();
-		Map<String, String> node1 = new HashMap<>();
+	private List<Map<String, Object>> getExpectedNodesList() {
+		List<Map<String, Object>> expectedNodeList = new ArrayList<>();
+		Map<String, Object> node1 = new HashMap<>();
 		node1.put("id", "key3");
-		Map<String, String> node2 = new HashMap<>();
+		node1.put("lane", 2);
+		node1.put("details", null);
+		Map<String, Object> node2 = new HashMap<>();
 		node2.put("id", "3c");
-		Map<String, String> node3 = new HashMap<>();
+		node2.put("lane", 3);
+		node2.put("details", null);
+		Map<String, Object> node3 = new HashMap<>();
 		node3.put("id", "3b");
-		Map<String, String> node4 = new HashMap<>();
+		node3.put("lane", 3);
+		node3.put("details", null);
+		Map<String, Object> node4 = new HashMap<>();
 		node4.put("id", "3a");
-		Map<String, String> node5 = new HashMap<>();
+		node4.put("lane", 3);
+		node4.put("details", null);
+		Map<String, Object> node5 = new HashMap<>();
 		node5.put("id", "key2");
-		Map<String, String> node6 = new HashMap<>();
+		node5.put("lane", 2);
+		node5.put("details", null);
+		Map<String, Object> node6 = new HashMap<>();
 		node6.put("id", "2a");
-		Map<String, String> node7 = new HashMap<>();
+		node6.put("lane", 3);
+		node6.put("details", null);
+		Map<String, Object> node7 = new HashMap<>();
 		node7.put("id", "2c");
-		Map<String, String> node8 = new HashMap<>();
+		node7.put("lane", 3);
+		node7.put("details", null);
+		Map<String, Object> node8 = new HashMap<>();
 		node8.put("id", "2b");
-		Map<String, String> node9 = new HashMap<>();
+		node8.put("lane", 3);
+		node8.put("details", null);
+		Map<String, Object> node9 = new HashMap<>();
 		node9.put("id", "key1");
-		Map<String, String> node10 = new HashMap<>();
+		node9.put("lane", 2);
+		node9.put("details", null);
+		Map<String, Object> node10 = new HashMap<>();
 		node10.put("id", "1b");
-		Map<String, String> node11 = new HashMap<>();
+		node10.put("lane", 3);
+		node10.put("details", null);
+		Map<String, Object> node11 = new HashMap<>();
 		node11.put("id", "1a");
-		Map<String, String> node12 = new HashMap<>();
+		node11.put("lane", 3);
+		node11.put("details", null);
+		Map<String, Object> node12 = new HashMap<>();
 		node12.put("id", "1c");
+		node12.put("lane", 3);
+		node12.put("details", null);
 		expectedNodeList.add(node1);
 		expectedNodeList.add(node2);
 		expectedNodeList.add(node3);

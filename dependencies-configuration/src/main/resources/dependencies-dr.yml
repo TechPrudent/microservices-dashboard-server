@@ -5,11 +5,6 @@ server:
 # context-path: for spring-boot-admin (AdminClientProperties)
   context-path: /dependencies
   
-esb:
-  url: http://soassgp.glb.bc:10000/SSG/services/ServiceRouterPort
-  username: ID994443
-  password: Msps77+33=110
-
 admin:
   url: http://mstbp-admin-ws.glb.ebc.local:10060/admin/
 
