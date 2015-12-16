@@ -1,17 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
-            by default -->
+
+    <!-- -->
+    <property name="filePath" value="${app.log.dir}" />
+    <property name="application.name" value="dependencies" />
+    <appender name="fileAppender"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${filePath}/${application.name}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${filePath}/${application.name}.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            <pattern>%d{ISO8601} %-5level %logger{0} %msg%n
             </pattern>
         </encoder>
     </appender>
-    <logger name="com.pxs" level="debug"
-            additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-    <root level="off">
-        <appender-ref ref="STDOUT" />
+
+    <appender name="console" level="INFO"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{ISO8601} %-5level %logger{0} %msg%n
+            </pattern>
+        </encoder>
+        <target>System.out</target>
+    </appender>
+    <logger name="org.springframework" level="INFO" additivity="true" />
+    <logger name="com.pxs" level="INFO" additivity="true" />
+    <root level="INFO">
+        <appender-ref ref="fileAppender" />
+        <appender-ref ref="console" />
     </root>
 </configuration>

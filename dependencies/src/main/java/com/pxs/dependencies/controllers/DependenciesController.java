@@ -26,12 +26,12 @@ public class DependenciesController {
 	@Autowired
 	private VirtualDependenciesService virtualDependenciesService;
 
-	@RequestMapping(value = "/dependencies/graph", produces = "application/json")
+	@RequestMapping(value = "/graph", produces = "application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
 		return ok().body(dependenciesResourceService.getDependenciesGraphResourceJson());
 	}
 
-	@RequestMapping(value = "/dependencies/table", produces = "application/json")
+	@RequestMapping(value = "/table", produces = "application/json")
 	public HttpEntity<Map<String, Map<String, Object>>> getDependenciesJson() {
 		return ok().body(dependenciesResourceService.getDependenciesResourceJson());
 	}
