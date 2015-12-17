@@ -27,9 +27,10 @@ public class VirtualDependenciesService {
 
 		Map<String, Map<String, Object>> nodesWithDependenciesAndHealth = Maps.newHashMap();
 
-		// TODO convert to the right format and return
-		// get online status of every dependency (backend) or just return
-		// online?
+		// Health.unknown()
+		// .withDetail("type", "REST")
+		// .withDetail("group", getGroupName())
+		// .build();
 
 		return nodesWithDependenciesAndHealth;
 	}
