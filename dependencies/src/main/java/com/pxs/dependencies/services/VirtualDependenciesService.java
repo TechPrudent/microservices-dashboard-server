@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Maps;
+
 @Service
 public class VirtualDependenciesService {
 
@@ -20,11 +22,16 @@ public class VirtualDependenciesService {
 		redisService.updateNode(nodeName, dependencies);
 	}
 
-	public void getAllNodes() {
+	public Map<String, Map<String, Object>> getAllNodes() {
 		Map<String, List<String>> nodesWithDependencies = redisService.getNodes();
 
-		// TODO convert to the right format and return
-		// get online status of every dependency (backend) or just return
-		// online?
+		Map<String, Map<String, Object>> nodesWithDependenciesAndHealth = Maps.newHashMap();
+
+		// Health.unknown()
+		// .withDetail("type", "REST")
+		// .withDetail("group", getGroupName())
+		// .build();
+
+		return nodesWithDependenciesAndHealth;
 	}
 }
