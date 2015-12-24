@@ -1,5 +1,6 @@
 package com.pxs.dependencies.services;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,31 +10,43 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Maps;
+import com.pxs.dependencies.model.Node;
+import com.pxs.utilities.converters.json.JsonToObjectConverter;
 
 @Service
 public class RedisService {
 
 	@Autowired
-	private RedisTemplate<String, Object> template;
+	private RedisTemplate<String, String> redisTemplate;
 
-	public void saveNode(final String nodeName, final List<String> properties) {
-		template.opsForList().leftPushAll(nodeName, properties);
-	}
-
-	public void updateNode(final String nodeName, final List<String> properties) {
-		template.opsForList().leftPushAll(nodeName, properties);
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<String, List<String>> getNodes() {
-		Map<String, List<String>> nodesWithDependencies = Maps.newHashMap();
-
-		Set<String> keys = template.keys("*");
+	public Map<String, Node> getAllNodes(){
+		Map<String, Node> results = new HashMap<>();
+		Set<String> keys = redisTemplate.keys("*");
 		for (String key : keys) {
-			List<String> properties = (List<String>) template.opsForList().leftPop(key);
-			nodesWithDependencies.put(key, properties);
+			String nodeString = redisTemplate.opsForValue().get(key);
+			JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
+			Node node = converter.convert(nodeString);
+			results.put(key, node);
 		}
+		return results;
+	}
 
-		return nodesWithDependencies;
+	public void saveNode(final String nodeData) {
+		String nodeId = getNodeId(nodeData);
+		redisTemplate.opsForValue().set(nodeId, nodeData);
+	}
+
+	public void deleteNode(final String nodeId){
+		redisTemplate.delete(nodeId);
+	}
+
+	public void deleteAllNodes(){
+		redisTemplate.delete(redisTemplate.keys("*"));
+	}
+
+	private String getNodeId(String nodeData) {
+		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
+		Node node = converter.convert(nodeData);
+		return node.getId();
 	}
 }

@@ -10,3 +10,5 @@ dependencies/.project
 dependencies/target/
 dependencies-ear/.project
 *.iml
+.idea/
+.ssh/

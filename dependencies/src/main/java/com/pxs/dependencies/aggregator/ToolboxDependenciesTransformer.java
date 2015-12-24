@@ -2,6 +2,13 @@ package com.pxs.dependencies.aggregator;
 
 import static org.springframework.boot.actuate.health.Health.status;
 
+import static com.pxs.dependencies.constants.Constants.CONFIGSERVER;
+import static com.pxs.dependencies.constants.Constants.DISCOVERY;
+import static com.pxs.dependencies.constants.Constants.GROUP;
+import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
+import static com.pxs.dependencies.constants.Constants.TOOLBOX;
+import static com.pxs.dependencies.constants.Constants.TYPE;
+
 import java.util.Map;
 
 import org.springframework.boot.actuate.health.Health;
@@ -10,11 +17,6 @@ import org.springframework.boot.actuate.health.Health.Builder;
 import com.google.common.collect.Maps.EntryTransformer;
 
 public class ToolboxDependenciesTransformer implements EntryTransformer<String, Object, Object> {
-
-	private static final String TOOLBOX = "TOOLBOX";
-	private static final String MICROSERVICE = "MICROSERVICE";
-	private static final String DISCOVERY = "discovery";
-	private static final String CONFIGSERVER = "configServer";
 
 	@Override
 	public Object transformEntry(final String key, final Object value) {
@@ -25,8 +27,8 @@ public class ToolboxDependenciesTransformer implements EntryTransformer<String, 
 			for (String detailKey : details.keySet()) {
 				enrichedHealth.withDetail(detailKey, details.get(detailKey));
 			}
-			enrichedHealth.withDetail("type", MICROSERVICE);
-			enrichedHealth.withDetail("group", TOOLBOX);
+			enrichedHealth.withDetail(TYPE, MICROSERVICE);
+			enrichedHealth.withDetail(GROUP, TOOLBOX);
 			return enrichedHealth.build();
 		}
 		return value;

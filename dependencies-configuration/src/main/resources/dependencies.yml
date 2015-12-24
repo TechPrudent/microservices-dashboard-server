@@ -21,6 +21,9 @@ spring:
     default-domain: dependencies
   aop:
     proxyTargetClass: true
+  redis:
+      host: el2604.bc
+      port: 6379
 
 # Microservices
 admin:
@@ -33,3 +36,5 @@ eureka:
 
 infinispan:
   config: dependencies-infinispan.xml
+
+

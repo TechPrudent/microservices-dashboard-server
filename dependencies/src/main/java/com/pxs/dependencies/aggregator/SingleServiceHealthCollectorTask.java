@@ -1,10 +1,13 @@
 package com.pxs.dependencies.aggregator;
 
 import static org.springframework.http.HttpMethod.GET;
+import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
+import static com.pxs.dependencies.constants.Constants.*;
 
 import static com.google.common.collect.Maps.filterEntries;
 import static com.google.common.collect.Maps.transformEntries;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -75,7 +78,9 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}
-		return healthMap;
+		Map<String, Object> healthMapCopy = copyMap(healthMap);
+		addOwnHealth(healthMapCopy, health);
+		return healthMapCopy;
 	}
 
 	@VisibleForTesting
@@ -95,4 +100,26 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 		return restTemplate;
 	}
 
+	private void addOwnHealth(final Map<String, Object> healthMap, final Health health) {
+		Health.Builder ownHealth = Health.status(health.getStatus());
+		if (health.getDetails().get(VERSION) != null) {
+			ownHealth.withDetail(VERSION, health.getDetails().get(VERSION));
+		}
+		ownHealth.withDetail(TYPE, health.getDetails().get(TYPE) != null ? health.getDetails().get(TYPE) : MICROSERVICE);
+		if (health.getDetails().get(NAME) != null) {
+			ownHealth.withDetail(NAME, health.getDetails().get(NAME));
+		}
+		if (health.getDetails().get(GROUP) != null) {
+			ownHealth.withDetail(GROUP, health.getDetails().get(GROUP));
+		}
+		healthMap.put(OWN_HEALTH, ownHealth.build());
+	}
+
+	private Map<String, Object> copyMap(Map<String, Object> healthMap) {
+		Map<String, Object> copy = new HashMap<>();
+		for (Map.Entry<String, Object> entry : healthMap.entrySet()) {
+			copy.put(entry.getKey(), entry.getValue());
+		}
+		return copy;
+	}
 }

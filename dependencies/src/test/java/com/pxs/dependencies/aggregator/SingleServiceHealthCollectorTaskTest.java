@@ -28,6 +28,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+import static com.pxs.dependencies.constants.Constants.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SingleServiceHealthCollectorTaskTest {
@@ -54,29 +55,29 @@ public class SingleServiceHealthCollectorTaskTest {
 	private Health mockResponseEntity() {
 		Health body = up()
 				.withDetail("bciManageCustomerContact", up()
-						.withDetail("version", "4.0")
-						.withDetail("type", "SOAP")
-						.withDetail("group", "BCI")
+						.withDetail(VERSION, "4.0")
+						.withDetail(TYPE, "SOAP")
+						.withDetail(GROUP, "BCI")
 						.build())
 				.withDetail("cslCustomer", up()
-						.withDetail("version", "Customer 4.0 (since 2012 CRC03)")
-						.withDetail("type", "SOAP")
-						.withDetail("group", "CSL")
+						.withDetail(VERSION, "Customer 4.0 (since 2012 CRC03)")
+						.withDetail(TYPE, "SOAP")
+						.withDetail(GROUP, "CSL")
 						.build())
 				.withDetail("cslEmployee", unknown()
-						.withDetail("version", "4.0")
-						.withDetail("type", "SOAP")
-						.withDetail("group", "CSL")
+						.withDetail(VERSION, "4.0")
+						.withDetail(TYPE, "SOAP")
+						.withDetail(GROUP, "CSL")
 						.build())
 				.withDetail("imaIMAServices", up()
-						.withDetail("version", "IMA SERVICES - Service Version 1.1")
-						.withDetail("type", "SOAP")
-						.withDetail("group", "IMA")
+						.withDetail(VERSION, "IMA SERVICES - Service Version 1.1")
+						.withDetail(TYPE, "SOAP")
+						.withDetail(GROUP, "IMA")
 						.build())
 				.withDetail("bciManageCustomerContact", up()
-						.withDetail("version", "4.0")
-						.withDetail("type", "SOAP")
-						.withDetail("group", "BCI")
+						.withDetail(VERSION, "4.0")
+						.withDetail(TYPE, "SOAP")
+						.withDetail(GROUP, "BCI")
 						.build())
 				.withDetail("discovery", up()
 						.withDetail("description", "Spring Cloud Eureka Discovery Client")
@@ -111,9 +112,10 @@ public class SingleServiceHealthCollectorTaskTest {
 	@Test
 	public void unmarshallsHealths() throws Exception {
 		Map<String, Object> health = task.call();
-		assertThat(health.keySet()).containsExactly("bciManageCustomerContact",
+		assertThat(health.keySet()).contains(OWN_HEALTH,"bciManageCustomerContact",
 				"cslCustomer", "cslEmployee", "imaIMAServices", "discovery", "db", "configServer");
 		assertThat(((Health) health.get("configServer")).getDetails().keySet())
-				.containsExactly("propertySources", "type", "group");
+				.containsExactly("propertySources", TYPE, GROUP);
+		assertThat(((Health) health.get(OWN_HEALTH)).getStatus().toString()).isEqualTo("UP");
 	}
 }

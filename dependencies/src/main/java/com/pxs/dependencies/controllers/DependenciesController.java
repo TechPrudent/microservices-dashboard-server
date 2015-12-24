@@ -1,10 +1,10 @@
 package com.pxs.dependencies.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pxs.dependencies.model.Node;
 import com.pxs.dependencies.services.DependenciesResourceService;
-import com.pxs.dependencies.services.VirtualDependenciesService;
+import com.pxs.dependencies.services.RedisService;
 
 @RestController
 public class DependenciesController {
@@ -24,7 +25,7 @@ public class DependenciesController {
 	private DependenciesResourceService dependenciesResourceService;
 
 	@Autowired
-	private VirtualDependenciesService virtualDependenciesService;
+	private RedisService redisService;
 
 	@RequestMapping(value = "/graph", produces = "application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
@@ -36,13 +37,23 @@ public class DependenciesController {
 		return ok().body(dependenciesResourceService.getDependenciesResourceJson());
 	}
 
-	@RequestMapping(value = "/node/{nodename}", method = POST)
-	public void createDependency(@PathVariable("nodename") final String nodename, @RequestBody final List<String> dependencies) {
-		virtualDependenciesService.createNewNode(nodename, dependencies);
+	@RequestMapping(value = "/node", method = POST)
+	public void saveNode(@RequestBody final String nodeData) {
+		redisService.saveNode(nodeData);
 	}
 
-	@RequestMapping(value = "/node/{nodename}", method = PUT)
-	public void updateDependency(@PathVariable("nodename") final String nodename, @RequestBody final List<String> dependencies) {
-		virtualDependenciesService.updateNode(nodename, dependencies);
+	@RequestMapping(value = "/node", method = GET)
+	public Map<String, Node> getAllNodes() {
+		return redisService.getAllNodes();
+	}
+
+	@RequestMapping(value = "/node/{nodeId}", method = DELETE)
+	public void deleteNode(@PathVariable String nodeId) {
+		redisService.deleteNode(nodeId);
+	}
+
+	@RequestMapping(value = "/node", method = DELETE)
+	public void deleteAllNodes() {
+		redisService.deleteAllNodes();
 	}
 }

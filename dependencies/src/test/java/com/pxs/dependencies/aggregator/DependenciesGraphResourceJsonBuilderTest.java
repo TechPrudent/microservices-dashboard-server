@@ -1,8 +1,7 @@
 package com.pxs.dependencies.aggregator;
 
-import static java.util.Arrays.asList;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.pxs.dependencies.constants.Constants.*;
 import static org.mockito.Mockito.doReturn;
 
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pxs.dependencies.services.RedisService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DependenciesGraphResourceJsonBuilderTest {
@@ -31,6 +31,12 @@ public class DependenciesGraphResourceJsonBuilderTest {
 
 	@Mock
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
+
+	@Mock
+	private RedisService redisService;
+
+	@Mock
+	private VirtualDependenciesConverter virtualDependenciesConverter;
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -75,53 +81,53 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	private List<Map<String, Object>> getExpectedNodesList() {
 		List<Map<String, Object>> expectedNodeList = new ArrayList<>();
 		Map<String, Object> node1 = new HashMap<>();
-		node1.put("id", "key3");
-		node1.put("lane", 2);
-		node1.put("details", null);
+		node1.put(ID, "key3");
+		node1.put(LANE, 2);
+		node1.put(DETAILS, null);
 		Map<String, Object> node2 = new HashMap<>();
-		node2.put("id", "3c");
-		node2.put("lane", 3);
-		node2.put("details", null);
+		node2.put(ID, "3c");
+		node2.put(LANE, 3);
+		node2.put(DETAILS, null);
 		Map<String, Object> node3 = new HashMap<>();
-		node3.put("id", "3b");
-		node3.put("lane", 3);
-		node3.put("details", null);
+		node3.put(ID, "3b");
+		node3.put(LANE, 3);
+		node3.put(DETAILS, null);
 		Map<String, Object> node4 = new HashMap<>();
-		node4.put("id", "3a");
-		node4.put("lane", 3);
-		node4.put("details", null);
+		node4.put(ID, "3a");
+		node4.put(LANE, 3);
+		node4.put(DETAILS, null);
 		Map<String, Object> node5 = new HashMap<>();
-		node5.put("id", "key2");
-		node5.put("lane", 2);
-		node5.put("details", null);
+		node5.put(ID, "key2");
+		node5.put(LANE, 2);
+		node5.put(DETAILS, null);
 		Map<String, Object> node6 = new HashMap<>();
-		node6.put("id", "2a");
-		node6.put("lane", 3);
-		node6.put("details", null);
+		node6.put(ID, "2a");
+		node6.put(LANE, 3);
+		node6.put(DETAILS, null);
 		Map<String, Object> node7 = new HashMap<>();
-		node7.put("id", "2c");
-		node7.put("lane", 3);
-		node7.put("details", null);
+		node7.put(ID, "2c");
+		node7.put(LANE, 3);
+		node7.put(DETAILS, null);
 		Map<String, Object> node8 = new HashMap<>();
-		node8.put("id", "2b");
-		node8.put("lane", 3);
-		node8.put("details", null);
+		node8.put(ID, "2b");
+		node8.put(LANE, 3);
+		node8.put(DETAILS, null);
 		Map<String, Object> node9 = new HashMap<>();
-		node9.put("id", "key1");
-		node9.put("lane", 2);
-		node9.put("details", null);
+		node9.put(ID, "key1");
+		node9.put(LANE, 2);
+		node9.put(DETAILS, null);
 		Map<String, Object> node10 = new HashMap<>();
-		node10.put("id", "1b");
-		node10.put("lane", 3);
-		node10.put("details", null);
+		node10.put(ID, "1b");
+		node10.put(LANE, 3);
+		node10.put(DETAILS, null);
 		Map<String, Object> node11 = new HashMap<>();
-		node11.put("id", "1a");
-		node11.put("lane", 3);
-		node11.put("details", null);
+		node11.put(ID, "1a");
+		node11.put(LANE, 3);
+		node11.put(DETAILS, null);
 		Map<String, Object> node12 = new HashMap<>();
-		node12.put("id", "1c");
-		node12.put("lane", 3);
-		node12.put("details", null);
+		node12.put(ID, "1c");
+		node12.put(LANE, 3);
+		node12.put(DETAILS, null);
 		expectedNodeList.add(node1);
 		expectedNodeList.add(node2);
 		expectedNodeList.add(node3);

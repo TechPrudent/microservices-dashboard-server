@@ -1,69 +1,121 @@
 package com.pxs.dependencies.aggregator;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static com.pxs.dependencies.constants.Constants.DETAILS;
+import static com.pxs.dependencies.constants.Constants.ID;
+import static com.pxs.dependencies.constants.Constants.LANE;
+import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
+import static com.pxs.dependencies.constants.Constants.OWN_HEALTH;
+import static com.pxs.dependencies.constants.Constants.TYPE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
+
+import com.pxs.dependencies.constants.Constants;
+import com.pxs.dependencies.model.Node;
+import com.pxs.dependencies.services.RedisService;
 
 @Component
 public class DependenciesGraphResourceJsonBuilder {
 
+	private static final String DIRECTED = "directed";
+	private static final String MULTIGRAPH = "multigraph";
+	private static final String GRAPH = "graph";
+	private static final String LANES = "lanes";
+	private static final String NODES = "nodes";
+	private static final String LINKS = "links";
+	private static final String UI = "UI";
+	private static final String ENDPOINT = "Endpoint";
+	private static final String BACKEND = "Backend";
+	private static final String DESCRIPTION = "description";
 	@Autowired
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 
+	@Autowired
+	private RedisService redisService;
+
+	@Autowired
+	private VirtualDependenciesConverter virtualDependenciesConverter;
+
 	public Map<String, Object> build() {
 		Map<String, Map<String, Object>> dependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
+		Map<String, Node> virtualDependencies = redisService.getAllNodes();
+		dependencies.putAll(virtualDependenciesConverter.convert(virtualDependencies));
 		return createGraph(dependencies);
 
 	}
 
 	private Map<String, Object> createGraph(final Map<String, Map<String, Object>> dependencies) {
 		Map<String, Object> graph = new HashMap<>();
-		graph.put("directed", true);
-		graph.put("multigraph", false);
-		graph.put("graph", new String[0]);
+		graph.put(DIRECTED, true);
+		graph.put(MULTIGRAPH, false);
+		graph.put(GRAPH, new String[0]);
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		List<Map<String, Integer>> links = new ArrayList<>();
 		for (String microserviceName : dependencies.keySet()) {
 			Map<String, Object> microservice = dependencies.get(microserviceName);
-			nodes.add(createNode(microserviceName, new Integer("2"), null));
+			nodes.add(createMicroserviceNode(microserviceName, microservice, new Integer("2")));
 			int microserviceNodeId = nodes.size() - 1;
-			for (Map.Entry<String, Object> dependencyEntrySet : microservice.entrySet()) {
+
+			Set<Map.Entry<String, Object>> entries = microservice.entrySet();
+			Set<Map.Entry<String, Object>> entriesCopy = new HashSet<>(entries);
+			removeEurecaDescription(entriesCopy);
+			for (Map.Entry<String, Object> dependencyEntrySet : entriesCopy) {
 
 				int dependencyNodeId = findDependencyNode(dependencyEntrySet.getKey(), nodes);
 				if (dependencyNodeId == -1) {
-					nodes.add(createNode(dependencyEntrySet.getKey(), new Integer("3"), dependencyEntrySet.getValue()));
+					Integer lane = determineLane(dependencyEntrySet);
+					nodes.add(createNode(dependencyEntrySet.getKey(), lane, dependencyEntrySet.getValue()));
 					dependencyNodeId = nodes.size() - 1;
 				}
 				links.add(createLink(microserviceNodeId, dependencyNodeId));
 			}
 		}
-		graph.put("lanes", constructLanes());
-		graph.put("nodes", nodes);
-		graph.put("links", links);
+		graph.put(LANES, constructLanes());
+		graph.put(NODES, nodes);
+		graph.put(LINKS, links);
 
 		return graph;
 	}
 
+	private Integer determineLane(Map.Entry<String, Object> dependencyEntrySet) {
+		if (dependencyEntrySet.getValue() instanceof Health) {
+			Health health = (Health) dependencyEntrySet.getValue();
+			if (health != null && health.getDetails() != null && Constants.MICROSERVICE.equals(health.getDetails().get(TYPE))) {
+				return new Integer("2");
+			}
+		}
+		return new Integer("3");
+	}
+
 	private int findDependencyNode(final String dependency, final List<Map<String, Object>> nodes) {
 		for (Map<String, Object> map : nodes) {
-			if (dependency.equals(map.get("id"))) {
+			if (dependency.equals(map.get(ID))) {
 				return nodes.indexOf(map);
 			}
 		}
 		return -1;
 	}
 
+	private Map<String, Object> createMicroserviceNode(String microServicename, Map<String, Object> microservice, final Integer lane) {
+		Health microserviceHealth = (Health) microservice.get(OWN_HEALTH);
+		microservice.remove(OWN_HEALTH);
+		return createNode(microServicename, lane, microserviceHealth);
+	}
+
 	private Map<String, Object> createNode(final String id, final Integer lane, Object details) {
 		Map<String, Object> node = new HashMap<>();
-		node.put("id", id);
-		node.put("lane", lane);
-		node.put("details", details);
+		node.put(ID, id);
+		node.put(LANE, lane);
+		node.put(DETAILS, details);
 		return node;
 	}
 
@@ -76,17 +128,26 @@ public class DependenciesGraphResourceJsonBuilder {
 
 	private List<Map<Object, Object>> constructLanes() {
 		List<Map<Object, Object>> lanes = new ArrayList<>();
-		lanes.add(constructLane(0, "UI"));
-		lanes.add(constructLane(1, "Endpoint"));
-		lanes.add(constructLane(2, "Microservice"));
-		lanes.add(constructLane(3, "Backend"));
+		lanes.add(constructLane(0, UI));
+		lanes.add(constructLane(1, ENDPOINT));
+		lanes.add(constructLane(2, MICROSERVICE));
+		lanes.add(constructLane(3, BACKEND));
 		return lanes;
 	}
 
 	private Map<Object, Object> constructLane(final int lane, final String type) {
 		Map<Object, Object> laneMap = newHashMap();
-		laneMap.put("lane", lane);
-		laneMap.put("type", type);
+		laneMap.put(LANE, lane);
+		laneMap.put(TYPE, type);
 		return laneMap;
+	}
+
+	private void removeEurecaDescription(Set<Map.Entry<String, Object>> entrySet) {
+		for (Map.Entry<String, Object> entry : entrySet) {
+			if (DESCRIPTION.equals(entry.getKey())) {
+				entrySet.remove(entry);
+				break;
+			}
+		}
 	}
 }

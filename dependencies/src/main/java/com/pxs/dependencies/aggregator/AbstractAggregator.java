@@ -47,7 +47,9 @@ public abstract class AbstractAggregator<T> {
 	}
 
 	private List<String> getIdsFromOnlineServices() {
-		List<String> serviceIds = discoveryClient.getServices();
+		//		List<String> serviceIds = discoveryClient.getServices();
+		List<String> serviceIds = new ArrayList<>();
+		serviceIds.add("awards");
 		serviceIds.remove(ZUUL_ID);
 		return serviceIds;
 	}
