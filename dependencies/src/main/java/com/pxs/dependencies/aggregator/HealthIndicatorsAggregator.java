@@ -1,6 +1,7 @@
 package com.pxs.dependencies.aggregator;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -29,7 +30,7 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Map<String, O
 
 	private Map<String, Map<String, Object>> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Map<String, Object>>> tasks) {
 
-		final Map<String, Map<String, Object>> aggregatedDependencies = new HashMap<>();
+		final Map<String, Map<String, Object>> aggregatedDependencies = new LinkedHashMap<>();
 
 		for (FutureTask<Map<String, Object>> task : tasks) {
 			String key = null;

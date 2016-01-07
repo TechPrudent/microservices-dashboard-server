@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.actuate.health.Health;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pxs.dependencies.services.RedisService;
@@ -38,22 +40,38 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@Mock
 	private VirtualDependenciesConverter virtualDependenciesConverter;
 
+	private Health microserviceHealth;
+
+	private Health backendHealth;
+
+	private Health ownHealth;
+
+	@Before
+	public void init(){
+		microserviceHealth = Health.unknown().withDetail("type", MICROSERVICE).build();
+		backendHealth = Health.unknown().withDetail("type", "SOAP").build();
+		ownHealth = Health.unknown().withDetail("type", MICROSERVICE).build();
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
 		Map<String, Map<String, Object>> map = new HashMap<>();
 		Map<String, Object> innermap1 = new HashMap<>();
-		innermap1.put("1a", null);
-		innermap1.put("1b", null);
-		innermap1.put("1c", null);
+		innermap1.put("1a", microserviceHealth);
+		innermap1.put("1b", microserviceHealth);
+		innermap1.put("1c", microserviceHealth);
+		innermap1.put(OWN_HEALTH, ownHealth);
 		Map<String, Object> innermap2 = new HashMap<>();
-		innermap2.put("2a", null);
-		innermap2.put("2b", null);
-		innermap2.put("2c", null);
+		innermap2.put("2a", backendHealth);
+		innermap2.put("2b", backendHealth);
+		innermap2.put("2c", backendHealth);
+		innermap2.put(OWN_HEALTH, ownHealth);
 		Map<String, Object> innermap3 = new HashMap<>();
-		innermap3.put("3a", null);
-		innermap3.put("3b", null);
-		innermap3.put("3c", null);
+		innermap3.put("3a", backendHealth);
+		innermap3.put("3b", backendHealth);
+		innermap3.put("3c", backendHealth);
+		innermap3.put(OWN_HEALTH, ownHealth);
 		map.put("key1", innermap1);
 		map.put("key2", innermap2);
 		map.put("key3", innermap3);
@@ -83,51 +101,51 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		Map<String, Object> node1 = new HashMap<>();
 		node1.put(ID, "key3");
 		node1.put(LANE, 2);
-		node1.put(DETAILS, null);
+		node1.put(DETAILS, ownHealth);
 		Map<String, Object> node2 = new HashMap<>();
 		node2.put(ID, "3c");
 		node2.put(LANE, 3);
-		node2.put(DETAILS, null);
+		node2.put(DETAILS, backendHealth);
 		Map<String, Object> node3 = new HashMap<>();
 		node3.put(ID, "3b");
 		node3.put(LANE, 3);
-		node3.put(DETAILS, null);
+		node3.put(DETAILS, backendHealth);
 		Map<String, Object> node4 = new HashMap<>();
 		node4.put(ID, "3a");
 		node4.put(LANE, 3);
-		node4.put(DETAILS, null);
+		node4.put(DETAILS, backendHealth);
 		Map<String, Object> node5 = new HashMap<>();
 		node5.put(ID, "key2");
 		node5.put(LANE, 2);
-		node5.put(DETAILS, null);
+		node5.put(DETAILS, ownHealth);
 		Map<String, Object> node6 = new HashMap<>();
 		node6.put(ID, "2a");
 		node6.put(LANE, 3);
-		node6.put(DETAILS, null);
+		node6.put(DETAILS, backendHealth);
 		Map<String, Object> node7 = new HashMap<>();
 		node7.put(ID, "2c");
 		node7.put(LANE, 3);
-		node7.put(DETAILS, null);
+		node7.put(DETAILS, backendHealth);
 		Map<String, Object> node8 = new HashMap<>();
 		node8.put(ID, "2b");
 		node8.put(LANE, 3);
-		node8.put(DETAILS, null);
+		node8.put(DETAILS, backendHealth);
 		Map<String, Object> node9 = new HashMap<>();
 		node9.put(ID, "key1");
 		node9.put(LANE, 2);
-		node9.put(DETAILS, null);
+		node9.put(DETAILS, ownHealth);
 		Map<String, Object> node10 = new HashMap<>();
 		node10.put(ID, "1b");
-		node10.put(LANE, 3);
-		node10.put(DETAILS, null);
+		node10.put(LANE, 2);
+		node10.put(DETAILS, microserviceHealth);
 		Map<String, Object> node11 = new HashMap<>();
 		node11.put(ID, "1a");
-		node11.put(LANE, 3);
-		node11.put(DETAILS, null);
+		node11.put(LANE, 2);
+		node11.put(DETAILS, microserviceHealth);
 		Map<String, Object> node12 = new HashMap<>();
 		node12.put(ID, "1c");
-		node12.put(LANE, 3);
-		node12.put(DETAILS, null);
+		node12.put(LANE, 2);
+		node12.put(DETAILS, microserviceHealth);
 		expectedNodeList.add(node1);
 		expectedNodeList.add(node2);
 		expectedNodeList.add(node3);

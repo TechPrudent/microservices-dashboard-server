@@ -62,9 +62,11 @@ public class DependenciesGraphResourceJsonBuilder {
 		List<Map<String, Integer>> links = new ArrayList<>();
 		for (String microserviceName : dependencies.keySet()) {
 			Map<String, Object> microservice = dependencies.get(microserviceName);
-			nodes.add(createMicroserviceNode(microserviceName, microservice, new Integer("2")));
+			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
+			if (!isNodeAlreadyThere(nodes, microserviceName)) {
+				nodes.add(microserviceNode);
+			}
 			int microserviceNodeId = nodes.size() - 1;
-
 			Set<Map.Entry<String, Object>> entries = microservice.entrySet();
 			Set<Map.Entry<String, Object>> entriesCopy = new HashSet<>(entries);
 			removeEurecaDescription(entriesCopy);
@@ -72,7 +74,12 @@ public class DependenciesGraphResourceJsonBuilder {
 
 				int dependencyNodeId = findDependencyNode(dependencyEntrySet.getKey(), nodes);
 				if (dependencyNodeId == -1) {
-					Integer lane = determineLane(dependencyEntrySet);
+					Integer lane = 0;
+					if (dependencyEntrySet.getValue() instanceof Health) {
+						Health health = (Health) dependencyEntrySet.getValue();
+						lane = determineLane(health);
+					}
+
 					nodes.add(createNode(dependencyEntrySet.getKey(), lane, dependencyEntrySet.getValue()));
 					dependencyNodeId = nodes.size() - 1;
 				}
@@ -86,12 +93,9 @@ public class DependenciesGraphResourceJsonBuilder {
 		return graph;
 	}
 
-	private Integer determineLane(Map.Entry<String, Object> dependencyEntrySet) {
-		if (dependencyEntrySet.getValue() instanceof Health) {
-			Health health = (Health) dependencyEntrySet.getValue();
-			if (health != null && health.getDetails() != null && Constants.MICROSERVICE.equals(health.getDetails().get(TYPE))) {
-				return new Integer("2");
-			}
+	private Integer determineLane(final Health health) {
+		if (health != null && health.getDetails() != null && Constants.MICROSERVICE.equals(health.getDetails().get(TYPE))) {
+			return new Integer("2");
 		}
 		return new Integer("3");
 	}
@@ -105,8 +109,9 @@ public class DependenciesGraphResourceJsonBuilder {
 		return -1;
 	}
 
-	private Map<String, Object> createMicroserviceNode(String microServicename, Map<String, Object> microservice, final Integer lane) {
+	private Map<String, Object> createMicroserviceNode(String microServicename, Map<String, Object> microservice) {
 		Health microserviceHealth = (Health) microservice.get(OWN_HEALTH);
+		Integer lane = determineLane(microserviceHealth);
 		microservice.remove(OWN_HEALTH);
 		return createNode(microServicename, lane, microserviceHealth);
 	}
@@ -142,12 +147,21 @@ public class DependenciesGraphResourceJsonBuilder {
 		return laneMap;
 	}
 
-	private void removeEurecaDescription(Set<Map.Entry<String, Object>> entrySet) {
+	private void removeEurecaDescription(final Set<Map.Entry<String, Object>> entrySet) {
 		for (Map.Entry<String, Object> entry : entrySet) {
 			if (DESCRIPTION.equals(entry.getKey())) {
 				entrySet.remove(entry);
 				break;
 			}
 		}
+	}
+
+	private boolean isNodeAlreadyThere(final List<Map<String, Object>> nodes, final String microserviceId) {
+		for (Map<String, Object> node : nodes) {
+			if (microserviceId.equals(node.get(ID))) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
