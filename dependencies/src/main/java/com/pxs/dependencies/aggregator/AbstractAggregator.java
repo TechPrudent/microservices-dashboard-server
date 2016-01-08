@@ -47,10 +47,10 @@ public abstract class AbstractAggregator<T> {
 	}
 
 	private List<String> getIdsFromOnlineServices() {
-//		List<String> serviceIds = discoveryClient.getServices();
-				List<String> serviceIds = new ArrayList<>();
+		List<String> serviceIds = discoveryClient.getServices();
+//				List<String> serviceIds = new ArrayList<>();
 //				serviceIds.add("awards");
-		 serviceIds.add("customer-management");
+//		 serviceIds.add("customer-management");
 		serviceIds.remove(ZUUL_ID);
 		return serviceIds;
 	}

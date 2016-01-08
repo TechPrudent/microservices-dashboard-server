@@ -1,0 +1,303 @@
+/**
+ *  If you want to override some foundation settings, you have to change values here.
+ *  The list of settings values are listed here bower_components/foundation/scss/foundation/_settings.scss
+ */
+$topbar-bg-color: #5AADBB;
+
+/**
+ *  The import of foundation is made manually because there is still no links of the
+ *  sass version in their bower.json...
+ */
+@import '../../bower_components/foundation/scss/foundation';
+
+/**
+ *  Do not remove this comments bellow. It's the markers used by wiredep to inject
+ *  sass dependencies when defined in the bower.json of your dependencies
+ */
+// bower:scss
+// endbower
+
+.browsehappy {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+.panel {
+  margin-top: 50px;
+}
+
+.th {
+  width: 100%;
+  height: 200px;
+
+  img.right {
+    width: 50px;
+  }
+}
+
+/**
+ *  Do not remove this comments bellow. It's the markers used by gulp-inject to inject
+ *  all your sass files automatically
+ */
+// injector
+// endinjector
+
+body,html{
+  height:100%;
+}
+
+.full-width {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: initial;
+}
+.nopadding{
+  padding:0;
+}
+
+input, select{
+  width:100%;
+}
+.button{
+  padding: 10px 10px 9px 10px;
+  width: 100%;
+}
+
+.button-div {
+  width:25%;
+  float: left;
+}
+
+/* Control bar styles */
+#control-bar {
+  input {
+    margin-bottom: 0;
+  }
+  select {
+    margin-bottom: 0;
+  }
+  button {
+    margin-bottom: 0;
+  }
+}
+
+/* Sidebar styles */
+#sidebar{
+  background: #ddd;
+  padding:10px;
+
+  h2{
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-size:1em;
+    padding-bottom:10px;
+    border-bottom:1px solid #aaa;
+    margin:{
+      top:0;
+      bottom:20px;
+    }
+    line-height:100%;
+
+    a{
+      float:right;
+      color: #000;
+    }
+
+  }
+}
+
+/* Bottom syles */
+#bottombar {
+  margin-bottom: 0;
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  pointer-events: none;
+  button {
+    height: 50px;
+    width: 50px;
+    float: right;
+    margin: 10px;
+    font-size: 200%;
+    padding: 0;
+    pointer-events: auto;
+  }
+}
+
+/* Graph styles */
+.node {
+  cursor: pointer;
+
+  circle {
+    fill: lightblue;
+    stroke: steelblue;
+    stroke-width: 3px;
+  }
+
+  text {
+    font: 10px sans-serif;
+    pointer-events: none;
+    fill: #000;
+    &.shadow {
+      stroke: #fff;
+      stroke-width: 3px;
+      stroke-opacity: .8;
+    }
+  }
+}
+
+.lane {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+  cursor: pointer;
+}
+
+.clickablelink {
+  fill: none;
+  cursor: pointer;
+}
+
+/* Accordion styles */
+.accordion dd > .content {
+  padding:0;
+
+  table{
+    width:100%;
+  }
+
+  p{
+    margin:10px;
+    font-size:0.9em;
+    line-height:1.3em;
+    text-align:justify;
+  }
+
+}
+
+/* Form */
+.error-message {
+  color: red;
+}
+
+.links-container {
+  width: 100%;
+  height: 100px;
+  overflow: scroll;
+  border: 1px solid;
+  margin-left: 0px;
+}
+
+.right {
+  float: right;
+}
+
+.links-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.links-container::-webkit-scrollbar-thumb {
+  background: grey;
+}
+.links-container::-webkit-scrollbar:horizontal:corner-present {
+  border-right-width: 0;
+}
+
+ul.links {
+  display: inline-block;
+  list-style-type: none;
+  border: 1px solid #808080;
+  border-bottom: none;
+}
+
+ul.links li {
+  display: block;
+  text-align: left;
+  background: white;
+  width: 400px;
+  min-height: 31px;
+  line-height:31px;
+  list-style-type: none;
+  border-bottom: 1px solid #808080;
+  padding: 0;
+  margin: 0;
+}
+
+//::-webkit-scrollbar {
+//  width: 14px;
+//  height: 6px;
+//}
+
+::-webkit-scrollbar:horizontal {
+  display: none;
+}
+
+/* Custom font styles */
+@font-face {
+  font-family: 'msg';
+  src: url('../assets/fonts/msg/msg.eot?80406286');
+  src: url('../assets/fonts/msg/msg.eot?80406286#iefix') format('embedded-opentype'),
+  url('../assets/fonts/msg/msg.woff?80406286') format('woff'),
+  url('../assets/fonts/msg/msg.ttf?80406286') format('truetype'),
+  url('../assets/fonts/msg/msg.svg?80406286#msg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'msg';
+    src: url('../font/msg.svg?80406286#msg') format('svg');
+  }
+}
+*/
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: "msg";
+  font-style: normal;
+  font-weight: normal;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-angle-double-left:before { content: '\e800'; } /* '' */
+.icon-angle-double-right:before { content: '\e801'; } /* '' */
+.icon-angle-double-up:before { content: '\e802'; } /* '' */
+.icon-angle-double-down:before { content: '\e803'; } /* '' */
