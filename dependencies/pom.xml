@@ -252,7 +252,7 @@
                 <version>0.0.26</version>
                 <configuration>
                     <workingDirectory>src/main/angular-ui</workingDirectory>
-                    <installDirectory>/fast/applications/nodeJS/</installDirectory>
+                    <installDirectory>../../../../../../../../nodeJS/</installDirectory>
                 </configuration>
                 <executions>
      <!--               <execution>
