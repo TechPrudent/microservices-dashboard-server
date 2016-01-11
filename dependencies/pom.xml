@@ -252,7 +252,7 @@
                 <version>0.0.26</version>
                 <configuration>
                     <workingDirectory>src/main/angular-ui</workingDirectory>
-                    <installDirectory>/fast/applications/nodejsPrivate/node-v0.12.0-linux-x64/</installDirectory>
+                    <installDirectory>/fast/applications/nodeJS/</installDirectory>
                 </configuration>
                 <executions>
      <!--               <execution>
