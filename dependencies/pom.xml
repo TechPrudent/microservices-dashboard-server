@@ -105,7 +105,8 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-client</artifactId>
         </dependency>
-        <!-- TEST -->
+
+             <!-- TEST -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
@@ -251,12 +252,10 @@
                 <version>0.0.26</version>
                 <configuration>
                     <workingDirectory>src/main/angular-ui</workingDirectory>
-                    <!--      <installDirectory>target</installDirectory> -->
+                    <installDirectory>/fast/applications/nodejsPrivate/node-v0.12.0-linux-x64/</installDirectory>
                 </configuration>
                 <executions>
-                    <execution>
-                        <!-- optional: you don't really need execution ids,
-                        but it looks nice in your build log. -->
+     <!--               <execution>
                         <id>install node and npm</id>
                         <goals>
                             <goal>install-node-and-npm</goal>
@@ -265,16 +264,14 @@
                             <nodeVersion>v0.12.7</nodeVersion>
                             <npmVersion>3.5.0</npmVersion>
                         </configuration>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <phase>generate-resources</phase>
+                    <phase>generate-resources</phase>
                     </execution>
                     <execution>
                         <id>npm install</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <!-- optional: default phase is "generate-resources" -->
-                        <phase>generate-resources</phase>
+                       <phase>generate-resources</phase>
                         <configuration>
                             <arguments>install</arguments>
                             <arguments>set loglevel info</arguments>
@@ -288,7 +285,7 @@
                         <configuration>
                             <arguments>install bower</arguments>
                         </configuration>
-                    </execution>
+                    </execution> -->
                     <execution>
                         <id>bower install</id>
                         <goals>

@@ -43,5 +43,4 @@ public class Application extends WebMvcConfigurerAdapter {
 	public CommonAnnotationBeanPostProcessor commonAnnotationBeanPostProcessor() {
 		return new CommonAnnotationBeanPostProcessor();
 	}
-
 }

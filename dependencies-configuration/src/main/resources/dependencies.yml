@@ -24,7 +24,8 @@ spring:
   redis:
       host: el2604.bc
       port: 6379
-
+#  cache:
+#    cache-names: dependenciesGraphResourceCache,dependenciesResourceCache
 # Microservices
 admin:
   url: http://localhost:8085
@@ -34,7 +35,5 @@ eureka:
     serviceUrl:
       defaultZone: http://esrvj6d1.web.bc:22141/serviceregistry/eureka/
 
-infinispan:
-  config: dependencies-infinispan.xml
-
-
+#infinispan:
+#  config: dependencies-infinispan.xml
