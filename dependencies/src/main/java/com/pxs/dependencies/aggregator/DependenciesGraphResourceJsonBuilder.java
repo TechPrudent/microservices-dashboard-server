@@ -75,12 +75,11 @@ public class DependenciesGraphResourceJsonBuilder {
 				int dependencyNodeId = findDependencyNode(dependencyEntrySet.getKey(), nodes);
 				if (dependencyNodeId == -1) {
 					Integer lane = 0;
-					System.out.println("OOOOOOOOOOOOOOOOOOOOO  "+ dependencyEntrySet.getValue());
+					System.out.println("OOOOOOOOOOOOOOOOOOOOO  " + dependencyEntrySet.getValue());
 					if (dependencyEntrySet.getValue() instanceof Node) {
 						lane = determineLane(((Node) dependencyEntrySet.getValue()).getDetails());
 						nodes.add(createNode(dependencyEntrySet.getKey(), lane, ((Node) dependencyEntrySet.getValue()).getDetails()));
 					}
-
 
 					dependencyNodeId = nodes.size() - 1;
 				}
@@ -115,19 +114,18 @@ public class DependenciesGraphResourceJsonBuilder {
 		for (Map.Entry<String, Object> detail : microservice.entrySet()) {
 			if (!(detail.getValue() instanceof Node)) {
 				details.put(detail.getKey(), detail.getValue());
-				details.remove(detail.getKey());
 			}
 		}
-		System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnnnnnn  "+ details);
+		System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnnnnnn  " + details);
 		Integer lane = determineLane(details);
 		return createNode(microServicename, lane, details);
 	}
 
-	private Map<String, Object> createNode(final String id, final Integer lane, Map<String,Object> details) {
+	private Map<String, Object> createNode(final String id, final Integer lane, Map<String, Object> details) {
 		Map<String, Object> node = new HashMap<>();
 		node.put(ID, id);
 		node.put(LANE, lane);
-		node.put(DETAILS,details);
+		node.put(DETAILS, details);
 		return node;
 	}
 

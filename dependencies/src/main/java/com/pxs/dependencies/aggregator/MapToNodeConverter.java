@@ -19,7 +19,10 @@ public class MapToNodeConverter {
 
 	public Node convert(final Map<String, Object> source) {
 		if (source.containsKey(STATUS)) {
-			return convertMapToNode(source);
+			Node node = convertMapToNode(source);
+			Map<String, Object> details = node.getDetails();
+			details.put(TYPE, MICROSERVICE);
+			return node;
 		} else {
 			throw new IllegalStateException("Health deserialization fails because no status was found at the root");
 		}
@@ -29,9 +32,6 @@ public class MapToNodeConverter {
 		Node node = new Node();
 		Map<String, Object> ownDetails = new HashMap<>();
 		ownDetails.put(STATUS, source.get(STATUS));
-//		if (!source.containsKey(TYPE)) {
-//			ownDetails.put(TYPE, MICROSERVICE);
-//		}
 		node.setDetails(ownDetails);
 		for (String key : source.keySet()) {
 			if (!STATUS.equals(key)) {
@@ -44,20 +44,6 @@ public class MapToNodeConverter {
 			}
 		}
 		return node;
-	}
-
-	private void addOwnDetails(Map<String, Object> ownDetails, final Map<String, Object> source) {
-		ownDetails.put(STATUS, source.get(STATUS));
-		if (source.get(VERSION) != null) {
-			ownDetails.put(STATUS, source.get(VERSION));
-		}
-		if (source.get(GROUP) != null) {
-			ownDetails.put(GROUP, source.get(GROUP));
-		}
-		if (source.get(VERSION) != null) {
-			ownDetails.put(STATUS, source.get(VERSION));
-		}
-		ownDetails.put(TYPE, source.get(TYPE != null ? source.get(TYPE) : MICROSERVICE));
 	}
 }
 

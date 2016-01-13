@@ -18,14 +18,13 @@ public class VirtualDependenciesConverter {
 
 	public Map<String, Map<String, Object>> convert(final Map<String, Node> virtualDependencies) {
 		Map<String, Map<String, Object>> resultingDependencies = new HashMap<>();
-
+		System.out.println("----------- virtual dependencies" + virtualDependencies);
 		for (Map.Entry<String, Node> nodeEntry : virtualDependencies.entrySet()) {
 			String virtualDependencyName = nodeEntry.getKey();
 			Node virtualDependencyValue = nodeEntry.getValue();
 			Map<String, Object> internalDependenciesMap = new HashMap<>();
 			for (Node node : virtualDependencyValue.getLinkednodes()) {
-				String id = node.getId();
-				addHealth(id, internalDependenciesMap, node);
+				 internalDependenciesMap.put(node.getId(),node);
 			}
 			addHealth(OWN_HEALTH, internalDependenciesMap, virtualDependencyValue);
 			resultingDependencies.put(virtualDependencyName, internalDependenciesMap);
