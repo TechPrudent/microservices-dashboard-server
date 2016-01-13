@@ -75,7 +75,6 @@ public class DependenciesGraphResourceJsonBuilder {
 				int dependencyNodeId = findDependencyNode(dependencyEntrySet.getKey(), nodes);
 				if (dependencyNodeId == -1) {
 					Integer lane = 0;
-					System.out.println("OOOOOOOOOOOOOOOOOOOOO  " + dependencyEntrySet.getValue());
 					if (dependencyEntrySet.getValue() instanceof Node) {
 						lane = determineLane(((Node) dependencyEntrySet.getValue()).getDetails());
 						nodes.add(createNode(dependencyEntrySet.getKey(), lane, ((Node) dependencyEntrySet.getValue()).getDetails()));
@@ -116,7 +115,6 @@ public class DependenciesGraphResourceJsonBuilder {
 				details.put(detail.getKey(), detail.getValue());
 			}
 		}
-		System.out.println("nnnnnnnnnnnnnnnnnnnnnnnnnnnnn  " + details);
 		Integer lane = determineLane(details);
 		return createNode(microServicename, lane, details);
 	}

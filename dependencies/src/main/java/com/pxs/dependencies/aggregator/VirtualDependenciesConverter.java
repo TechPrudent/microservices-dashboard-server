@@ -18,7 +18,6 @@ public class VirtualDependenciesConverter {
 
 	public Map<String, Map<String, Object>> convert(final Map<String, Node> virtualDependencies) {
 		Map<String, Map<String, Object>> resultingDependencies = new HashMap<>();
-		System.out.println("----------- virtual dependencies" + virtualDependencies);
 		for (Map.Entry<String, Node> nodeEntry : virtualDependencies.entrySet()) {
 			String virtualDependencyName = nodeEntry.getKey();
 			Node virtualDependencyValue = nodeEntry.getValue();
@@ -26,18 +25,16 @@ public class VirtualDependenciesConverter {
 			for (Node node : virtualDependencyValue.getLinkednodes()) {
 				 internalDependenciesMap.put(node.getId(),node);
 			}
-			addHealth(OWN_HEALTH, internalDependenciesMap, virtualDependencyValue);
 			resultingDependencies.put(virtualDependencyName, internalDependenciesMap);
+			addOwnDetails(internalDependenciesMap, virtualDependencyValue);
 		}
 		return resultingDependencies;
 	}
 
-	private void addHealth(final String key, final Map<String, Object> backendTransformedMap, final Node microserviceValue) {
+	private void addOwnDetails(final Map<String, Object> internalDependenciesMap, final Node microserviceValue) {
 		Map<String, Object> details = microserviceValue.getDetails();
-		Health.Builder builder = Health.unknown();
 		for (Map.Entry<String, Object> entry : details.entrySet()) {
-			builder.withDetail(entry.getKey(), entry.getValue());
+			internalDependenciesMap.put(entry.getKey(), entry.getValue());
 		}
-		backendTransformedMap.put(key, builder.build());
 	}
 }

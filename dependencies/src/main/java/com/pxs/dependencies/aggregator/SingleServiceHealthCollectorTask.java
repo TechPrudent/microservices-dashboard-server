@@ -83,7 +83,6 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}
-		System.out.println("________________________" + nodeMap);
 		return nodeMap;
 	}
 
