@@ -26,6 +26,7 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.pxs.dependencies.model.Node;
 
 public class SingleServiceHealthCollectorTask implements Callable<Map<String, Object>> {
 
@@ -36,12 +37,14 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 	private MapToHealthConverter mapToHealthConverter;
 	private final static String GATEWAY = "";
 	private final static String HEALTH = "health";
+	private MapToNodeConverter mapToNodeConverter;
 
 	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest) {
 		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost);
 		dependenciesPredicate = new DependenciesPredicate();
 		toolboxDependenciesTransformer = new ToolboxDependenciesTransformer();
 		mapToHealthConverter = new MapToHealthConverter();
+		mapToNodeConverter = new MapToNodeConverter();
 	}
 
 	private String buildHealthUri(final String serviceId, final int gatewayPort, final String gatewayHost) {
@@ -70,17 +73,18 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 				GET,
 				new HttpEntity<Map>(headers),
 				Map.class);
-		Health health = mapToHealthConverter.convert(responseRest.getBody());
-		Map<String, Object> healthMap = health.getDetails();
-		healthMap = filterEntries(healthMap, dependenciesPredicate);
-		healthMap = transformEntries(healthMap, toolboxDependenciesTransformer);
+		Node node = mapToNodeConverter.convert(responseRest.getBody());
+
+		Map<String, Object> nodeMap = node.getDetails();
+		nodeMap = filterEntries(nodeMap, dependenciesPredicate);
+		nodeMap = transformEntries(nodeMap, toolboxDependenciesTransformer);
+
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}
-		Map<String, Object> healthMapCopy = copyMap(healthMap);
-		addOwnHealth(healthMapCopy, health);
-		return healthMapCopy;
+		System.out.println("________________________" + nodeMap);
+		return nodeMap;
 	}
 
 	@VisibleForTesting
@@ -100,26 +104,26 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 		return restTemplate;
 	}
 
-	private void addOwnHealth(final Map<String, Object> healthMap, final Health health) {
-		Health.Builder ownHealth = Health.status(health.getStatus());
-		if (health.getDetails().get(VERSION) != null) {
-			ownHealth.withDetail(VERSION, health.getDetails().get(VERSION));
-		}
-		ownHealth.withDetail(TYPE, health.getDetails().get(TYPE) != null ? health.getDetails().get(TYPE) : MICROSERVICE);
-		if (health.getDetails().get(NAME) != null) {
-			ownHealth.withDetail(NAME, health.getDetails().get(NAME));
-		}
-		if (health.getDetails().get(GROUP) != null) {
-			ownHealth.withDetail(GROUP, health.getDetails().get(GROUP));
-		}
-		healthMap.put(OWN_HEALTH, ownHealth.build());
-	}
-
-	private Map<String, Object> copyMap(Map<String, Object> healthMap) {
-		Map<String, Object> copy = new HashMap<>();
-		for (Map.Entry<String, Object> entry : healthMap.entrySet()) {
-			copy.put(entry.getKey(), entry.getValue());
-		}
-		return copy;
-	}
+//	private void addOwnHealth(final Map<String, Object> healthMap, final Health health) {
+//		Health.Builder ownHealth = Health.status(health.getStatus());
+//		if (health.getDetails().get(VERSION) != null) {
+//			ownHealth.withDetail(VERSION, health.getDetails().get(VERSION));
+//		}
+//		ownHealth.withDetail(TYPE, health.getDetails().get(TYPE) != null ? health.getDetails().get(TYPE) : MICROSERVICE);
+//		if (health.getDetails().get(NAME) != null) {
+//			ownHealth.withDetail(NAME, health.getDetails().get(NAME));
+//		}
+//		if (health.getDetails().get(GROUP) != null) {
+//			ownHealth.withDetail(GROUP, health.getDetails().get(GROUP));
+//		}
+//		healthMap.put(OWN_HEALTH, ownHealth.build());
+//	}
+//
+//	private Map<String, Object> copyMap(Map<String, Object> healthMap) {
+//		Map<String, Object> copy = new HashMap<>();
+//		for (Map.Entry<String, Object> entry : healthMap.entrySet()) {
+//			copy.put(entry.getKey(), entry.getValue());
+//		}
+//		return copy;
+//	}
 }

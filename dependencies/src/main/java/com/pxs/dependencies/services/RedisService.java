@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,9 @@ public class RedisService {
 
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
+
+	@Autowired
+	private RedisConnectionFactory redisConnectionFactory;
 
 	public Map<String, Node> getAllNodes(){
 		Map<String, Node> results = new HashMap<>();
@@ -48,5 +53,9 @@ public class RedisService {
 		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
 		Node node = converter.convert(nodeData);
 		return node.getId();
+	}
+
+	public void flushDB(){
+		redisConnectionFactory.getConnection().flushDb();
 	}
 }

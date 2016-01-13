@@ -15,23 +15,18 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Health.Builder;
 
 import com.google.common.collect.Maps.EntryTransformer;
+import com.pxs.dependencies.model.Node;
 
 public class ToolboxDependenciesTransformer implements EntryTransformer<String, Object, Object> {
 
 	@Override
 	public Object transformEntry(final String key, final Object value) {
 		if (DISCOVERY.equals(key) || CONFIGSERVER.equals(key)) {
-			Health originalHealth = (Health) value;
+			Node originalHealth = (Node) value;
 			Map<String, Object> details = originalHealth.getDetails();
-			Builder enrichedHealth = status(originalHealth.getStatus());
-			for (String detailKey : details.keySet()) {
-				enrichedHealth.withDetail(detailKey, details.get(detailKey));
-			}
-			enrichedHealth.withDetail(TYPE, MICROSERVICE);
-			enrichedHealth.withDetail(GROUP, TOOLBOX);
-			return enrichedHealth.build();
+			details.put(TYPE, MICROSERVICE);
+			details.put(GROUP, TOOLBOX);
 		}
 		return value;
 	}
-
 }

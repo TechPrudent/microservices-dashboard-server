@@ -16,6 +16,7 @@ public class MapToHealthConverter implements Converter<Map<String, Object>, Heal
 
 	@Override
 	public Health convert(final Map<String, Object> source) {
+		System.out.println("****************************" + source);
 		if (source.containsKey(STATUS)) {
 			return convertMapToHealth(source);
 		} else {

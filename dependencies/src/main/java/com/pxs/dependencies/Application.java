@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -43,4 +45,11 @@ public class Application extends WebMvcConfigurerAdapter {
 	public CommonAnnotationBeanPostProcessor commonAnnotationBeanPostProcessor() {
 		return new CommonAnnotationBeanPostProcessor();
 	}
+
+//	@Bean
+//	RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//		redisTemplate.setConnectionFactory(redisConnectionFactory);
+//		return redisTemplate;
+//	}
 }

@@ -44,6 +44,7 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Map<String, O
 			}
 		}
 		LOG.debug("Finished fetching combined dependencies");
+		System.out.println("+++++++++++++++++++++++++++  "+ aggregatedDependencies);
 		return aggregatedDependencies;
 	}
 

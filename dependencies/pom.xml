@@ -63,6 +63,8 @@
             <scope>compile</scope>
         </dependency>
         <!-- SPRING -->
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -80,6 +82,18 @@
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <!-- SPRING CLOUD -->
         <dependency>
@@ -105,8 +119,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-client</artifactId>
         </dependency>
-
-             <!-- TEST -->
+                   <!-- TEST -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
@@ -167,7 +180,7 @@
         <dependency>
             <groupId>com.pxs.microservices.common</groupId>
             <artifactId>utilities</artifactId>
-            <version>1.15.0</version>
+            <version>1.31.0</version>
         </dependency>
         <dependency>
             <groupId>com.pxs.microservices.common</groupId>
@@ -193,14 +206,9 @@
             <version>2.9.1</version>
         </dependency>
         <dependency>
-            <groupId>com.netflix.rxjava</groupId>
-            <artifactId>rxjava-core</artifactId>
-            <version>0.20.7</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.5.0</version>
+
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -211,6 +219,11 @@
             <groupId>com.github.eirslett</groupId>
             <artifactId>frontend-maven-plugin</artifactId>
             <version>0.0.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20140107</version>
         </dependency>
 
     </dependencies>
@@ -252,7 +265,7 @@
                 <version>0.0.26</version>
                 <configuration>
                     <workingDirectory>src/main/angular-ui</workingDirectory>
-                    <installDirectory>../../../../../../../../nodeJS/</installDirectory>
+         <!--           <installDirectory>/fast/applications/nodeJS/</installDirectory> -->
                 </configuration>
                 <executions>
      <!--               <execution>
