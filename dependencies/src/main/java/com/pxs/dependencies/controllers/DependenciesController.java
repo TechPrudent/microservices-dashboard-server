@@ -56,4 +56,9 @@ public class DependenciesController {
 	public void deleteAllNodes() {
 		redisService.deleteAllNodes();
 	}
+
+	@RequestMapping(value = "/flush", method = DELETE)
+	public void flushAll() {
+		redisService.flushDB();
+	}
 }
