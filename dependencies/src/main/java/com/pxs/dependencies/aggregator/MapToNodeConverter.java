@@ -30,20 +30,28 @@ public class MapToNodeConverter {
 
 	private Node convertMapToNode(final Map<String, Object> source) {
 		Node node = new Node();
-		Map<String, Object> ownDetails = new HashMap<>();
+		Map<String, Object> ownDetails = node.getDetails();
 		ownDetails.put(STATUS, source.get(STATUS));
-		node.setDetails(ownDetails);
 		for (String key : source.keySet()) {
 			if (!STATUS.equals(key)) {
 				Object nested = source.get(key);
 				if (nested instanceof Map && ((Map) nested).containsKey(STATUS)) {
-					ownDetails.put(key, convertMapToNode((Map<String, Object>) source.get(key)));
+					Node nestedNode = new Node();
+					nestedNode.setId(key);
+					copyDetails((Map<String, Object>) source.get(key), nestedNode.getDetails());
+					node.getLinkedNodes().add(nestedNode);
 				} else {
 					ownDetails.put(key, source.get(key));
 				}
 			}
 		}
 		return node;
+	}
+
+	private void copyDetails(Map<String, Object> source, Map<String, Object> target) {
+		for (Map.Entry<String, Object> sourceEntry : source.entrySet()) {
+			target.put(sourceEntry.getKey(), sourceEntry.getValue());
+		}
 	}
 }
 

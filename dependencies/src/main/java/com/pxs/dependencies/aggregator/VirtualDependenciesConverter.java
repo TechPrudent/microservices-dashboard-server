@@ -1,15 +1,9 @@
 package com.pxs.dependencies.aggregator;
 
-import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
-import static com.pxs.dependencies.constants.Constants.OWN_HEALTH;
-import static com.pxs.dependencies.constants.Constants.TYPE;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import com.pxs.dependencies.model.Node;
 
@@ -22,7 +16,7 @@ public class VirtualDependenciesConverter {
 			String virtualDependencyName = nodeEntry.getKey();
 			Node virtualDependencyValue = nodeEntry.getValue();
 			Map<String, Object> internalDependenciesMap = new HashMap<>();
-			for (Node node : virtualDependencyValue.getLinkednodes()) {
+			for (Node node : virtualDependencyValue.getLinkedNodes()) {
 				 internalDependenciesMap.put(node.getId(),node);
 			}
 			resultingDependencies.put(virtualDependencyName, internalDependenciesMap);
