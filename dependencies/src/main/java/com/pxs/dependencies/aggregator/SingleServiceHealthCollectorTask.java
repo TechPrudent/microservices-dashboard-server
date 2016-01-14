@@ -33,13 +33,10 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.pxs.dependencies.model.Node;
 
-public class SingleServiceHealthCollectorTask implements Callable<List<Node>> {
+public class SingleServiceHealthCollectorTask implements Callable<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SingleServiceHealthCollectorTask.class);
 	private final String uriString;
-//	private DependenciesPredicate dependenciesPredicate;
-//	private ToolboxDependenciesTransformer toolboxDependenciesTransformer;
-//	private MapToHealthConverter mapToHealthConverter;
 	private final static String GATEWAY = "";
 	private final static String HEALTH = "health";
 	private MapToNodeConverter mapToNodeConverter;
@@ -48,9 +45,6 @@ public class SingleServiceHealthCollectorTask implements Callable<List<Node>> {
 
 	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest) {
 		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost);
-//		dependenciesPredicate = new DependenciesPredicate();
-//		toolboxDependenciesTransformer = new ToolboxDependenciesTransformer();
-//		mapToHealthConverter = new MapToHealthConverter();
 		mapToNodeConverter = new MapToNodeConverter();
 		dependenciesListFilterPredicate = new DependenciesListFilterPredicate();
 		toolBoxDependenciesModifier = new ToolBoxDependenciesModifier();
@@ -69,7 +63,7 @@ public class SingleServiceHealthCollectorTask implements Callable<List<Node>> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public List<Node> call() throws Exception {
+	public Node call() throws Exception {
 		long startTime = 0;
 		if (LOG.isDebugEnabled()) {
 			startTime = new DateTime().getMillis();
@@ -86,16 +80,12 @@ public class SingleServiceHealthCollectorTask implements Callable<List<Node>> {
 		Collection<Node> nodeCollection = node.getLinkedNodes();
 		nodeCollection = Collections2.filter(nodeCollection, dependenciesListFilterPredicate);
 		nodeCollection = toolBoxDependenciesModifier.modify(nodeCollection);
-		System.out.println("lllllllllllllll" + nodeCollection);
-
-//		Map<String, Object> nodeMap = node.getDetails();
-//		nodeMap = filterEntries(nodeMap, dependenciesPredicate);
-//		nodeMap = transformEntries(nodeMap, toolboxDependenciesTransformer);
-		if (LOG.isDebugEnabled()) {
+		node.setLinkedNodes((List)nodeCollection);
+ 	if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}
-		return (List)nodeCollection;
+		return node;
 	}
 
 	@VisibleForTesting

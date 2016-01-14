@@ -14,5 +14,6 @@ public class Constants {
 	public static final String LANE ="lane";
 	public static final String ID = "id";
 	public static final String DETAILS = "details";
+	public static final String STATUS = "status";
 
 }

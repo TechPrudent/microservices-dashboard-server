@@ -1,5 +1,6 @@
 package com.pxs.dependencies.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,14 +25,15 @@ public class RedisService {
 	@Autowired
 	private RedisConnectionFactory redisConnectionFactory;
 
-	public Map<String, Node> getAllNodes(){
-		Map<String, Node> results = new HashMap<>();
+	public List<Node> getAllNodes() {
+		List<Node> results = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys("*");
 		for (String key : keys) {
 			String nodeString = redisTemplate.opsForValue().get(key);
 			JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
 			Node node = converter.convert(nodeString);
-			results.put(key, node);
+			node.setId(key);
+			results.add(node);
 		}
 		return results;
 	}
@@ -41,11 +43,11 @@ public class RedisService {
 		redisTemplate.opsForValue().set(nodeId, nodeData);
 	}
 
-	public void deleteNode(final String nodeId){
+	public void deleteNode(final String nodeId) {
 		redisTemplate.delete(nodeId);
 	}
 
-	public void deleteAllNodes(){
+	public void deleteAllNodes() {
 		redisTemplate.delete(redisTemplate.keys("*"));
 	}
 
@@ -55,7 +57,7 @@ public class RedisService {
 		return node.getId();
 	}
 
-	public void flushDB(){
+	public void flushDB() {
 		redisConnectionFactory.getConnection().flushDb();
 	}
 }

@@ -18,24 +18,24 @@ public class MapToNodeConverterTest {
 	private static final String STATUS = "status";
 
 	@Test
-	public void testConvert() throws Exception {
+	public void shouldConvertCorrectly() throws Exception {
 		System.out.println(getSourceMap());
 		MapToNodeConverter converter = new MapToNodeConverter();
 		Node result = converter.convert(getSourceMap());
 		System.out.println(result);
-//		Map<String, Object> details = result.getDetails();
-//		assertThat(details.get(STATUS)).isEqualTo("UP");
-//		assertThat(details.get("bciManageCustomerContact")).isInstanceOf(Node.class);
-//		Node bciNode = (Node) details.get("bciManageCustomerContact");
-//		assertThat(bciNode.getDetails().get(TYPE)).isEqualTo("SOAP");
-//		assertThat(bciNode.getDetails().get(VERSION)).isEqualTo("4.0");
-//		assertThat(bciNode.getDetails().get(GROUP)).isEqualTo("BCI");
-//		assertThat(bciNode.getDetails().get(STATUS)).isEqualTo("UP");
-//		Node cslNode = (Node) details.get("cslCustomer");
-//		assertThat(cslNode.getDetails().get(TYPE)).isEqualTo("SOAP");
-//		assertThat(cslNode.getDetails().get(VERSION)).isEqualTo("Customer 4.0 (since 2012 CRC03)");
-//		assertThat(cslNode.getDetails().get(GROUP)).isEqualTo("CSL");
-//		assertThat(cslNode.getDetails().get(STATUS)).isEqualTo("UP");
+		Map<String, Object> details = result.getDetails();
+		assertThat(details.get(STATUS)).isEqualTo("UP");
+		assertThat(details.get(TYPE)).isEqualTo(MICROSERVICE);
+		Node bciNode = result.getLinkedNodes().get(0);
+		assertThat(bciNode.getDetails().get(TYPE)).isEqualTo("SOAP");
+		assertThat(bciNode.getDetails().get(VERSION)).isEqualTo("4.0");
+		assertThat(bciNode.getDetails().get(GROUP)).isEqualTo("BCI");
+		assertThat(bciNode.getDetails().get(STATUS)).isEqualTo("UP");
+		Node cslNode = result.getLinkedNodes().get(1);
+		assertThat(cslNode.getDetails().get(TYPE)).isEqualTo("SOAP");
+		assertThat(cslNode.getDetails().get(VERSION)).isEqualTo("Customer 4.0 (since 2012 CRC03)");
+		assertThat(cslNode.getDetails().get(GROUP)).isEqualTo("CSL");
+		assertThat(cslNode.getDetails().get(STATUS)).isEqualTo("UP");
 	}
 
 	private Map<String, Object> getSourceMap() {

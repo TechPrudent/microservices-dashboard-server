@@ -5,20 +5,17 @@ import static com.pxs.dependencies.constants.Constants.DETAILS;
 import static com.pxs.dependencies.constants.Constants.ID;
 import static com.pxs.dependencies.constants.Constants.LANE;
 import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
-import static com.pxs.dependencies.constants.Constants.OWN_HEALTH;
 import static com.pxs.dependencies.constants.Constants.TYPE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
 import com.pxs.dependencies.services.RedisService;
@@ -42,18 +39,16 @@ public class DependenciesGraphResourceJsonBuilder {
 	@Autowired
 	private RedisService redisService;
 
-	@Autowired
-	private VirtualDependenciesConverter virtualDependenciesConverter;
-
 	public Map<String, Object> build() {
-		Map<String, Map<String, Object>> dependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
-		Map<String, Node> virtualDependencies = redisService.getAllNodes();
-		dependencies.putAll(virtualDependenciesConverter.convert(virtualDependencies));
+		List<Node> dependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
+		List<Node> virtualDependencies = redisService.getAllNodes();
+		if (!virtualDependencies.isEmpty()) {
+			dependencies.addAll(virtualDependencies);
+		}
 		return createGraph(dependencies);
-
 	}
 
-	private Map<String, Object> createGraph(final Map<String, Map<String, Object>> dependencies) {
+	private Map<String, Object> createGraph(final List<Node> dependencies) {
 		Map<String, Object> graph = new HashMap<>();
 		graph.put(DIRECTED, true);
 		graph.put(MULTIGRAPH, false);
@@ -61,25 +56,21 @@ public class DependenciesGraphResourceJsonBuilder {
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		List<Map<String, Integer>> links = new ArrayList<>();
 
-		for (String microserviceName : dependencies.keySet()) {
-			Map<String, Object> microservice = dependencies.get(microserviceName);
-
+		for (Node microservice : dependencies) {
+			String microserviceName = microservice.getId();
 			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
 			if (!isNodeAlreadyThere(nodes, microserviceName)) {
 				nodes.add(microserviceNode);
 			}
 			int microserviceNodeId = nodes.size() - 1;
-			Set<Map.Entry<String, Object>> entries = microservice.entrySet();
-			removeEurecaDescription(entries);
-			for (Map.Entry<String, Object> dependencyEntrySet : entries) {
-				int dependencyNodeId = findDependencyNode(dependencyEntrySet.getKey(), nodes);
+			List<Node> dependencyNodes = microservice.getLinkedNodes();
+			removeEurekaDescription(dependencyNodes);
+			for (Node dependencyNode : dependencyNodes) {
+				int dependencyNodeId = findDependencyNode(dependencyNode.getId(), nodes);
 				if (dependencyNodeId == -1) {
-					Integer lane = 0;
-					if (dependencyEntrySet.getValue() instanceof Node) {
-						lane = determineLane(((Node) dependencyEntrySet.getValue()).getDetails());
-						nodes.add(createNode(dependencyEntrySet.getKey(), lane, ((Node) dependencyEntrySet.getValue()).getDetails()));
-					}
-
+					Integer lane;
+					lane = determineLane(dependencyNode.getDetails());
+					nodes.add(createNode(dependencyNode.getId(), lane, dependencyNode.getDetails()));
 					dependencyNodeId = nodes.size() - 1;
 				}
 				links.add(createLink(microserviceNodeId, dependencyNodeId));
@@ -92,7 +83,8 @@ public class DependenciesGraphResourceJsonBuilder {
 		return graph;
 	}
 
-	private Integer determineLane(Map<String, Object> details) {
+	@VisibleForTesting
+	Integer determineLane(Map<String, Object> details) {
 		if (Constants.MICROSERVICE.equals(details.get(TYPE))) {
 			return new Integer("2");
 		}
@@ -108,9 +100,10 @@ public class DependenciesGraphResourceJsonBuilder {
 		return -1;
 	}
 
-	private Map<String, Object> createMicroserviceNode(String microServicename, Map<String, Object> microservice) {
+	@VisibleForTesting
+	Map<String, Object> createMicroserviceNode(final String microServicename, final Node node) {
 		Map<String, Object> details = new HashMap<>();
-		for (Map.Entry<String, Object> detail : microservice.entrySet()) {
+		for (Map.Entry<String, Object> detail : node.getDetails().entrySet()) {
 			if (!(detail.getValue() instanceof Node)) {
 				details.put(detail.getKey(), detail.getValue());
 			}
@@ -150,10 +143,10 @@ public class DependenciesGraphResourceJsonBuilder {
 		return laneMap;
 	}
 
-	private void removeEurecaDescription(final Set<Map.Entry<String, Object>> entrySet) {
-		for (Map.Entry<String, Object> entry : entrySet) {
-			if (DESCRIPTION.equals(entry.getKey())) {
-				entrySet.remove(entry);
+	private void removeEurekaDescription(final List<Node> dependencyNodes) {
+		for (Node dependencyNode : dependencyNodes) {
+			if (DESCRIPTION.equals(dependencyNode.getId())) {
+				dependencyNodes.remove(dependencyNode);
 				break;
 			}
 		}
