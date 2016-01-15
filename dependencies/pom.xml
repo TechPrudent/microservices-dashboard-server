@@ -10,7 +10,7 @@
 
     <groupId>com.pxs.dependencies</groupId>
     <artifactId>dependencies</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>${artifact-packaging}</packaging>
 
     <scm>
