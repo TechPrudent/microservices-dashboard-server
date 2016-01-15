@@ -215,17 +215,6 @@
 
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/angular-ui/dist</directory>
-                <filtering>false</filtering>
-                <targetPath>static</targetPath>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
