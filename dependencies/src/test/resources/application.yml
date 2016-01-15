@@ -15,7 +15,7 @@ spring:
     default-domain: dependencies
   aop:
     proxyTargetClass: true
-    
+
 eureka:
   instance:
     appGroupName: microservices

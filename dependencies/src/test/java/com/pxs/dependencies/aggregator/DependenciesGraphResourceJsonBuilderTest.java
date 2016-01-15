@@ -3,6 +3,7 @@ package com.pxs.dependencies.aggregator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static com.pxs.dependencies.constants.Constants.*;
+import static com.pxs.dependencies.model.NodeBuilder.node;
 
 import static org.mockito.Mockito.doReturn;
 
@@ -22,8 +23,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.boot.actuate.health.Health;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.pxs.dependencies.model.Node;
+import com.pxs.dependencies.model.NodeBuilder;
 import com.pxs.dependencies.services.RedisService;
+import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DependenciesGraphResourceJsonBuilderTest {
@@ -40,51 +44,54 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@Mock
 	private RedisService redisService;
 
-	private Health microserviceHealth;
+	private Map<String, Object> microserviceDetails;
 
-	private Health backendHealth;
+	private Map<String, Object> backendDetails;
 
-	private Health ownHealth;
 
 	@Before
 	public void init() {
-		microserviceHealth = Health.unknown().withDetail("type", MICROSERVICE).build();
-		backendHealth = Health.unknown().withDetail("type", "SOAP").build();
-		ownHealth = Health.unknown().withDetail("type", MICROSERVICE).build();
+		microserviceDetails = new HashMap<>();
+		microserviceDetails.put()
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
-		Node outerNodeKey1 = new Node();
+		List<Node> dependencies = Lists.newArrayList(
+				node().withId("key1")
+						.withDetail("type", MICROSERVICE)
+						.withDetail(STATUS, "UP")
+						.withLinkedNode(node().withId("1a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("1b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("1c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.build(),
 
+				node().withId("key2")
+						.withDetail("type", MICROSERVICE)
+						.withDetail(STATUS, "UP")
+						.withLinkedNode(node().withId("2a").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
+						.withLinkedNode(node().withId("2b").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
+						.withLinkedNode(node().withId("2c").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
+						.build(),
+				node().withId("key3")
+						.withDetail("type", MICROSERVICE)
+						.withDetail(STATUS, "UP")
+						.withLinkedNode(node().withId("3a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("3b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.build()
+		);
 
-		//		Map<String, Map<String, Object>> map = new HashMap<>();
-		//		Map<String, Object> innermap1 = new HashMap<>();
-		//		innermap1.put("1a", microserviceHealth);
-		//		innermap1.put("1b", microserviceHealth);
-		//		innermap1.put("1c", microserviceHealth);
-		//		innermap1.put(OWN_HEALTH, ownHealth);
-		//		Map<String, Object> innermap2 = new HashMap<>();
-		//		innermap2.put("2a", backendHealth);
-		//		innermap2.put("2b", backendHealth);
-		//		innermap2.put("2c", backendHealth);
-		//		innermap2.put(OWN_HEALTH, ownHealth);
-		//		Map<String, Object> innermap3 = new HashMap<>();
-		//		innermap3.put("3a", backendHealth);
-		//		innermap3.put("3b", backendHealth);
-		//		innermap3.put("3c", backendHealth);
-		//		innermap3.put(OWN_HEALTH, ownHealth);
-		//		map.put("key1", innermap1);
-		//		map.put("key2", innermap2);
-		//		map.put("key3", innermap3);
-		//
-		//		doReturn(map).when(healthIndicatorsAggregator).fetchCombinedDependencies();
-		//
-		//		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();
-		//		assertThat(((boolean) returnedMap.get("directed"))).isEqualTo(true);
-		//		assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
-		//		assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
+		doReturn(serializeResponse(dependencies)).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+
+		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();
+
+		assertThat(((boolean) returnedMap.get("directed"))).isEqualTo(true);
+				assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
+				assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
+
 		//
 		//		List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
 		//		System.out.println(expectedNodeList);
@@ -93,10 +100,9 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		//
 		//		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
 		//
-		//		List<Map<String, Integer>> expectedLinks = getExpectedLinks();
-		//		List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
-		//
-		//		assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
+				List<Map<String, Integer>> expectedLinks = getExpectedLinks();
+				List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
+				assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
 
 	}
 
@@ -112,13 +118,13 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@Test
 	public void shouldCreateCorrectNode() {
 		Node node = new Node();
-		node.getDetails().put(STATUS,"UP");
+		node.getDetails().put(STATUS, "UP");
 		node.getDetails().put(TYPE, MICROSERVICE);
 		Map<String, Object> microserviceNode = dependenciesGraphResourceJsonBuilder.createMicroserviceNode("Awards", node);
 		assertThat(microserviceNode.get(ID)).isEqualTo("Awards");
 		assertThat(microserviceNode.get(LANE)).isEqualTo(2);
-		assertThat(((Map<String, Object>)microserviceNode.get(DETAILS)).get(STATUS)).isEqualTo("UP");
-		assertThat(((Map<String, Object>)microserviceNode.get(DETAILS)).get(TYPE)).isEqualTo(MICROSERVICE);
+		assertThat(((Map<String, Object>) microserviceNode.get(DETAILS)).get(STATUS)).isEqualTo("UP");
+		assertThat(((Map<String, Object>) microserviceNode.get(DETAILS)).get(TYPE)).isEqualTo(MICROSERVICE);
 	}
 
 	private List<Map<String, Object>> getExpectedNodesList() {
@@ -225,5 +231,10 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		expectedLinks.add(link8);
 		expectedLinks.add(link9);
 		return expectedLinks;
+	}
+
+	private String serializeResponse(List<Node> nodes) {
+		ObjectToJsonConverter<List<Node>> serializer = new ObjectToJsonConverter<>();
+		return serializer.convert(nodes);
 	}
 }

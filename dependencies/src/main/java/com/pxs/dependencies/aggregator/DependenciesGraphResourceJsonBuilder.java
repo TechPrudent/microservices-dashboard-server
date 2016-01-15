@@ -7,6 +7,7 @@ import static com.pxs.dependencies.constants.Constants.LANE;
 import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
 import static com.pxs.dependencies.constants.Constants.TYPE;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
@@ -40,11 +43,12 @@ public class DependenciesGraphResourceJsonBuilder {
 	private RedisService redisService;
 
 	public Map<String, Object> build() {
-		List<Node> dependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
-		List<Node> virtualDependencies = redisService.getAllNodes();
-		if (!virtualDependencies.isEmpty()) {
-			dependencies.addAll(virtualDependencies);
-		}
+		String jsonDependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
+		List<Node> dependencies = deserializeResponse(jsonDependencies);
+//		List<Node> virtualDependencies = redisService.getAllNodes();
+//		if (!virtualDependencies.isEmpty()) {
+//			dependencies.addAll(virtualDependencies);
+//		}
 		return createGraph(dependencies);
 	}
 
@@ -159,5 +163,16 @@ public class DependenciesGraphResourceJsonBuilder {
 			}
 		}
 		return false;
+	}
+
+	private List<Node> deserializeResponse(final String json) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			List<Node> deserializedList = mapper.readValue(json, new TypeReference<List<Node>>() {
+			});
+			return deserializedList;
+		} catch (IOException e) {
+			throw new IllegalArgumentException(json, e);
+		}
 	}
 }

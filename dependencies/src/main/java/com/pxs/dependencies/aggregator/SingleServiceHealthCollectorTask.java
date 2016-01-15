@@ -2,14 +2,7 @@ package com.pxs.dependencies.aggregator;
 
 import static org.springframework.http.HttpMethod.GET;
 
-import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
-import static com.pxs.dependencies.constants.Constants.*;
-
-import static com.google.common.collect.Maps.filterEntries;
-import static com.google.common.collect.Maps.transformEntries;
-
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -19,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,7 +22,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import com.pxs.dependencies.model.Node;
 
 public class SingleServiceHealthCollectorTask implements Callable<Node> {
@@ -80,8 +71,8 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 		Collection<Node> nodeCollection = node.getLinkedNodes();
 		nodeCollection = Collections2.filter(nodeCollection, dependenciesListFilterPredicate);
 		nodeCollection = toolBoxDependenciesModifier.modify(nodeCollection);
-		node.setLinkedNodes((List)nodeCollection);
- 	if (LOG.isDebugEnabled()) {
+		node.setLinkedNodes((List) nodeCollection);
+		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}

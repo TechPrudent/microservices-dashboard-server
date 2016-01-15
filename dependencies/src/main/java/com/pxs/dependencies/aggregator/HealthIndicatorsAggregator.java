@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.health.Health;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -34,10 +35,12 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 
 	private static final long TIMEOUT = 17000L;
 
-	public List<Node> fetchCombinedDependencies() {
+	private static final String GRAPH_CACHE_NAME = "buildAggregatedDependenciesListFromTaskResponses";
+
+	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	public String fetchCombinedDependencies() {
 		List<Node> taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
-		System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaa" + taskResponses);
-		return taskResponses;
+		return serializeResponse(taskResponses);
 	}
 
 	private List<Node> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Node>> tasks) {
@@ -55,11 +58,6 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 			}
 		}
 		LOG.debug("Finished fetching combined dependencies");
-		String serializeResponse = serializeResponse(nodes);
-		System.out.println(serializeResponse);
-
-		System.out.println(deserializeResponse(serializeResponse));
-
 		return nodes;
 	}
 
@@ -71,16 +69,5 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	private String serializeResponse(List<Node> nodes) {
 		ObjectToJsonConverter<List<Node>> serializer = new ObjectToJsonConverter<>();
 		return serializer.convert(nodes);
-	}
-
-	private List<Node> deserializeResponse(final String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			List<Node> deserializedList = mapper.readValue(json, new TypeReference<List<Node>>() {
-			});
-			return deserializedList;
-		} catch (IOException e) {
-			throw new IllegalArgumentException(json, e);
-		}
 	}
 }
