@@ -17,7 +17,7 @@
         <connection>scm:git:http://el2604.bc:8585/ms-toolbox/dependencies.git</connection>
         <developerConnection>scm:git:ssh://el2604.bc/ms-toolbox/dependencies.git</developerConnection>
         <url>http://el2604.bc:8585/ms-toolbox/dependencies.git/</url>
-        <tag>HEAD</tag>
+        <tag>dependencies-1.0.1</tag>
     </scm>
     <profiles>
         <profile>
