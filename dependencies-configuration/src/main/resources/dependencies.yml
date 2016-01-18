@@ -24,6 +24,8 @@ spring:
   redis:
       host: el2604.bc
       port: 6379
+      pool:
+        max-wait: 10000
 #  cache:
 #    cache-names: dependenciesGraphResourceCache,dependenciesResourceCache
 # Microservices

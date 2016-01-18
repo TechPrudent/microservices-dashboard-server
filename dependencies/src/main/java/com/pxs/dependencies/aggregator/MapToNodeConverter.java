@@ -39,6 +39,7 @@ public class MapToNodeConverter {
 					Node nestedNode = new Node();
 					nestedNode.setId(key);
 					copyDetails((Map<String, Object>) source.get(key), nestedNode.getDetails());
+					node.getLinkedNodes().add(nestedNode);
 //					node.getLinkedNodes().add(convertMapToNode((Map)nested));
 				} else {
 					ownDetails.put(key, source.get(key));

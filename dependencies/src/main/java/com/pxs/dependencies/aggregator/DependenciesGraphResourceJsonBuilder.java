@@ -45,10 +45,10 @@ public class DependenciesGraphResourceJsonBuilder {
 	public Map<String, Object> build() {
 		String jsonDependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
 		List<Node> dependencies = deserializeResponse(jsonDependencies);
-//		List<Node> virtualDependencies = redisService.getAllNodes();
-//		if (!virtualDependencies.isEmpty()) {
-//			dependencies.addAll(virtualDependencies);
-//		}
+		List<Node> virtualDependencies = redisService.getAllNodes();
+		if (!virtualDependencies.isEmpty()) {
+			dependencies.addAll(virtualDependencies);
+		}
 		return createGraph(dependencies);
 	}
 
