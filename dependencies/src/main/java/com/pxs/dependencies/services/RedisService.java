@@ -1,11 +1,14 @@
 package com.pxs.dependencies.services;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +22,18 @@ public class RedisService {
 	@Autowired
 	private RedisTemplate<String, String> redisTemplate;
 
-	public Map<String, Node> getAllNodes(){
-		Map<String, Node> results = new HashMap<>();
+	@Autowired
+	private RedisConnectionFactory redisConnectionFactory;
+
+	public List<Node> getAllNodes() {
+		List<Node> results = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys("*");
 		for (String key : keys) {
 			String nodeString = redisTemplate.opsForValue().get(key);
 			JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
 			Node node = converter.convert(nodeString);
-			results.put(key, node);
+			node.setId(key);
+			results.add(node);
 		}
 		return results;
 	}
@@ -36,11 +43,11 @@ public class RedisService {
 		redisTemplate.opsForValue().set(nodeId, nodeData);
 	}
 
-	public void deleteNode(final String nodeId){
+	public void deleteNode(final String nodeId) {
 		redisTemplate.delete(nodeId);
 	}
 
-	public void deleteAllNodes(){
+	public void deleteAllNodes() {
 		redisTemplate.delete(redisTemplate.keys("*"));
 	}
 
@@ -48,5 +55,9 @@ public class RedisService {
 		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
 		Node node = converter.convert(nodeData);
 		return node.getId();
+	}
+
+	public void flushDB() {
+		redisConnectionFactory.getConnection().flushDb();
 	}
 }

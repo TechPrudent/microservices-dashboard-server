@@ -5,6 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class DependenciesController {
 	}
 
 	@RequestMapping(value = "/table", produces = "application/json")
-	public HttpEntity<Map<String, Map<String, Object>>> getDependenciesJson() {
+	public HttpEntity<String> getDependenciesJson() {
 		return ok().body(dependenciesResourceService.getDependenciesResourceJson());
 	}
 
@@ -43,7 +44,7 @@ public class DependenciesController {
 	}
 
 	@RequestMapping(value = "/node", method = GET)
-	public Map<String, Node> getAllNodes() {
+	public List<Node> getAllNodes() {
 		return redisService.getAllNodes();
 	}
 
@@ -55,5 +56,10 @@ public class DependenciesController {
 	@RequestMapping(value = "/node", method = DELETE)
 	public void deleteAllNodes() {
 		redisService.deleteAllNodes();
+	}
+
+	@RequestMapping(value = "/flush", method = DELETE)
+	public void flushAll() {
+		redisService.flushDB();
 	}
 }

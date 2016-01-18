@@ -5,13 +5,17 @@ import static com.pxs.dependencies.constants.Constants.DETAILS;
 import static com.pxs.dependencies.constants.Constants.ID;
 import static com.pxs.dependencies.constants.Constants.LANE;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
 	@JsonProperty(ID)
 	private String id;
@@ -23,7 +27,7 @@ public class Node {
 	private Integer lane;
 
 	@JsonProperty("linkedNodes")
-	private List<Node> linkednodes;
+	private List<Node> linkedNodes;
 
 	public void setLane(Integer lane) {
 		this.lane = lane;
@@ -41,15 +45,21 @@ public class Node {
 		return id;
 	}
 
-	public List<Node> getLinkednodes() {
-		return linkednodes;
+	public List<Node> getLinkedNodes() {
+		if(linkedNodes ==null){
+			linkedNodes = new ArrayList<>();
+		}
+		return linkedNodes;
 	}
 
-	public void setLinkednodes(List<Node> linkednodes) {
-		this.linkednodes = linkednodes;
+	public void setLinkedNodes(List<Node> linkedNodes) {
+		this.linkedNodes = linkedNodes;
 	}
 
 	public Map<String, Object> getDetails() {
+		if(details==null){
+			details = new HashMap<>();
+		}
 		return details;
 	}
 
@@ -63,7 +73,7 @@ public class Node {
 				"details=" + details +
 				", id='" + id + '\'' +
 				", lane=" + lane +
-				", linkednodes=" + linkednodes +
+				", linkedNodes=" + linkedNodes +
 				'}';
 	}
 }

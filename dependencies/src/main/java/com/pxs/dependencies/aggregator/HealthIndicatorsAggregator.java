@@ -1,5 +1,7 @@
 package com.pxs.dependencies.aggregator;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,42 +16,58 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pxs.dependencies.model.Node;
+import com.pxs.utilities.converters.json.JsonToObjectConverter;
+import com.pxs.utilities.converters.json.ObjectToJsonConverter;
+
+import progress.message.util.ListNode;
+
 @Component
-public class HealthIndicatorsAggregator extends AbstractAggregator<Map<String, Object>> {
+public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private static final long TIMEOUT = 17000L;
 
-	public Map<String, Map<String, Object>> fetchCombinedDependencies() {
-		Map<String, Map<String, Object>> taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
-		return taskResponses;
+	private static final String GRAPH_CACHE_NAME = "buildAggregatedDependenciesListFromTaskResponses";
+
+	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	public String fetchCombinedDependencies() {
+		List<Node> taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
+		return serializeResponse(taskResponses);
 	}
 
-	private Map<String, Map<String, Object>> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Map<String, Object>>> tasks) {
-
-		final Map<String, Map<String, Object>> aggregatedDependencies = new LinkedHashMap<>();
-
-		for (FutureTask<Map<String, Object>> task : tasks) {
+	private List<Node> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Node>> tasks) {
+		List<Node> nodes = new ArrayList<>();
+		for (FutureTask<Node> task : tasks) {
 			String key = null;
 			try {
 				key = ((IdentifiableFutureTask) task).getId();
-				Map<String, Object> value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
+				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				LOG.debug("task {} is done {}", key, task.isDone());
-				aggregatedDependencies.put(key, value);
+				value.setId(key);
+				nodes.add(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.debug("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
 		}
 		LOG.debug("Finished fetching combined dependencies");
-		return aggregatedDependencies;
+		return nodes;
 	}
 
 	@Override
-	protected Callable<Map<String, Object>> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, final String serviceHost, final int servicePort) {
+	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, final String serviceHost, final int servicePort) {
 		return new SingleServiceHealthCollectorTask(serviceId, servicePort, serviceHost, originRequest);
 	}
 
+	private String serializeResponse(List<Node> nodes) {
+		ObjectToJsonConverter<List<Node>> serializer = new ObjectToJsonConverter<>();
+		return serializer.convert(nodes);
+	}
 }

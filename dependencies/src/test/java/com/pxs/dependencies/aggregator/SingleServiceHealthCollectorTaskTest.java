@@ -7,10 +7,12 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.boot.actuate.health.Health.unknown;
-import static org.springframework.boot.actuate.health.Health.up;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.pxs.dependencies.constants.Constants.GROUP;
+import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
+import static com.pxs.dependencies.constants.Constants.STATUS;
+import static com.pxs.dependencies.constants.Constants.TYPE;
+import static com.pxs.dependencies.constants.Constants.VERSION;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -23,12 +25,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import static com.pxs.dependencies.constants.Constants.*;
+
+import com.pxs.dependencies.model.Node;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SingleServiceHealthCollectorTaskTest {
@@ -39,8 +41,10 @@ public class SingleServiceHealthCollectorTaskTest {
 
 	@Mock
 	private ResponseEntity<Map> response;
+
 	@Mock
-	private MapToHealthConverter mapToHealthConverter;
+	private MapToNodeConverter mapToNodeConverter;
+
 	private RestTemplate restTemplate;
 
 	@Before
@@ -49,73 +53,45 @@ public class SingleServiceHealthCollectorTaskTest {
 		when(task.getRestTemplate()).thenReturn(restTemplate);
 		when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Map.class))).thenReturn(response);
 		when(response.getBody()).thenReturn(new HashMap());
-		when(mapToHealthConverter.convert(any(Map.class))).thenReturn(mockResponseEntity());
-	}
-
-	private Health mockResponseEntity() {
-		Health body = up()
-				.withDetail("bciManageCustomerContact", up()
-						.withDetail(VERSION, "4.0")
-						.withDetail(TYPE, "SOAP")
-						.withDetail(GROUP, "BCI")
-						.build())
-				.withDetail("cslCustomer", up()
-						.withDetail(VERSION, "Customer 4.0 (since 2012 CRC03)")
-						.withDetail(TYPE, "SOAP")
-						.withDetail(GROUP, "CSL")
-						.build())
-				.withDetail("cslEmployee", unknown()
-						.withDetail(VERSION, "4.0")
-						.withDetail(TYPE, "SOAP")
-						.withDetail(GROUP, "CSL")
-						.build())
-				.withDetail("imaIMAServices", up()
-						.withDetail(VERSION, "IMA SERVICES - Service Version 1.1")
-						.withDetail(TYPE, "SOAP")
-						.withDetail(GROUP, "IMA")
-						.build())
-				.withDetail("bciManageCustomerContact", up()
-						.withDetail(VERSION, "4.0")
-						.withDetail(TYPE, "SOAP")
-						.withDetail(GROUP, "BCI")
-						.build())
-				.withDetail("discovery", up()
-						.withDetail("description", "Spring Cloud Eureka Discovery Client")
-						.withDetail("discoveryClient", up()
-								.withDetail("description", "Spring Cloud Eureka Discovery Client")
-								.withDetail("services", new String[0])
-								.build())
-						.build())
-				.withDetail("diskSpace", up()
-						.withDetail("free", 165026881536L)
-						.withDetail("threshold", 10485760)
-						.build())
-				.withDetail("db", up()
-						.withDetail("buscDataSource", up()
-								.withDetail("database", "Oracle")
-								.withDetail("hello", "hello")
-								.build())
-						.withDetail("pdbDataSource", up()
-								.withDetail("database", "Oracle")
-								.withDetail("hello", "hello")
-								.build())
-						.build())
-				.withDetail("configServer", up()
-						.withDetail("propertySources", newArrayList("applicationConfig: [classpath:/application-loc-jboss.yml]",
-								"applicationConfig: [classpath:/application.yml]").toArray())
-						.build())
-				.withDetail("hystrix", up().build())
-				.build();
-		return body;
+		when(mapToNodeConverter.convert(any(Map.class))).thenReturn(mockResponseEntity());
 	}
 
 	@Test
 	public void unmarshallsHealths() throws Exception {
-		Map<String, Object> health = task.call();
-		assertThat(health.keySet()).contains(OWN_HEALTH,"bciManageCustomerContact",
-				"cslCustomer", "cslEmployee", "imaIMAServices", "discovery", "db", "configServer");
-		assertThat(((Health) health.get("configServer")).getDetails().keySet())
-				.containsExactly("propertySources", TYPE, GROUP);
-		assertThat(((Health) health.get(OWN_HEALTH)).getStatus().toString()).isEqualTo("UP");
+		Node node = task.call();
+		assertThat(node.getLinkedNodes().size()).isEqualTo(2);
+	}
+
+	private Node mockResponseEntity() {
+		Node node = new Node();
+		node.getDetails().put(STATUS, "UP");
+		node.getDetails().put(TYPE, MICROSERVICE);
+
+		Node bciNode = new Node();
+		bciNode.setId("bciManageCustomerContact");
+		bciNode.getDetails().put(STATUS, "UP");
+		bciNode.getDetails().put(VERSION, "4.0");
+		bciNode.getDetails().put(TYPE, "SOAP");
+		bciNode.getDetails().put(GROUP, "BCI");
+
+		Node cslNode = new Node();
+		cslNode.setId("cslCustomer");
+		cslNode.getDetails().put(STATUS, "UP");
+		cslNode.getDetails().put(VERSION, "Customer 4.0 (since 2012 CRC03)");
+		cslNode.getDetails().put(TYPE, "SOAP");
+		cslNode.getDetails().put(GROUP, "CSL");
+
+		Node diskSpaceNode = new Node();
+		diskSpaceNode.setId("diskSpace");
+		diskSpaceNode.getDetails().put(STATUS, "UP");
+		diskSpaceNode.getDetails().put("free", 165026881536L);
+		diskSpaceNode.getDetails().put("threshold", 10485760);
+		diskSpaceNode.getDetails().put(GROUP, "CSL");
+
+		node.getLinkedNodes().add(bciNode);
+		node.getLinkedNodes().add(cslNode);
+		node.getLinkedNodes().add(diskSpaceNode);
+
+		return node;
 	}
 }

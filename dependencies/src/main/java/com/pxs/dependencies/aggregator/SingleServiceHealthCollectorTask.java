@@ -1,13 +1,9 @@
 package com.pxs.dependencies.aggregator;
 
 import static org.springframework.http.HttpMethod.GET;
-import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
-import static com.pxs.dependencies.constants.Constants.*;
 
-import static com.google.common.collect.Maps.filterEntries;
-import static com.google.common.collect.Maps.transformEntries;
-
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -16,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,22 +21,24 @@ import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Collections2;
+import com.pxs.dependencies.model.Node;
 
-public class SingleServiceHealthCollectorTask implements Callable<Map<String, Object>> {
+public class SingleServiceHealthCollectorTask implements Callable<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SingleServiceHealthCollectorTask.class);
 	private final String uriString;
-	private DependenciesPredicate dependenciesPredicate;
-	private ToolboxDependenciesTransformer toolboxDependenciesTransformer;
-	private MapToHealthConverter mapToHealthConverter;
 	private final static String GATEWAY = "";
 	private final static String HEALTH = "health";
+	private MapToNodeConverter mapToNodeConverter;
+	private DependenciesListFilterPredicate dependenciesListFilterPredicate;
+	private ToolBoxDependenciesModifier toolBoxDependenciesModifier;
 
 	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest) {
 		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost);
-		dependenciesPredicate = new DependenciesPredicate();
-		toolboxDependenciesTransformer = new ToolboxDependenciesTransformer();
-		mapToHealthConverter = new MapToHealthConverter();
+		mapToNodeConverter = new MapToNodeConverter();
+		dependenciesListFilterPredicate = new DependenciesListFilterPredicate();
+		toolBoxDependenciesModifier = new ToolBoxDependenciesModifier();
 	}
 
 	private String buildHealthUri(final String serviceId, final int gatewayPort, final String gatewayHost) {
@@ -57,7 +54,7 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Map<String, Object> call() throws Exception {
+	public Node call() throws Exception {
 		long startTime = 0;
 		if (LOG.isDebugEnabled()) {
 			startTime = new DateTime().getMillis();
@@ -70,17 +67,16 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 				GET,
 				new HttpEntity<Map>(headers),
 				Map.class);
-		Health health = mapToHealthConverter.convert(responseRest.getBody());
-		Map<String, Object> healthMap = health.getDetails();
-		healthMap = filterEntries(healthMap, dependenciesPredicate);
-		healthMap = transformEntries(healthMap, toolboxDependenciesTransformer);
+		Node node = mapToNodeConverter.convert(responseRest.getBody());
+		Collection<Node> nodeCollection = node.getLinkedNodes();
+		nodeCollection = Collections2.filter(nodeCollection, dependenciesListFilterPredicate);
+		nodeCollection = toolBoxDependenciesModifier.modify(nodeCollection);
+		node.setLinkedNodes((List) nodeCollection);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("uri: {} total time: {}", uriString, totalTime);
 		}
-		Map<String, Object> healthMapCopy = copyMap(healthMap);
-		addOwnHealth(healthMapCopy, health);
-		return healthMapCopy;
+		return node;
 	}
 
 	@VisibleForTesting
@@ -98,28 +94,5 @@ public class SingleServiceHealthCollectorTask implements Callable<Map<String, Ob
 			}
 		});
 		return restTemplate;
-	}
-
-	private void addOwnHealth(final Map<String, Object> healthMap, final Health health) {
-		Health.Builder ownHealth = Health.status(health.getStatus());
-		if (health.getDetails().get(VERSION) != null) {
-			ownHealth.withDetail(VERSION, health.getDetails().get(VERSION));
-		}
-		ownHealth.withDetail(TYPE, health.getDetails().get(TYPE) != null ? health.getDetails().get(TYPE) : MICROSERVICE);
-		if (health.getDetails().get(NAME) != null) {
-			ownHealth.withDetail(NAME, health.getDetails().get(NAME));
-		}
-		if (health.getDetails().get(GROUP) != null) {
-			ownHealth.withDetail(GROUP, health.getDetails().get(GROUP));
-		}
-		healthMap.put(OWN_HEALTH, ownHealth.build());
-	}
-
-	private Map<String, Object> copyMap(Map<String, Object> healthMap) {
-		Map<String, Object> copy = new HashMap<>();
-		for (Map.Entry<String, Object> entry : healthMap.entrySet()) {
-			copy.put(entry.getKey(), entry.getValue());
-		}
-		return copy;
 	}
 }
