@@ -34,7 +34,7 @@ public class DependenciesController {
 	}
 
 	@RequestMapping(value = "/table", produces = "application/json")
-	public HttpEntity<List<Node>> getDependenciesJson() {
+	public HttpEntity<String> getDependenciesJson() {
 		return ok().body(dependenciesResourceService.getDependenciesResourceJson());
 	}
 

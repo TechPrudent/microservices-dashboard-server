@@ -14,8 +14,7 @@ public class DependenciesResourceJsonBuilder {
 	@Autowired
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 
-	public List<Node> build() {
-		return null;
-		//return healthIndicatorsAggregator.fetchCombinedDependencies();
+	public String build() {
+		return healthIndicatorsAggregator.fetchCombinedDependencies();
 	}
 }

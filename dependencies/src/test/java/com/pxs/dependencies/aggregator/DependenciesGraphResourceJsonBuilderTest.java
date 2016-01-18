@@ -44,18 +44,6 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@Mock
 	private RedisService redisService;
 
-	private Map<String, Object> microserviceDetails;
-
-	private Map<String, Object> backendDetails;
-
-
-	@Before
-	public void init() {
-		microserviceDetails = new HashMap<>();
-		microserviceDetails.put()
-
-	}
-
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
@@ -92,14 +80,14 @@ public class DependenciesGraphResourceJsonBuilderTest {
 				assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
 				assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
 
-		//
-		//		List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
-		//		System.out.println(expectedNodeList);
-		//		List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
-		//		System.out.println(returnedNodeList);
-		//
-		//		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
-		//
+
+				List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
+				System.out.println(expectedNodeList);
+				List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
+				System.out.println(returnedNodeList);
+
+				assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
+
 				List<Map<String, Integer>> expectedLinks = getExpectedLinks();
 				List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
 				assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
@@ -129,54 +117,62 @@ public class DependenciesGraphResourceJsonBuilderTest {
 
 	private List<Map<String, Object>> getExpectedNodesList() {
 		List<Map<String, Object>> expectedNodeList = new ArrayList<>();
+		Map<String, Object> microserviceDetails = new HashMap<>();
+		microserviceDetails.put("type", MICROSERVICE);
+		microserviceDetails.put(STATUS, "UP");
+
+		Map<String, Object> backendDetails = new HashMap<>();
+		backendDetails.put(STATUS, "DOWN");
+		backendDetails.put("type", "SOAP");
+
 		Map<String, Object> node1 = new HashMap<>();
-		node1.put(ID, "key3");
+		node1.put(ID, "key1");
 		node1.put(LANE, 2);
-		node1.put(DETAILS, ownHealth);
+		node1.put(DETAILS, microserviceDetails);
 		Map<String, Object> node2 = new HashMap<>();
-		node2.put(ID, "3c");
+		node2.put(ID, "1c");
 		node2.put(LANE, 3);
-		node2.put(DETAILS, backendHealth);
+		node2.put(DETAILS, backendDetails);
 		Map<String, Object> node3 = new HashMap<>();
-		node3.put(ID, "3b");
+		node3.put(ID, "1b");
 		node3.put(LANE, 3);
-		node3.put(DETAILS, backendHealth);
+		node3.put(DETAILS, backendDetails);
 		Map<String, Object> node4 = new HashMap<>();
-		node4.put(ID, "3a");
+		node4.put(ID, "1a");
 		node4.put(LANE, 3);
-		node4.put(DETAILS, backendHealth);
+		node4.put(DETAILS, backendDetails);
 		Map<String, Object> node5 = new HashMap<>();
 		node5.put(ID, "key2");
 		node5.put(LANE, 2);
-		node5.put(DETAILS, ownHealth);
+		node5.put(DETAILS, microserviceDetails);
 		Map<String, Object> node6 = new HashMap<>();
 		node6.put(ID, "2a");
 		node6.put(LANE, 3);
-		node6.put(DETAILS, backendHealth);
+		node6.put(DETAILS, backendDetails);
 		Map<String, Object> node7 = new HashMap<>();
 		node7.put(ID, "2c");
 		node7.put(LANE, 3);
-		node7.put(DETAILS, backendHealth);
+		node7.put(DETAILS, backendDetails);
 		Map<String, Object> node8 = new HashMap<>();
 		node8.put(ID, "2b");
 		node8.put(LANE, 3);
-		node8.put(DETAILS, backendHealth);
+		node8.put(DETAILS, backendDetails);
 		Map<String, Object> node9 = new HashMap<>();
-		node9.put(ID, "key1");
+		node9.put(ID, "key3");
 		node9.put(LANE, 2);
-		node9.put(DETAILS, ownHealth);
+		node9.put(DETAILS, microserviceDetails);
 		Map<String, Object> node10 = new HashMap<>();
-		node10.put(ID, "1b");
-		node10.put(LANE, 2);
-		node10.put(DETAILS, microserviceHealth);
+		node10.put(ID, "3b");
+		node10.put(LANE, 3);
+		node10.put(DETAILS, backendDetails);
 		Map<String, Object> node11 = new HashMap<>();
-		node11.put(ID, "1a");
-		node11.put(LANE, 2);
-		node11.put(DETAILS, microserviceHealth);
+		node11.put(ID, "3a");
+		node11.put(LANE, 3);
+		node11.put(DETAILS, backendDetails);
 		Map<String, Object> node12 = new HashMap<>();
-		node12.put(ID, "1c");
-		node12.put(LANE, 2);
-		node12.put(DETAILS, microserviceHealth);
+		node12.put(ID, "3c");
+		node12.put(LANE, 3);
+		node12.put(DETAILS, backendDetails);
 		expectedNodeList.add(node1);
 		expectedNodeList.add(node2);
 		expectedNodeList.add(node3);

@@ -4,7 +4,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ public class DependenciesResourceJsonBuilderTest {
 
 	@Test
 	public void testBuild() throws Exception {
-		doReturn(new HashMap<String, Node>()).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(new String()).when(healthIndicatorsAggregator).fetchCombinedDependencies();
 
 		dependenciesResourceJsonBuilder.build();
 
