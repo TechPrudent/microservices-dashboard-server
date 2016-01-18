@@ -35,7 +35,7 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 
 	private static final long TIMEOUT = 17000L;
 
-	private static final String GRAPH_CACHE_NAME = "buildAggregatedDependenciesListFromTaskResponses";
+	private static final String GRAPH_CACHE_NAME = "dependenciesGraph";
 
 	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public String fetchCombinedDependencies() {

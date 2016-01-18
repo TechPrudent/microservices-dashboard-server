@@ -27,7 +27,7 @@ public class RedisService {
 
 	public List<Node> getAllNodes() {
 		List<Node> results = new ArrayList<>();
-		Set<String> keys = redisTemplate.keys("*");
+		Set<String> keys = redisTemplate.keys("^(?!.*?(?:dependenciesGraph.*)).*$");
 		for (String key : keys) {
 			String nodeString = redisTemplate.opsForValue().get(key);
 			JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
