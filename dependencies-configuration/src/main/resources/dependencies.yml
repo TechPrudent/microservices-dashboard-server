@@ -26,8 +26,9 @@ spring:
       port: 6379
       pool:
         max-wait: 10000
-#  cache:
-#    cache-names: dependenciesGraphResourceCache,dependenciesResourceCache
+  cache:
+      default-expiration: 30
+      redis-cache-prefix: dependenciesGraph
 # Microservices
 admin:
   url: http://localhost:8085

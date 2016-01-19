@@ -1,7 +1,9 @@
-package com.pxs.dependencies;
+package com.pxs.dependencies.caching;
 
 import java.lang.reflect.Method;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +15,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 @EnableCaching
+@EnableConfigurationProperties(CachingProperties.class)
 public class CachingConfig {
+
+	@Autowired
+	private CachingProperties cachingProperties;
 	@Bean
 	public RedisCacheManager cacheManager(RedisTemplate<String, String> redisTemplate) {
 		RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
-		cacheManager.setDefaultExpiration(100L);
+		cacheManager.setDefaultExpiration(cachingProperties.getDefaultExpiration());
 		RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();
-		redisCachePrefix.prefix("dependenciesGraph");
+		redisCachePrefix.prefix(cachingProperties.getRedisCachePrefix());
 		cacheManager.setCachePrefix(redisCachePrefix);
 		return cacheManager;
 	}
