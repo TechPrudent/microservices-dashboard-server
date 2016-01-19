@@ -64,7 +64,7 @@
                     </resource>
                     <resource>
                         <directory>${JENKINS_HOME}/workspace/proximusFrontendGenericBuild/dependencies-gui/dist/.</directory>
-                        <targetPath>/static/</targetPath>
+                        <targetPath>static/</targetPath>
                     </resource>
                 </resources>
             </build>
