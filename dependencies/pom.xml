@@ -63,8 +63,8 @@
                         <filtering>true</filtering>
                     </resource>
                     <resource>
-                        <directory>${JENKINS_HOME}/workspace/proximusFrontendGenericBuild/dependencies-gui/dist/</directory>
-                        <targetPath>src/main/resources/static/</targetPath>
+                        <directory>${JENKINS_HOME}/workspace/proximusFrontendGenericBuild/dependencies-gui/dist/.</directory>
+                        <targetPath>/static/</targetPath>
                     </resource>
                 </resources>
             </build>
