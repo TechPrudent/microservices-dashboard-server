@@ -45,6 +45,17 @@
             <properties>
                 <artifact-packaging>jar</artifact-packaging>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>javax.transaction</groupId>
+                    <artifactId>transaction-api</artifactId>
+                    <version>1.1</version>
+                </dependency>
+            </dependencies>
             <build>
                 <resources>
                     <resource>
