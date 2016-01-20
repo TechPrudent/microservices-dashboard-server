@@ -93,9 +93,8 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
 
 		List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
-		System.out.println(expectedNodeList);
+
 		List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
-		System.out.println(returnedNodeList);
 
 		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
 

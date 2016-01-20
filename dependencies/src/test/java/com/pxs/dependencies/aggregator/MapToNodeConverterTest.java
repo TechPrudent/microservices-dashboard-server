@@ -22,7 +22,6 @@ public class MapToNodeConverterTest {
 		System.out.println(getSourceMap());
 		MapToNodeConverter converter = new MapToNodeConverter();
 		Node result = converter.convert(getSourceMap());
-		System.out.println(result);
 		Map<String, Object> details = result.getDetails();
 		assertThat(details.get(STATUS)).isEqualTo("UP");
 		assertThat(details.get(TYPE)).isEqualTo(MICROSERVICE);
