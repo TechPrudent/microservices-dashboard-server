@@ -36,27 +36,39 @@ public class DependenciesGraphResourceJsonBuilder {
 	private static final String ENDPOINT = "Endpoint";
 	private static final String BACKEND = "Backend";
 	private static final String DESCRIPTION = "description";
-	@Autowired
+
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 
-	@Autowired
 	private RedisService redisService;
+
+	private VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator;
+
+	private ResponseSerializerDeserializer responseSerializerDeserializer;
+
+	private final Map<String, Object> graph;
+
+	@Autowired
+	public DependenciesGraphResourceJsonBuilder(HealthIndicatorsAggregator healthIndicatorsAggregator, RedisService redisService, ResponseSerializerDeserializer responseSerializerDeserializer,
+			VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
+		this.healthIndicatorsAggregator = healthIndicatorsAggregator;
+		this.redisService = redisService;
+		this.responseSerializerDeserializer = responseSerializerDeserializer;
+		this.virtualAndRealDependencyIntegrator = virtualAndRealDependencyIntegrator;
+		graph = new HashMap<>();
+		initGraph(graph);
+	}
 
 	public Map<String, Object> build() {
 		String jsonDependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
-		List<Node> dependencies = deserializeResponse(jsonDependencies);
+		List<Node> dependencies = responseSerializerDeserializer.deserializeResponse(jsonDependencies);
 		List<Node> virtualDependencies = redisService.getAllNodes();
 		if (!virtualDependencies.isEmpty()) {
-			dependencies.addAll(virtualDependencies);
+			virtualAndRealDependencyIntegrator.integrateVirtualNodesToReal(dependencies, virtualDependencies);
 		}
 		return createGraph(dependencies);
 	}
 
 	private Map<String, Object> createGraph(final List<Node> dependencies) {
-		Map<String, Object> graph = new HashMap<>();
-		graph.put(DIRECTED, true);
-		graph.put(MULTIGRAPH, false);
-		graph.put(GRAPH, new String[0]);
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		List<Map<String, Integer>> links = new ArrayList<>();
 
@@ -80,10 +92,8 @@ public class DependenciesGraphResourceJsonBuilder {
 				links.add(createLink(microserviceNodeId, dependencyNodeId));
 			}
 		}
-		graph.put(LANES, constructLanes());
 		graph.put(NODES, nodes);
 		graph.put(LINKS, links);
-
 		return graph;
 	}
 
@@ -165,14 +175,10 @@ public class DependenciesGraphResourceJsonBuilder {
 		return false;
 	}
 
-	private List<Node> deserializeResponse(final String json) {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			List<Node> deserializedList = mapper.readValue(json, new TypeReference<List<Node>>() {
-			});
-			return deserializedList;
-		} catch (IOException e) {
-			throw new IllegalArgumentException(json, e);
-		}
+	private void initGraph(final Map<String, Object> graph){
+		graph.put(DIRECTED, true);
+		graph.put(MULTIGRAPH, false);
+		graph.put(GRAPH, new String[0]);
+		graph.put(LANES, constructLanes());
 	}
 }

@@ -17,6 +17,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Maps;
+import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
 import com.pxs.utilities.converters.json.JsonToObjectConverter;
 
@@ -33,8 +34,8 @@ public class RedisService {
 	public RedisService(final RedisTemplate<String, String> redisTemplate,
 			final RedisConnectionFactory redisConnectionFactory) {
 		this.redisTemplate = redisTemplate;
-		((JedisConnectionFactory)redisConnectionFactory).setTimeout(10000);
-		this.redisConnectionFactory =redisConnectionFactory;
+		((JedisConnectionFactory) redisConnectionFactory).setTimeout(10000);
+		this.redisConnectionFactory = redisConnectionFactory;
 	}
 
 	public List<Node> getAllNodes() {
@@ -42,8 +43,7 @@ public class RedisService {
 		Set<String> keys = redisTemplate.keys(PREFIX + "*");
 		for (String key : keys) {
 			String nodeString = redisTemplate.opsForValue().get(key);
-			JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
-			Node node = converter.convert(nodeString);
+			Node node = getNode(nodeString);
 			results.add(node);
 		}
 		return results;
@@ -63,10 +63,15 @@ public class RedisService {
 	}
 
 	private String getNodeId(String nodeData) {
-		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
-		Node node = converter.convert(nodeData);
+		Node node = getNode(nodeData);
 		return node.getId();
 	}
+
+	private Node getNode(String nodeData) {
+		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
+		return converter.convert(nodeData);
+	}
+
 	public void flushDB() {
 		redisConnectionFactory.getConnection().flushDb();
 	}

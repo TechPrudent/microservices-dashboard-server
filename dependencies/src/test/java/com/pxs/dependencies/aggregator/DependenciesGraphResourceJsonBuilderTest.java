@@ -1,11 +1,17 @@
 package com.pxs.dependencies.aggregator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import static com.pxs.dependencies.constants.Constants.*;
-import static com.pxs.dependencies.model.NodeBuilder.node;
-
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.doReturn;
+
+import static com.pxs.dependencies.constants.Constants.DETAILS;
+import static com.pxs.dependencies.constants.Constants.ID;
+import static com.pxs.dependencies.constants.Constants.LANE;
+import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
+import static com.pxs.dependencies.constants.Constants.STATUS;
+import static com.pxs.dependencies.constants.Constants.TYPE;
+import static com.pxs.dependencies.model.NodeBuilder.node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,21 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.boot.actuate.health.Health;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.pxs.dependencies.model.Node;
-import com.pxs.dependencies.model.NodeBuilder;
 import com.pxs.dependencies.services.RedisService;
-import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DependenciesGraphResourceJsonBuilderTest {
@@ -44,6 +46,12 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@Mock
 	private RedisService redisService;
 
+	@Mock
+	private ResponseSerializerDeserializer responseSerializerDeserializer;
+
+	@Mock
+	private VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator;
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
@@ -59,9 +67,9 @@ public class DependenciesGraphResourceJsonBuilderTest {
 				node().withId("key2")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
-						.withLinkedNode(node().withId("2a").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
-						.withLinkedNode(node().withId("2b").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
-						.withLinkedNode(node().withId("2c").withDetail(STATUS, "DOWN").withDetail("type",  "SOAP").build())
+						.withLinkedNode(node().withId("2a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("2b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedNode(node().withId("2c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build(),
 				node().withId("key3")
 						.withDetail("type", MICROSERVICE)
@@ -71,26 +79,29 @@ public class DependenciesGraphResourceJsonBuilderTest {
 						.withLinkedNode(node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build()
 		);
+		String serializedResponce = "someSerializedResponse";
 
-		doReturn(serializeResponse(dependencies)).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
+		doReturn(dependencies).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesToReal(anyListOf(Node.class), anyListOf(Node.class));
+		doReturn(serializedResponce).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(dependencies).when(responseSerializerDeserializer).deserializeResponse(serializedResponce);
 
 		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();
 
 		assertThat(((boolean) returnedMap.get("directed"))).isEqualTo(true);
-				assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
-				assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
+		assertThat(((boolean) returnedMap.get("multigraph"))).isEqualTo(false);
+		assertThat(((String[]) returnedMap.get("graph")).length).isEqualTo(0);
 
+		List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
+		System.out.println(expectedNodeList);
+		List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
+		System.out.println(returnedNodeList);
 
-				List<Map<String, Object>> expectedNodeList = getExpectedNodesList();
-				System.out.println(expectedNodeList);
-				List<Map<String, String>> returnedNodeList = (List<Map<String, String>>) returnedMap.get("nodes");
-				System.out.println(returnedNodeList);
+		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
 
-				assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
-
-				List<Map<String, Integer>> expectedLinks = getExpectedLinks();
-				List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
-				assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
+		List<Map<String, Integer>> expectedLinks = getExpectedLinks();
+		List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
+		assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
 
 	}
 
@@ -227,10 +238,5 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		expectedLinks.add(link8);
 		expectedLinks.add(link9);
 		return expectedLinks;
-	}
-
-	private String serializeResponse(List<Node> nodes) {
-		ObjectToJsonConverter<List<Node>> serializer = new ObjectToJsonConverter<>();
-		return serializer.convert(nodes);
 	}
 }
