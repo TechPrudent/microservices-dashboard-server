@@ -15,7 +15,6 @@ public class Constants {
 	public static final String ID = "id";
 	public static final String DETAILS = "details";
 	public static final String STATUS = "status";
-	public static final String DISK_SPACE = "diskSpace";
-	public static final String HYSTRIX = "hystrix";
+	public static final String VIRTUAL = "virtual";
 
 }
