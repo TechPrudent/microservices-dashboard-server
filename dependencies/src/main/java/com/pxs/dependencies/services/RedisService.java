@@ -20,11 +20,13 @@ import com.google.common.collect.Maps;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
 import com.pxs.utilities.converters.json.JsonToObjectConverter;
+import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 
 @Service
 public class RedisService {
 
 	public static final String PREFIX = "virtual:";
+	public static final String VIRTUAL = "virtual";
 
 	private RedisTemplate<String, String> redisTemplate;
 
@@ -51,7 +53,10 @@ public class RedisService {
 
 	public void saveNode(final String nodeData) {
 		String nodeId = getNodeId(nodeData);
-		redisTemplate.opsForValue().set(PREFIX + nodeId, nodeData);
+		Node node = getNode(nodeData);
+		node.getDetails().put(VIRTUAL, true);
+		ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
+		redisTemplate.opsForValue().set(PREFIX + nodeId, converter.convert(node));
 	}
 
 	public void deleteNode(final String nodeId) {
