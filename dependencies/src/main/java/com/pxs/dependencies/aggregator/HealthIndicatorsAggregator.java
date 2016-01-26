@@ -1,11 +1,9 @@
 package com.pxs.dependencies.aggregator;
 
-import java.io.IOException;
+import static com.pxs.dependencies.constants.Constants.GRAPH_CACHE_NAME;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -16,17 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pxs.dependencies.model.Node;
-import com.pxs.utilities.converters.json.JsonToObjectConverter;
 import com.pxs.utilities.converters.json.ObjectToJsonConverter;
-
-import progress.message.util.ListNode;
 
 @Component
 public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
@@ -34,8 +26,6 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	private static final Logger LOG = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private static final long TIMEOUT = 17000L;
-
-	private static final String GRAPH_CACHE_NAME = "dependenciesGraph";
 
 	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public String fetchCombinedDependencies() {

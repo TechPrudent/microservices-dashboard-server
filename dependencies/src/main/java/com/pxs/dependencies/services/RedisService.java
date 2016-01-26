@@ -1,22 +1,16 @@
 package com.pxs.dependencies.services;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
 
-import com.google.common.collect.Maps;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
 import com.pxs.utilities.converters.json.JsonToObjectConverter;
@@ -25,8 +19,8 @@ import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 @Service
 public class RedisService {
 
-	public static final String PREFIX = "virtual:";
-	public static final String VIRTUAL = "virtual";
+	public static final String REDIS_KEY_PREFIX = "virtual:";
+	public static final String _VIRTUAL_FLAG = "virtual";
 
 	private RedisTemplate<String, String> redisTemplate;
 
@@ -42,7 +36,7 @@ public class RedisService {
 
 	public List<Node> getAllNodes() {
 		List<Node> results = new ArrayList<>();
-		Set<String> keys = redisTemplate.keys(PREFIX + "*");
+		Set<String> keys = redisTemplate.keys(REDIS_KEY_PREFIX + "*");
 		for (String key : keys) {
 			String nodeString = redisTemplate.opsForValue().get(key);
 			Node node = getNode(nodeString);
@@ -54,9 +48,9 @@ public class RedisService {
 	public void saveNode(final String nodeData) {
 		String nodeId = getNodeId(nodeData);
 		Node node = getNode(nodeData);
-		node.getDetails().put(VIRTUAL, true);
+		node.getDetails().put(_VIRTUAL_FLAG, true);
 		ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
-		redisTemplate.opsForValue().set(PREFIX + nodeId, converter.convert(node));
+		redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + nodeId, converter.convert(node));
 	}
 
 	public void deleteNode(final String nodeId) {
@@ -79,5 +73,9 @@ public class RedisService {
 
 	public void flushDB() {
 		redisConnectionFactory.getConnection().flushDb();
+	}
+
+	@CacheEvict(value = Constants.GRAPH_CACHE_NAME, allEntries = true)
+	public void evictCache() {
 	}
 }

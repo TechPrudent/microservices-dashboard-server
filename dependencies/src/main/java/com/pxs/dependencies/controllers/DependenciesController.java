@@ -62,4 +62,9 @@ public class DependenciesController {
 	public void flushAll() {
 		redisService.flushDB();
 	}
+
+	@RequestMapping(value = "evictCache", method = POST)
+	public void evictCache (){
+		redisService.evictCache();
+	}
 }
