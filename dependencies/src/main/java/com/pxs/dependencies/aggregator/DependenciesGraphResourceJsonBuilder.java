@@ -7,7 +7,6 @@ import static com.pxs.dependencies.constants.Constants.LANE;
 import static com.pxs.dependencies.constants.Constants.MICROSERVICE;
 import static com.pxs.dependencies.constants.Constants.TYPE;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,8 +15,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
@@ -43,24 +40,21 @@ public class DependenciesGraphResourceJsonBuilder {
 
 	private VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator;
 
-	private ResponseSerializerDeserializer responseSerializerDeserializer;
-
 	private final Map<String, Object> graph;
 
 	@Autowired
-	public DependenciesGraphResourceJsonBuilder(HealthIndicatorsAggregator healthIndicatorsAggregator, RedisService redisService, ResponseSerializerDeserializer responseSerializerDeserializer,
-			VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
+	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final RedisService redisService,
+			final VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
 		this.healthIndicatorsAggregator = healthIndicatorsAggregator;
 		this.redisService = redisService;
-		this.responseSerializerDeserializer = responseSerializerDeserializer;
 		this.virtualAndRealDependencyIntegrator = virtualAndRealDependencyIntegrator;
 		graph = new HashMap<>();
 		initGraph(graph);
 	}
 
 	public Map<String, Object> build() {
-		String jsonDependencies = healthIndicatorsAggregator.fetchCombinedDependencies();
-		List<Node> dependencies = responseSerializerDeserializer.deserializeResponse(jsonDependencies);
+		Node node = healthIndicatorsAggregator.fetchCombinedDependencies();
+		List<Node> dependencies = node.getLinkedNodes();
 		List<Node> virtualDependencies = redisService.getAllNodes();
 		if (!virtualDependencies.isEmpty()) {
 			virtualAndRealDependencyIntegrator.integrateVirtualNodesToReal(dependencies, virtualDependencies);
@@ -175,7 +169,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		return false;
 	}
 
-	private void initGraph(final Map<String, Object> graph){
+	private void initGraph(final Map<String, Object> graph) {
 		graph.put(DIRECTED, true);
 		graph.put(MULTIGRAPH, false);
 		graph.put(GRAPH, new String[0]);

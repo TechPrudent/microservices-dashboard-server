@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.pxs.dependencies.aggregator.DependenciesGraphResourceJsonBuilder;
 import com.pxs.dependencies.aggregator.DependenciesResourceJsonBuilder;
+import com.pxs.dependencies.model.Node;
 
 @Service
 public class DependenciesResourceService {
@@ -15,9 +16,10 @@ public class DependenciesResourceService {
 	private DependenciesResourceJsonBuilder dependenciesResourceJsonBuilder;
 
 	@Autowired
+
 	private DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder;
 
-	public String getDependenciesResourceJson() {
+	public Node getDependenciesResourceJson() {
 		return dependenciesResourceJsonBuilder.build();
 	}
 

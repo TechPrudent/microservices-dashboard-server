@@ -29,6 +29,7 @@ spring:
   cache:
       default-expiration: 30
       redis-cache-prefix: dependenciesGraph
+      evict: true
 # Microservices
 admin:
   url: http://localhost:8085
@@ -37,6 +38,11 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://esrvj6d1.web.bc:22141/serviceregistry/eureka/
+
+jboss:
+  qualified:
+    host:
+      name: el2604.bc
 
 #infinispan:
 #  config: dependencies-infinispan.xml

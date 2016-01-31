@@ -9,6 +9,15 @@ public class CachingProperties {
 
 	private String redisCachePrefix;
 	private long defaultExpiration;
+	private boolean evict;
+
+	public boolean isEvict() {
+		return evict;
+	}
+
+	public void setEvict(boolean evict) {
+		this.evict = evict;
+	}
 
 	public long getDefaultExpiration() {
 		return defaultExpiration;

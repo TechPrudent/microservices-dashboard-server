@@ -30,7 +30,7 @@ public class DependenciesResourceJsonBuilderTest {
 
 	@Test
 	public void testBuild() throws Exception {
-		doReturn(new String()).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(new Node()).when(healthIndicatorsAggregator).fetchCombinedDependencies();
 
 		dependenciesResourceJsonBuilder.build();
 

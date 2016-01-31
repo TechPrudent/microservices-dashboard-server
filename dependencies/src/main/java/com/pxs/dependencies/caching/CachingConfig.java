@@ -8,10 +8,14 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import com.pxs.dependencies.model.Node;
 
 @Configuration
 @EnableCaching
@@ -20,8 +24,9 @@ public class CachingConfig {
 
 	@Autowired
 	private CachingProperties cachingProperties;
+
 	@Bean
-	public RedisCacheManager cacheManager(RedisTemplate<String, String> redisTemplate) {
+	public RedisCacheManager cacheManager(RedisTemplate<String, Node> redisTemplate) {
 		RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
 		cacheManager.setDefaultExpiration(cachingProperties.getDefaultExpiration());
 		RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();
@@ -44,5 +49,11 @@ public class CachingConfig {
 				return sb.toString();
 			}
 		};
+	}
+
+	@Bean
+	@Scope(value = "refresh", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public CacheCleaningBean cacheCleaningBean(){
+		return new CacheCleaningBean(cachingProperties.isEvict());
 	}
 }

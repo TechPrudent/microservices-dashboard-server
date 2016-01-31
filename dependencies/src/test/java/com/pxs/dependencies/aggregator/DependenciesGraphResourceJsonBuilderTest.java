@@ -29,6 +29,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.pxs.dependencies.model.Node;
+import com.pxs.dependencies.model.NodeBuilder;
 import com.pxs.dependencies.services.RedisService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -47,15 +48,12 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	private RedisService redisService;
 
 	@Mock
-	private ResponseSerializerDeserializer responseSerializerDeserializer;
-
-	@Mock
 	private VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator;
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
-		List<Node> dependencies = Lists.newArrayList(
+		List<Node> dependenciesList = Lists.newArrayList(
 				node().withId("key1")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
@@ -79,12 +77,11 @@ public class DependenciesGraphResourceJsonBuilderTest {
 						.withLinkedNode(node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build()
 		);
-		String serializedResponce = "someSerializedResponse";
-
+	Node dependencies = NodeBuilder.node().havingLinkedNodes(dependenciesList).build();
 		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
-		doReturn(dependencies).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesToReal(anyListOf(Node.class), anyListOf(Node.class));
-		doReturn(serializedResponce).when(healthIndicatorsAggregator).fetchCombinedDependencies();
-		doReturn(dependencies).when(responseSerializerDeserializer).deserializeResponse(serializedResponce);
+		doReturn(dependencies.getLinkedNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesToReal(anyListOf(Node.class), anyListOf(Node.class));
+		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+
 
 		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();
 

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.pxs.dependencies.constants.Constants;
 import com.pxs.dependencies.model.Node;
 import com.pxs.utilities.converters.json.JsonToObjectConverter;
-import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 
 @Service
 public class RedisService {
@@ -22,12 +21,12 @@ public class RedisService {
 	public static final String REDIS_KEY_PREFIX = "virtual:";
 	public static final String _VIRTUAL_FLAG = "virtual";
 
-	private RedisTemplate<String, String> redisTemplate;
+	private RedisTemplate<String, Node> redisTemplate;
 
 	private RedisConnectionFactory redisConnectionFactory;
 
 	@Autowired
-	public RedisService(final RedisTemplate<String, String> redisTemplate,
+	public RedisService(final RedisTemplate<String, Node> redisTemplate,
 			final RedisConnectionFactory redisConnectionFactory) {
 		this.redisTemplate = redisTemplate;
 		((JedisConnectionFactory) redisConnectionFactory).setTimeout(10000);
@@ -38,8 +37,7 @@ public class RedisService {
 		List<Node> results = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys(REDIS_KEY_PREFIX + "*");
 		for (String key : keys) {
-			String nodeString = redisTemplate.opsForValue().get(key);
-			Node node = getNode(nodeString);
+			Node node = redisTemplate.opsForValue().get(key);
 			results.add(node);
 		}
 		return results;
@@ -49,8 +47,7 @@ public class RedisService {
 		String nodeId = getNodeId(nodeData);
 		Node node = getNode(nodeData);
 		node.getDetails().put(_VIRTUAL_FLAG, true);
-		ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
-		redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + nodeId, converter.convert(node));
+		redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + nodeId, node);
 	}
 
 	public void deleteNode(final String nodeId) {

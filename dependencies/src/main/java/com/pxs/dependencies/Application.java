@@ -11,10 +11,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.pxs.dependencies.model.Node;
 import com.pxs.utilities.interceptors.MappedDiagnosticContextInterceptor;
 
 @Configuration
@@ -42,5 +46,13 @@ public class Application extends WebMvcConfigurerAdapter {
 	@Bean
 	public CommonAnnotationBeanPostProcessor commonAnnotationBeanPostProcessor() {
 		return new CommonAnnotationBeanPostProcessor();
+	}
+	@Bean
+	public RedisTemplate<String,Node> redisTemplate(final RedisConnectionFactory factory){
+		RedisTemplate<String, Node> virtualNodeTemplate = new RedisTemplate<>();
+		virtualNodeTemplate.setConnectionFactory(factory);
+		virtualNodeTemplate.setKeySerializer(new StringRedisSerializer());
+		virtualNodeTemplate.setValueSerializer(new NodeSerializer());
+		return virtualNodeTemplate;
 	}
 }

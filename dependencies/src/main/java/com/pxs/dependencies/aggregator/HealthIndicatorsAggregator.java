@@ -18,7 +18,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import com.pxs.dependencies.model.Node;
-import com.pxs.utilities.converters.json.ObjectToJsonConverter;
+import com.pxs.dependencies.model.NodeBuilder;
 
 @Component
 public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
@@ -28,13 +28,14 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	private static final long TIMEOUT = 17000L;
 
 	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public String fetchCombinedDependencies() {
-		List<Node> taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
-		return serializeResponse(taskResponses);
+	public Node fetchCombinedDependencies() {
+		Node taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
+		return taskResponses;
 	}
 
-	private List<Node> buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Node>> tasks) {
+	private Node buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Node>> tasks) {
 		List<Node> nodes = new ArrayList<>();
+		NodeBuilder nodeBuilder = NodeBuilder.node();
 		for (FutureTask<Node> task : tasks) {
 			String key = null;
 			try {
@@ -43,21 +44,17 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 				LOG.debug("task {} is done {}", key, task.isDone());
 				value.setId(key);
 				nodes.add(value);
+				nodeBuilder.withLinkedNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.debug("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
 		}
 		LOG.debug("Finished fetching combined dependencies");
-		return nodes;
+		return nodeBuilder.build();
 	}
 
 	@Override
 	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, final String serviceHost, final int servicePort) {
 		return new SingleServiceHealthCollectorTask(serviceId, servicePort, serviceHost, originRequest);
-	}
-
-	private String serializeResponse(List<Node> nodes) {
-		ObjectToJsonConverter<List<Node>> serializer = new ObjectToJsonConverter<>();
-		return serializer.convert(nodes);
 	}
 }
