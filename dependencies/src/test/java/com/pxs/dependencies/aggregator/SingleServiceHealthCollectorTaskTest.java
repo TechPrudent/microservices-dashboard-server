@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class SingleServiceHealthCollectorTaskTest {
 
 	@InjectMocks
 	@Spy
-	private SingleServiceHealthCollectorTask task = new SingleServiceHealthCollectorTask("", 10, "", null);
+	private SingleServiceHealthCollectorTask task = new SingleServiceHealthCollectorTask("", 10, "",  null, null);
 
 	@Mock
 	private ResponseEntity<Map> response;

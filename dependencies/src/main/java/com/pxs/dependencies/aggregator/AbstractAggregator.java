@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -48,9 +49,6 @@ public abstract class AbstractAggregator<T> {
 
 	private List<String> getIdsFromOnlineServices() {
 		List<String> serviceIds = discoveryClient.getServices();
-//				List<String> serviceIds = new ArrayList<>();
-//				serviceIds.add("awards");
-//		 serviceIds.add("customer-management");
 		serviceIds.remove(ZUUL_ID);
 		return serviceIds;
 	}

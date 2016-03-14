@@ -34,20 +34,21 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 	private DependenciesListFilterPredicate dependenciesListFilterPredicate;
 	private ToolBoxDependenciesModifier toolBoxDependenciesModifier;
 
-	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest) {
-		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost);
+	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest, final String managementContextPath) {
+		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost, managementContextPath);
 		mapToNodeConverter = new MapToNodeConverter();
 		dependenciesListFilterPredicate = new DependenciesListFilterPredicate();
 		toolBoxDependenciesModifier = new ToolBoxDependenciesModifier();
 	}
 
-	private String buildHealthUri(final String serviceId, final int gatewayPort, final String gatewayHost) {
+	private String buildHealthUri(final String serviceId, final int gatewayPort, final String gatewayHost, final String managementContextPath) {
 		Assert.notNull(serviceId);
 		StringBuilder builder = new StringBuilder("http://");
 		builder.append(gatewayHost)
 				.append(":").append(gatewayPort)
 				.append("/").append(GATEWAY)
 				.append(serviceId)
+				.append(managementContextPath)
 				.append("/").append(HEALTH);
 		return builder.toString();
 	}

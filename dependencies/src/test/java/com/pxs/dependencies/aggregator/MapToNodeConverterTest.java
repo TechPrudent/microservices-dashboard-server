@@ -25,12 +25,12 @@ public class MapToNodeConverterTest {
 		Map<String, Object> details = result.getDetails();
 		assertThat(details.get(STATUS)).isEqualTo("UP");
 		assertThat(details.get(TYPE)).isEqualTo(MICROSERVICE);
-		Node bciNode = result.getLinkedNodes().get(0);
+		Node bciNode = result.getLinkedNodes().get(1);
 		assertThat(bciNode.getDetails().get(TYPE)).isEqualTo("SOAP");
 		assertThat(bciNode.getDetails().get(VERSION)).isEqualTo("4.0");
 		assertThat(bciNode.getDetails().get(GROUP)).isEqualTo("BCI");
 		assertThat(bciNode.getDetails().get(STATUS)).isEqualTo("UP");
-		Node cslNode = result.getLinkedNodes().get(1);
+		Node cslNode = result.getLinkedNodes().get(0);
 		assertThat(cslNode.getDetails().get(TYPE)).isEqualTo("SOAP");
 		assertThat(cslNode.getDetails().get(VERSION)).isEqualTo("Customer 4.0 (since 2012 CRC03)");
 		assertThat(cslNode.getDetails().get(GROUP)).isEqualTo("CSL");

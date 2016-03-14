@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import com.pxs.dependencies.model.Node;
@@ -26,6 +28,9 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	private static final Logger LOG = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private static final long TIMEOUT = 17000L;
+
+	@Autowired
+	private Environment environment;
 
 	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchCombinedDependencies() {
@@ -55,6 +60,6 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 
 	@Override
 	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, final String serviceHost, final int servicePort) {
-		return new SingleServiceHealthCollectorTask(serviceId, servicePort, serviceHost, originRequest);
+		return new SingleServiceHealthCollectorTask(serviceId, servicePort, serviceHost, originRequest, environment.getProperty("management.context-path"));
 	}
 }

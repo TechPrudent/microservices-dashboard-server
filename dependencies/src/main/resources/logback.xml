@@ -1,40 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!-- -->
-    <property name="filePath" value="${app.log.dir}" />
-    <property name="application.name" value="dependencies" />
-    <appender name="fileAppender"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${filePath}/${application.name}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${filePath}/${application.name}.%d{yyyy-MM-dd}.%i.log
-            </fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <append>true</append>
-        <encoder>
-            <pattern>%d{ISO8601} %-5level %logger{0} %msg%n
-            </pattern>
-        </encoder>
-    </appender>
+    <include resource="generic-file-appender.xml"/>
 
-    <appender name="console" level="INFO"
+    <appender name="CONSOLE" level="INFO"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{ISO8601} %-5level %logger{0} %msg%n
+            <pattern>%d{ISO8601} %-5level %X{host:-}:%X{port:-} %X{application} gid:%X{globalId:-} rid:%X{uuid} trace=%X{X-Trace-Id:-} span=%X{X-Span-Id:-} [%thread] %logger{36} %msg%n
             </pattern>
         </encoder>
         <target>System.out</target>
     </appender>
-    <logger name="org.springframework" level="INFO" additivity="true" />
-    <logger name="com.pxs" level="INFO" additivity="true" />
     <root level="INFO">
-        <appender-ref ref="fileAppender" />
-        <appender-ref ref="console" />
+        <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
