@@ -30,5 +30,6 @@ admin:
 
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: http://localhost:7878/serviceregistry/eureka/

@@ -10,10 +10,7 @@ public class CacheCleaningBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CacheCleaningBean.class);
 
-	@Autowired
-	private RedisService redisService;
-
-	public CacheCleaningBean(boolean evict) {
+	public CacheCleaningBean(RedisService redisService, boolean evict) {
 		LOG.info("Cleaning cash=" + evict);
 		if (evict) {
 			redisService.evictCache();

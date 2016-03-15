@@ -2,6 +2,7 @@ package com.pxs.dependencies.caching;
 
 import java.lang.reflect.Method;
 
+import com.pxs.dependencies.services.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -53,7 +54,7 @@ public class CachingConfig {
 
 	@Bean
 	@Scope(value = "refresh", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public CacheCleaningBean cacheCleaningBean(){
-		return new CacheCleaningBean(cachingProperties.isEvict());
+	public CacheCleaningBean cacheCleaningBean(RedisService redisService){
+		return new CacheCleaningBean(redisService, cachingProperties.isEvict());
 	}
 }

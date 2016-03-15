@@ -27,6 +27,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <version>${spring-boot.version}</version>
             <optional>true</optional>
@@ -136,7 +140,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.kstyrc</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.6</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -167,6 +175,10 @@
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

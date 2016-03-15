@@ -44,4 +44,9 @@ public class Application extends WebMvcConfigurerAdapter {
 		virtualNodeTemplate.setValueSerializer(new NodeSerializer());
 		return virtualNodeTemplate;
 	}
+
+	@Bean
+	public InMemoryRedis inMemoryRedis() {
+		return new InMemoryRedis();
+	}
 }
