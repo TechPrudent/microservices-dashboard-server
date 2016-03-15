@@ -1,5 +1,0 @@
-com/pxs/dependencies/aggregator/SingleServiceHealthCollectorTaskTest.class
-com/pxs/dependencies/aggregator/DependenciesResourceJsonBuilderTest.class
-com/pxs/dependencies/aggregator/MapToNodeConverterTest.class
-com/pxs/dependencies/aggregator/VirtualAndRealDependencyIntegratorTest.class
-com/pxs/dependencies/aggregator/DependenciesGraphResourceJsonBuilderTest.class

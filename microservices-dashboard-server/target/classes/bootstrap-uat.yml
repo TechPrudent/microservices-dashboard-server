@@ -1,5 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://jba-a1-ext.web.bc:10062/configuration
-      failFast: true

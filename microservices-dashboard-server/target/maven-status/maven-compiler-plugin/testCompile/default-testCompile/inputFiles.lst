@@ -1,5 +1,0 @@
-/Users/andreasevers/repos/microservices-dashboard-server/microservices-dashboard-server/src/test/java/com/pxs/dependencies/aggregator/VirtualAndRealDependencyIntegratorTest.java
-/Users/andreasevers/repos/microservices-dashboard-server/microservices-dashboard-server/src/test/java/com/pxs/dependencies/aggregator/SingleServiceHealthCollectorTaskTest.java
-/Users/andreasevers/repos/microservices-dashboard-server/microservices-dashboard-server/src/test/java/com/pxs/dependencies/aggregator/MapToNodeConverterTest.java
-/Users/andreasevers/repos/microservices-dashboard-server/microservices-dashboard-server/src/test/java/com/pxs/dependencies/aggregator/DependenciesGraphResourceJsonBuilderTest.java
-/Users/andreasevers/repos/microservices-dashboard-server/microservices-dashboard-server/src/test/java/com/pxs/dependencies/aggregator/DependenciesResourceJsonBuilderTest.java

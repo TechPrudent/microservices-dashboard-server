@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: dependencies
-  cloud:
-    config:
-      uri: http://localhost:8080/configuration-service
-      failFast: false
