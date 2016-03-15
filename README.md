@@ -21,5 +21,5 @@ Microservices-dashboard-server requires Java 7 or later and is built using maven
 To run this application locally, build from source and run the following command:
 
 ```
-./java <application.jar>
+./java -jar target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
