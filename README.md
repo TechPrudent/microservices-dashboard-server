@@ -23,3 +23,11 @@ To run this application locally, build from source and run the following command
 ```
 ./java -jar target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
+
+If successful, you should see the following output in the log:
+
+> o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8383 (http)
+
+From there on, you can visit actuator endpoints to validate the server's status:
+
+> http://localhost:8383/env
