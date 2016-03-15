@@ -1,11 +1,11 @@
 package com.pxs.dependencies;
 
+import com.pxs.dependencies.converters.JsonToObjectConverter;
+import com.pxs.dependencies.converters.ObjectToJsonConverter;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
 import com.pxs.dependencies.model.Node;
-import com.pxs.utilities.converters.json.JsonToObjectConverter;
-import com.pxs.utilities.converters.json.ObjectToJsonConverter;
 
 public class NodeSerializer implements RedisSerializer<Node> {
 

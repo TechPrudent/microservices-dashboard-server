@@ -19,7 +19,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.pxs.dependencies.model.Node;
-import com.pxs.utilities.interceptors.MappedDiagnosticContextInterceptor;
 
 @Configuration
 @ComponentScan(basePackages = "com.pxs")
@@ -31,16 +30,6 @@ public class Application extends WebMvcConfigurerAdapter {
 
 	public static void main(final String[] args) {
 		SpringApplication.run(Application.class, args);
-	}
-
-	@Override
-	public void addInterceptors(final InterceptorRegistry registry) {
-		registry.addInterceptor(mappedDiagnosticContextInterceptor()).addPathPatterns("/**");
-	}
-
-	@Bean
-	public MappedDiagnosticContextInterceptor mappedDiagnosticContextInterceptor() {
-		return new MappedDiagnosticContextInterceptor();
 	}
 
 	@Bean

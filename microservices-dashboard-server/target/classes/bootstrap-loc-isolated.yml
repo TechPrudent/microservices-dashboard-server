@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: dependencies
+  cloud:
+    config:
+      uri: http://localhost:8080/configuration-service
+      failFast: false
+      enabled: false
+  boot:
+    admin:
+      period: 100000000
+
+eureka:
+  registration:
+    enabled: false
+  client:
+    enabled: false
