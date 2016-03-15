@@ -4,11 +4,6 @@ server:
   servletPath: /*
   contextPath:
 
-endpoints:
-  # For multiple microservices on the same container
-  jmx:
-    uniqueNames: true
-
 spring:
   jackson:
     mapper:
@@ -17,12 +12,10 @@ spring:
       WRITE_NULL_MAP_VALUES: false
   boot:
     admin.url: ${admin.url}
-  jmx:
-    default-domain: dependencies
   aop:
     proxyTargetClass: true
   redis:
-      host: el2604.bc
+      host: localhost
       port: 6379
       pool:
         max-wait: 10000
@@ -30,19 +23,12 @@ spring:
       default-expiration: 30
       redis-cache-prefix: dependenciesGraph
       evict: true
-# Microservices
+
+# Microservices platform integration
 admin:
   url: http://localhost:8085
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://esrvj6d1.web.bc:22141/serviceregistry/eureka/
-
-jboss:
-  qualified:
-    host:
-      name: el2604.bc
-
-#infinispan:
-#  config: dependencies-infinispan.xml
+      defaultZone: http://localhost:7878/serviceregistry/eureka/
