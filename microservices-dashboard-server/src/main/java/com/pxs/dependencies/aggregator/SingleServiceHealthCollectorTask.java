@@ -64,6 +64,8 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("globalId", "abc");
 
+		LOG.debug("Calling URI: {}", uriString);
+
 		ResponseEntity<Map> responseRest = restTemplate.exchange(uriString,
 				GET,
 				new HttpEntity<Map>(headers),

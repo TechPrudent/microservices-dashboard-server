@@ -4,6 +4,12 @@ server:
   servletPath: /*
   contextPath:
 
+management:
+  context-path: /actuator
+
+services:
+  mock: true
+
 spring:
   jackson:
     mapper:
