@@ -36,3 +36,15 @@ For now, two major functional resources are exposed:
 
 - ```http://localhost:8383/graph```
 - ```http://localhost:8383/table```
+
+## Troubleshooting
+
+For remote debugging, run the following command:
+
+```
+./java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
+```
+
+To enable Spring debug logging, add ```--debug``` to the command.
+
+Make sure to use actuator endpoints such as ```/autoconfig``` and ```/beans``` for validating the right beans have been loaded.
