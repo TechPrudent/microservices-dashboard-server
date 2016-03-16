@@ -14,7 +14,7 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
-    <logger name="com.pxs.dependencies" level="DEBUG">
+    <logger name="be.ordina.msdashboard" level="DEBUG">
         <appender-ref ref="CONSOLE" />
     </logger>
 </configuration>
