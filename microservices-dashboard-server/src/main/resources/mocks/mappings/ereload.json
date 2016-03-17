@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ereload/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ereload.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

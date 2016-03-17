@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ordering-onedrive/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ordering-onedrive.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

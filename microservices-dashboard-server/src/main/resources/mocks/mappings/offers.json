@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/offers/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "offers.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

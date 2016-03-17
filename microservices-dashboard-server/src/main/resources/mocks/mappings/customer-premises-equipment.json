@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-premises-equipment/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-premises-equipment.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

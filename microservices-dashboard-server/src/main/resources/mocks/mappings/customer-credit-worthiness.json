@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-credit-worthiness/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-credit-worthiness.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

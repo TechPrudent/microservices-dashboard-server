@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/user-application-trusts/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "user-application-trusts.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

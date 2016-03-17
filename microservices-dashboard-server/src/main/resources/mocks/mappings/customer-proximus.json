@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-proximus/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-proximus.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

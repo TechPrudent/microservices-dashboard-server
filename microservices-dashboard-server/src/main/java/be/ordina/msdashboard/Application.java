@@ -20,7 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import be.ordina.msdashboard.model.Node;
 
 @Configuration
-@ComponentScan(basePackages = "com.pxs")
+@ComponentScan(basePackages = "be.ordina")
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
 @EnableDiscoveryClient
 @EnableCircuitBreaker
