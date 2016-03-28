@@ -16,6 +16,13 @@
     "type": "REST",
     "group": "PPT"
   },
+  "loyalty-program": {
+    "status": "UP",
+    "type": "MICROSERVICE",
+    "group": "FUNCTIONAL",
+    "minVersion": "2.1.3",
+    "version": "3.0.1"
+  },
   "discoveryComposite": {
     "description": "Spring Cloud Eureka Discovery Client",
     "status": "UP",

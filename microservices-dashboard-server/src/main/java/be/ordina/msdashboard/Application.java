@@ -2,6 +2,7 @@ package be.ordina.msdashboard;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -45,6 +46,7 @@ public class Application extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
+	@ConditionalOnProperty(name = "redis.mock", matchIfMissing = false)
 	public InMemoryRedis inMemoryRedis() {
 		return new InMemoryRedis();
 	}

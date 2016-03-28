@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "cad:administrators": {
+      "href": "http://jboss0019.bc:22201/customer-administrators/customer/{cdbId}/administrators",
+      "templated": true
+    },
+    "cad:invitation": {
+      "href": "http://jboss0019.bc:22201/customer-administrators/customer/{cdbId}/administrator/invitation",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-administrators/generated-docs/api-guide.html#resources-{rel}",
+        "name": "cad",
+        "templated": true
+      }
+    ]
+  }
+}

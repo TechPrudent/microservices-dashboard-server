@@ -14,5 +14,6 @@ public class Constants {
 	public static final String STATUS = "status";
 	public static final String DISK_SPACE = "diskSpace";
 	public static final String HYSTRIX = "hystrix";
-	public static final String GRAPH_CACHE_NAME = "dependenciesGraph";
+	public static final String HEALTH_CACHE_NAME = "healths";
+	public static final String INDEX_CACHE_NAME = "indexes";
 }

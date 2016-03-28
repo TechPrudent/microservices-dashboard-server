@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "ereload:echo": {
+      "href": "http://jboss0014.bc:22181/ereload/echo{?echoMessage}",
+      "templated": true
+    },
+    "ereload:msisdn_profile": {
+      "href": "http://jboss0014.bc:22181/ereload/msisdn/{msisdn}",
+      "templated": true
+    },
+    "ereload:reload_order": {
+      "href": "http://jboss0014.bc:22181/ereload/reload/order"
+    },
+    "ereload:order_status": {
+      "href": "http://jboss0014.bc:22181/ereload/reload/order/{orderId}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/ereload/generated-docs/api-guide.html#resources-{rel}",
+        "name": "ereload",
+        "templated": true
+      }
+    ]
+  }
+}

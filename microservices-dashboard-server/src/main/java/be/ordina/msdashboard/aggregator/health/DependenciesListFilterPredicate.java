@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;

@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "cpe:modem": {
+      "href": "http://jboss0015.bc:22261/customer-premises-equipment/modem/{serviceID}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-premises-equipment/generated-docs/api-guide.html#resources-{rel}",
+        "name": "cpe",
+        "templated": true
+      }
+    ]
+  }
+}

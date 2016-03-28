@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/cdb-customer-provider"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "cdb-customer-provider-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

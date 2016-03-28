@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "cg:group": {
+      "href": "http://jboss0019.bc:22241/customer-group/customer-group-fls/{groupId}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-group/generated-docs/api-guide.html#resources-{rel}",
+        "name": "cg",
+        "templated": true
+      }
+    ]
+  }
+}

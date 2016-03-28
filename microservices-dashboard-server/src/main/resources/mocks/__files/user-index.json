@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "us:user": {
+      "href": "http://jboss0019.bc:22161/user/user{?includes}",
+      "templated": true
+    },
+    "us:roles": {
+      "href": "http://jboss0019.bc:22161/user/user/roles?oneCDB={oneCDB}",
+      "templated": true
+    },
+    "us:role": {
+      "href": "http://jboss0019.bc:22161/user/user/{globalId}/role{?mobile}",
+      "templated": true
+    },
+    "us:passwordverification": {
+      "href": "http://jboss0019.bc:22161/user/user/passwordverification"
+    },
+    "curies": [
+      {
+        "href": "/user/generated-docs/api-guide.html#resources-{rel}",
+        "name": "us",
+        "templated": true
+      }
+    ]
+  }
+}

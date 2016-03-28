@@ -18,7 +18,7 @@ public class VirtualAndRealDependencyIntegratorTest {
 	@Test
 	public void shouldIntegrateVirtualNodesToReal() throws Exception {
 		VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator = new VirtualAndRealDependencyIntegrator();
-		List<Node> integratedDependencies = virtualAndRealDependencyIntegrator.integrateVirtualNodesToReal(getRealDependencies(), getVirtualDependencies());
+		List<Node> integratedDependencies = virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(getRealDependencies(), null, getVirtualDependencies());
 		assertThat(integratedDependencies.size()).isEqualTo(4);
 		assertThat(integratedDependencies.get(0).getLinkedNodes().size()).isEqualTo(4);
 		assertThat(integratedDependencies.get(0).getLinkedNodes().get(0).getId()).isEqualTo("1a");

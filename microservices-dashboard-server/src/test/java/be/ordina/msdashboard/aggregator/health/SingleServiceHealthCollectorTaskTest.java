@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import be.ordina.msdashboard.model.Service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,13 +38,13 @@ public class SingleServiceHealthCollectorTaskTest {
 
 	@InjectMocks
 	@Spy
-	private SingleServiceHealthCollectorTask task = new SingleServiceHealthCollectorTask("", 10, "",  null, null);
+	private SingleServiceHealthCollectorTask task = new SingleServiceHealthCollectorTask(new Service("", "", 10),  null, null);
 
 	@Mock
 	private ResponseEntity<Map> response;
 
 	@Mock
-	private MapToNodeConverter mapToNodeConverter;
+	private HealthToNodeConverter healthToNodeConverter;
 
 	private RestTemplate restTemplate;
 
@@ -53,7 +54,7 @@ public class SingleServiceHealthCollectorTaskTest {
 		when(task.getRestTemplate()).thenReturn(restTemplate);
 		when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(Map.class))).thenReturn(response);
 		when(response.getBody()).thenReturn(new HashMap());
-		when(mapToNodeConverter.convert(any(Map.class))).thenReturn(mockResponseEntity());
+		when(healthToNodeConverter.convert(any(Map.class))).thenReturn(mockResponseEntity());
 	}
 
 	@Test

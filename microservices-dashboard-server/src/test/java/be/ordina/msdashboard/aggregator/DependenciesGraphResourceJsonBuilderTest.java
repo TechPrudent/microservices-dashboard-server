@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.services.RedisService;
 import org.apache.commons.collections.CollectionUtils;
@@ -44,6 +46,9 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 
 	@Mock
+	private IndexesAggregator indexesAggregator;
+
+	@Mock
 	private RedisService redisService;
 
 	@Mock
@@ -52,7 +57,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
-		List<Node> dependenciesList = Lists.newArrayList(
+		List<Node> microservicesAndBackends = Lists.newArrayList(
 				NodeBuilder.node().withId("key1")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
@@ -76,10 +81,11 @@ public class DependenciesGraphResourceJsonBuilderTest {
 						.withLinkedNode(NodeBuilder.node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build()
 		);
-	Node dependencies = NodeBuilder.node().havingLinkedNodes(dependenciesList).build();
+	Node dependencies = NodeBuilder.node().havingLinkedNodes(microservicesAndBackends).build();
 		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
-		doReturn(dependencies.getLinkedNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesToReal(anyListOf(Node.class), anyListOf(Node.class));
+		doReturn(dependencies.getLinkedNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anyListOf(Node.class), anyListOf(Node.class), anyListOf(Node.class));
 		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(new Node()).when(indexesAggregator).fetchIndexes();
 
 
 		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();

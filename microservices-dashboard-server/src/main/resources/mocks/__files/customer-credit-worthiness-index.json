@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "ccw:validate": {
+      "href": "http://jboss0019.bc:22061/customer-credit-worthiness/validate{?cdbId,vatNumber,birthDate,firstName,lastName,city,street,number,numberSuffix,zipCode}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-credit-worthiness/generated-docs/api-guide.html#resources-{rel}",
+        "name": "ccw",
+        "templated": true
+      }
+    ]
+  }
+}

@@ -1,9 +1,6 @@
 package be.ordina.msdashboard.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NodeBuilder {
 
@@ -45,6 +42,11 @@ public class NodeBuilder {
 			linkedNodes = new ArrayList<>();
 		}
 		linkedNodes.add(node);
+		return this;
+	}
+
+	public NodeBuilder withLinkedNodes(final Collection<Node> nodes) {
+		nodes.stream().forEach(this::withLinkedNode);
 		return this;
 	}
 

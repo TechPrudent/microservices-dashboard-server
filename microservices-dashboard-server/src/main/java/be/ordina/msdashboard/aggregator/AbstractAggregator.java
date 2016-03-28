@@ -7,6 +7,7 @@ import java.util.concurrent.FutureTask;
 
 import javax.servlet.http.HttpServletRequest;
 
+import be.ordina.msdashboard.model.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,7 @@ public abstract class AbstractAggregator<T> {
 	}
 
 	public List<FutureTask<T>> getFutureTasks() {
-		LOG.debug("Starting collecting backend info");
+		LOG.debug("Starting collecting remote info");
 		List<String> serviceIds = getIdsFromOnlineServices();
 		return launchSingleServiceRootLinksCollectorTasks(serviceIds);
 	}
@@ -60,7 +61,7 @@ public abstract class AbstractAggregator<T> {
 			ServiceInstance serviceInstance = serviceInstances.get(0);
 			int servicePort = serviceInstance.getPort();
 			String serviceHost = serviceInstance.getHost();
-			FutureTask<T> task = new IdentifiableFutureTask(instantiateAggregatorTask(originRequest, serviceId, serviceHost, servicePort), serviceId);
+			FutureTask<T> task = new IdentifiableFutureTask(instantiateAggregatorTask(originRequest, new Service(serviceId, serviceHost, servicePort)), serviceId);
 			tasks.add(task);
 			taskExecutor.execute(task);
 		}
@@ -68,7 +69,7 @@ public abstract class AbstractAggregator<T> {
 		return tasks;
 	}
 
-	protected abstract Callable<T> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, String serviceHost, int servicePort);
+	protected abstract Callable<T> instantiateAggregatorTask(final HttpServletRequest originRequest, final Service service);
 
 	protected class IdentifiableFutureTask extends FutureTask<T> {
 

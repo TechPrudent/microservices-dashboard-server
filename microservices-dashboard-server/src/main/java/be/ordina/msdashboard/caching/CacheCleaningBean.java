@@ -9,9 +9,10 @@ public class CacheCleaningBean {
 	private static final Logger LOG = LoggerFactory.getLogger(CacheCleaningBean.class);
 
 	public CacheCleaningBean(RedisService redisService, boolean evict) {
-		LOG.info("Cleaning cash=" + evict);
+		LOG.info("Cleaning cash: " + evict);
 		if (evict) {
-			redisService.evictCache();
+			redisService.evictHealthsCache();
+			redisService.evictIndexesCache();
 		}
 	}
 }

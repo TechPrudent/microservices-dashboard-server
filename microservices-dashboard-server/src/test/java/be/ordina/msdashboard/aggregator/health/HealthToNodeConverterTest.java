@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,13 +13,13 @@ import java.util.Map;
 import be.ordina.msdashboard.model.Node;
 import org.junit.Test;
 
-public class MapToNodeConverterTest {
+public class HealthToNodeConverterTest {
 	private static final String STATUS = "status";
 
 	@Test
 	public void shouldConvertCorrectly() throws Exception {
 		System.out.println(getSourceMap());
-		MapToNodeConverter converter = new MapToNodeConverter();
+		HealthToNodeConverter converter = new HealthToNodeConverter();
 		Node result = converter.convert(getSourceMap());
 		Map<String, Object> details = result.getDetails();
 		assertThat(details.get(STATUS)).isEqualTo("UP");

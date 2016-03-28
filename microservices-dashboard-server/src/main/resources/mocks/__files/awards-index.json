@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "aw:awards": {
+      "href": "http://jboss0014.bc:22281/awards/customer/{customerId}/awards?filter={filter}",
+      "templated": true
+    },
+    "aw:award": {
+      "href": "http://jboss0014.bc:22281/awards/customer/{customerId}/award/{awardId}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/awards/generated-docs/api-guide.html#resources-{rel}",
+        "name": "aw",
+        "templated": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ordering-macsmobile"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ordering-macsmobile-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

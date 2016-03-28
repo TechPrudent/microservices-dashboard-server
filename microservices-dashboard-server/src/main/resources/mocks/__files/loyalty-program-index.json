@@ -1,0 +1,34 @@
+{
+  "_links": {
+    "lp:loyaltyProgramSubscription": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/customer/{customerId}/loyaltyprogramsubscription",
+      "templated": true
+    },
+    "lp:loyaltyProgramSubscriptionRestricted": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/customer/loyaltyprogramsubscription"
+    },
+    "lp:loyaltyPointsTransferEligibility": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/eligibilityCheck/loyaltyProgramSubscription/{loyaltyProgramSubscriptionId}/transfer",
+      "templated": true
+    },
+    "lp:loyaltyeligibility": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/customer/{customerId}/loyaltyeligibility",
+      "templated": true
+    },
+    "lp:loyaltyPointsHistory": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/customer/{customerId}/loyaltypoints{?fromDate,toDate}",
+      "templated": true
+    },
+    "lp:loyaltyPointsDebitTransaction": {
+      "href": "http://jboss0020.bc:22301/loyalty-program/loyaltyProgramSubscription/{loyaltyProgramSubscriptionId}/transaction/debit",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/loyalty-program/generated-docs/api-guide.html#resources-{rel}",
+        "name": "lp",
+        "templated": true
+      }
+    ]
+  }
+}

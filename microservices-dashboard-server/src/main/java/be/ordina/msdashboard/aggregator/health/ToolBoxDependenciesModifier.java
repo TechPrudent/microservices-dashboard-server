@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import static be.ordina.msdashboard.constants.Constants.CONFIGSERVER;
 import static be.ordina.msdashboard.constants.Constants.DISCOVERY;

@@ -1,0 +1,39 @@
+{
+  "_links": {
+    "mb:echo": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/echo{?echoMessage}",
+      "templated": true
+    },
+    "mb:msisdn-info": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/msisdn/{msisdnNumber}/info",
+      "templated": true
+    },
+    "mb:sim-info": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/sim/{simNumber}/info",
+      "templated": true
+    },
+    "mb:sim-swap": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/sim/{simNumber}/swap",
+      "templated": true
+    },
+    "mb:msisdn-block": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/msisdn/{msisdn}/block",
+      "templated": true
+    },
+    "mb:msisdn-unblock": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/msisdn/{msisdn}/unblock",
+      "templated": true
+    },
+    "mb:order-history": {
+      "href": "http://jboss0014.bc:22401/ordering-macsmobile/customer/{userId}/orders?transactionType={transactionType}&startDate={startDate}&endDate={endDate}&pageNumber={pageNumber}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/ordering-macsmobile/generated-docs/api-guide.html#resources-{rel}",
+        "name": "mb",
+        "templated": true
+      }
+    ]
+  }
+}

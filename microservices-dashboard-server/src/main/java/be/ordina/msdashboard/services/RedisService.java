@@ -72,7 +72,11 @@ public class RedisService {
 		redisConnectionFactory.getConnection().flushDb();
 	}
 
-	@CacheEvict(value = Constants.GRAPH_CACHE_NAME, allEntries = true)
-	public void evictCache() {
+	@CacheEvict(value = Constants.HEALTH_CACHE_NAME, allEntries = true)
+	public void evictHealthsCache() {
+	}
+
+	@CacheEvict(value = Constants.INDEX_CACHE_NAME, allEntries = true)
+	public void evictIndexesCache() {
 	}
 }

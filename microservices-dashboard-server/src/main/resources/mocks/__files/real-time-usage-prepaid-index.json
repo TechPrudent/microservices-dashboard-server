@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "rp:usage": {
+      "href": "http://jboss0018.bc:22241/real-time-usage-prepaid/usage/{msisdn}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/real-time-usage-prepaid/generated-docs/api-guide.html#resources-{rel}",
+        "name": "rp",
+        "templated": true
+      }
+    ]
+  }
+}

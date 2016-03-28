@@ -63,6 +63,6 @@ public class DependenciesController {
 
 	@RequestMapping(value = "evictCache", method = POST)
 	public void evictCache (){
-		redisService.evictCache();
+		redisService.evictHealthsCache();
 	}
 }

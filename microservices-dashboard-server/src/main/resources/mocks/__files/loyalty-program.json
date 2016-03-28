@@ -12,6 +12,13 @@
     "type": "SOAP",
     "group": "NGRP"
   },
+  "user": {
+    "status": "UP",
+    "type": "MICROSERVICE",
+    "group": "FUNCTIONAL",
+    "minVersion": "1.0.2",
+    "version": "1.4.0"
+  },
   "octCreateCorrespondence": {
     "status": "UP",
     "version": "1.9",

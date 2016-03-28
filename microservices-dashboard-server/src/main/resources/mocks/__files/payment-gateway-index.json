@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "pg:sign": {
+      "href": "http://jboss0018.bc:22101/payment-gateway/ogone/sign"
+    },
+    "pg:verify": {
+      "href": "http://jboss0018.bc:22101/payment-gateway/ogone/verify?account={account}",
+      "templated": true
+    },
+    "pg:voucher": {
+      "href": "http://jboss0018.bc:22101/payment-gateway/voucher/{voucherReferenceId}",
+      "templated": true
+    },
+    "pg:redeem": {
+      "href": "http://jboss0018.bc:22101/payment-gateway/voucher/{voucherReferenceId}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/payment-gateway/generated-docs/api-guide.html#resources-{rel}",
+        "name": "pg",
+        "templated": true
+      }
+    ]
+  }
+}

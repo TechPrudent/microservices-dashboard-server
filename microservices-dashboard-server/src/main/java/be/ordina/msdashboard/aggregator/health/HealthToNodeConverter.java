@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
 import static be.ordina.msdashboard.constants.Constants.TYPE;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import be.ordina.msdashboard.model.Node;
 
 @Component
-public class MapToNodeConverter {
+public class HealthToNodeConverter {
 
 	private static final String STATUS = "status";
 

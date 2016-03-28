@@ -1,0 +1,48 @@
+{
+  "_links": {
+    "ps:echo": {
+      "href": "http://jboss0018.bc:22201/product-stock/echo{?echoMessage}",
+      "templated": true
+    },
+    "ps:productStocks": {
+      "href": "http://jboss0018.bc:22201/product-stock/productStocks"
+    },
+    "ps:productStock": {
+      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock",
+      "templated": true
+    },
+    "ps:updateProductStock": {
+      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock",
+      "templated": true
+    },
+    "ps:productStockChange": {
+      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock/change",
+      "templated": true
+    },
+    "ps:productStockChanges": {
+      "href": "http://jboss0018.bc:22201/product-stock/productStocks/change"
+    },
+    "ps:productStocksCC": {
+      "href": "http://jboss0018.bc:22201/product-stock/shops/productStockAvailabilities"
+    },
+    "ps:productStockLocator": {
+      "href": "http://jboss0018.bc:22201/product-stock/ProductStockLocator/{type}/{locationId}",
+      "templated": true
+    },
+    "ps:productStockReservation": {
+      "href": "http://jboss0018.bc:22201/product-stock/order/{orderId}/stockreservation?email={email}",
+      "templated": true
+    },
+    "ps:cancelReservation": {
+      "href": "http://jboss0018.bc:22201/product-stock/order/{orderId}/stockreservation",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/product-stock/generated-docs/api-guide.html#resources-{rel}",
+        "name": "ps",
+        "templated": true
+      }
+    ]
+  }
+}

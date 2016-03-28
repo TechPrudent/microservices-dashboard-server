@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "sm:echo": {
+      "href": "http://jboss0018.bc:22281/shop-management/echo{?echoMessage}",
+      "templated": true
+    },
+    "sm:shops": {
+      "href": "http://jboss0018.bc:22281/shop-management/shops{?clickAndCollect}",
+      "templated": true
+    },
+    "sm:shop": {
+      "href": "http://jboss0018.bc:22281/shop-management/shop/{id}?context={context}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/shop-management/generated-docs/api-guide.html#resources-{rel}",
+        "name": "sm",
+        "templated": true
+      }
+    ]
+  }
+}

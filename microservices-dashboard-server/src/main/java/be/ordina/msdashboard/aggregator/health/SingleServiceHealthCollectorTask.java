@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
 import static org.springframework.http.HttpMethod.GET;
 
@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import javax.servlet.http.HttpServletRequest;
 
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.Service;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,28 +29,29 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SingleServiceHealthCollectorTask.class);
 	private final String uriString;
-	private final static String GATEWAY = "";
 	private final static String HEALTH = "health";
-	private MapToNodeConverter mapToNodeConverter;
+	private HealthToNodeConverter healthToNodeConverter;
 	private DependenciesListFilterPredicate dependenciesListFilterPredicate;
 	private ToolBoxDependenciesModifier toolBoxDependenciesModifier;
 
-	public SingleServiceHealthCollectorTask(final String serviceId, final int gatewayPort, final String gatewayHost, final HttpServletRequest originRequest, final String managementContextPath) {
-		uriString = buildHealthUri(serviceId, gatewayPort, gatewayHost, managementContextPath);
-		mapToNodeConverter = new MapToNodeConverter();
+	public SingleServiceHealthCollectorTask(final Service service, final HttpServletRequest originRequest, final String managementContextPath) {
+		uriString = buildHealthUri(service, managementContextPath);
+		healthToNodeConverter = new HealthToNodeConverter();
 		dependenciesListFilterPredicate = new DependenciesListFilterPredicate();
 		toolBoxDependenciesModifier = new ToolBoxDependenciesModifier();
 	}
 
-	private String buildHealthUri(final String serviceId, final int gatewayPort, final String gatewayHost, final String managementContextPath) {
-		Assert.notNull(serviceId);
+	private String buildHealthUri(final Service service, final String managementContextPath) {
+		Assert.notNull(service.getId());
 		StringBuilder builder = new StringBuilder("http://");
-		builder.append(gatewayHost)
-				.append(":").append(gatewayPort)
-				.append("/").append(GATEWAY)
-				.append(serviceId)
+		builder.append(service.getHost())
+				.append(":")
+				.append(service.getPort())
+				.append("/")
+				.append(service.getId())
 				.append(managementContextPath)
-				.append("/").append(HEALTH);
+				.append("/")
+				.append(HEALTH);
 		return builder.toString();
 	}
 
@@ -70,14 +72,14 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 				GET,
 				new HttpEntity<Map>(headers),
 				Map.class);
-		Node node = mapToNodeConverter.convert(responseRest.getBody());
+		Node node = healthToNodeConverter.convert(responseRest.getBody());
 		Collection<Node> nodeCollection = node.getLinkedNodes();
 		nodeCollection = Collections2.filter(nodeCollection, dependenciesListFilterPredicate);
 		nodeCollection = toolBoxDependenciesModifier.modify(nodeCollection);
 		node.setLinkedNodes((List) nodeCollection);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
-			LOG.debug("uri: {} total time: {}", uriString, totalTime);
+			LOG.debug("URI: {} Total time: {}", uriString, totalTime);
 		}
 		return node;
 	}

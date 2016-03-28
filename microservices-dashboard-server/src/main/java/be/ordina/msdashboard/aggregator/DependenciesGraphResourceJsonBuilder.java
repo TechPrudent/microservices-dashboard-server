@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.services.RedisService;
@@ -24,12 +26,14 @@ public class DependenciesGraphResourceJsonBuilder {
 	private static final String LANES = "lanes";
 	private static final String NODES = "nodes";
 	private static final String LINKS = "links";
-	private static final String UI = "UI";
-	private static final String ENDPOINT = "Endpoint";
-	private static final String BACKEND = "Backend";
+	private static final String UI = "UI Components";
+	private static final String RESOURCES = "Resources";
+	private static final String MICROSERVICES = "Microservices";
+	private static final String BACKEND = "Backends";
 	private static final String DESCRIPTION = "description";
 
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
+	private IndexesAggregator indexesAggregator;
 
 	private RedisService redisService;
 
@@ -38,9 +42,10 @@ public class DependenciesGraphResourceJsonBuilder {
 	private final Map<String, Object> graph;
 
 	@Autowired
-	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final RedisService redisService,
+	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final IndexesAggregator indexesAggregator, final RedisService redisService,
 			final VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
 		this.healthIndicatorsAggregator = healthIndicatorsAggregator;
+		this.indexesAggregator = indexesAggregator;
 		this.redisService = redisService;
 		this.virtualAndRealDependencyIntegrator = virtualAndRealDependencyIntegrator;
 		graph = new HashMap<>();
@@ -48,20 +53,22 @@ public class DependenciesGraphResourceJsonBuilder {
 	}
 
 	public Map<String, Object> build() {
-		Node node = healthIndicatorsAggregator.fetchCombinedDependencies();
-		List<Node> dependencies = node.getLinkedNodes();
-		List<Node> virtualDependencies = redisService.getAllNodes();
-		if (!virtualDependencies.isEmpty()) {
-			virtualAndRealDependencyIntegrator.integrateVirtualNodesToReal(dependencies, virtualDependencies);
+		Node healthNode = healthIndicatorsAggregator.fetchCombinedDependencies();
+		Node indexNode = indexesAggregator.fetchIndexes();
+		List<Node> microservicesAndBackends = healthNode.getLinkedNodes();
+		List<Node> resources = indexNode.getLinkedNodes();
+		List<Node> virtualNodes = redisService.getAllNodes();
+		if (!virtualNodes.isEmpty()) {
+			virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(microservicesAndBackends, resources, virtualNodes);
 		}
-		return createGraph(dependencies);
+		return createGraph(microservicesAndBackends, resources);
 	}
 
-	private Map<String, Object> createGraph(final List<Node> dependencies) {
+	private Map<String, Object> createGraph(final List<Node> microservicesAndBackends, List<Node> resources) {
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		List<Map<String, Integer>> links = new ArrayList<>();
 
-		for (Node microservice : dependencies) {
+		for (Node microservice : microservicesAndBackends) {
 			String microserviceName = microservice.getId();
 			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
 			if (!isNodeAlreadyThere(nodes, microserviceName)) {
@@ -71,15 +78,22 @@ public class DependenciesGraphResourceJsonBuilder {
 			List<Node> dependencyNodes = microservice.getLinkedNodes();
 			removeEurekaDescription(dependencyNodes);
 			for (Node dependencyNode : dependencyNodes) {
-				int dependencyNodeId = findDependencyNode(dependencyNode.getId(), nodes);
+				int dependencyNodeId = findNode(dependencyNode.getId(), nodes);
 				if (dependencyNodeId == -1) {
-					Integer lane;
-					lane = determineLane(dependencyNode.getDetails());
+					Integer lane = determineLane(dependencyNode.getDetails());
 					nodes.add(createNode(dependencyNode.getId(), lane, dependencyNode.getDetails()));
 					dependencyNodeId = nodes.size() - 1;
 				}
 				links.add(createLink(microserviceNodeId, dependencyNodeId));
 			}
+		}
+		for (Node resource : resources) {
+			Map<String, Object> resourceNode = createResourceNode(resource);
+			nodes.add(resourceNode);
+			String linkedMicroservice = resource.getLinkedNodes().get(0).getId();
+			int resourceNodeId = nodes.size() - 1;
+			int linkedMicroserviceNodeId = findNode(linkedMicroservice, nodes);
+			links.add(createLink(resourceNodeId, linkedMicroserviceNodeId));
 		}
 		graph.put(NODES, nodes);
 		graph.put(LINKS, links);
@@ -94,7 +108,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		return new Integer("3");
 	}
 
-	private int findDependencyNode(final String dependency, final List<Map<String, Object>> nodes) {
+	private int findNode(final String dependency, final List<Map<String, Object>> nodes) {
 		for (Map<String, Object> map : nodes) {
 			if (dependency.equals(map.get(Constants.ID))) {
 				return nodes.indexOf(map);
@@ -115,6 +129,10 @@ public class DependenciesGraphResourceJsonBuilder {
 		return createNode(microServicename, lane, details);
 	}
 
+	private Map<String, Object> createResourceNode(final Node node) {
+		return createNode(node.getId(), node.getLane(), node.getDetails());
+	}
+
 	private Map<String, Object> createNode(final String id, final Integer lane, Map<String, Object> details) {
 		Map<String, Object> node = new HashMap<>();
 		node.put(Constants.ID, id);
@@ -133,8 +151,8 @@ public class DependenciesGraphResourceJsonBuilder {
 	private List<Map<Object, Object>> constructLanes() {
 		List<Map<Object, Object>> lanes = new ArrayList<>();
 		lanes.add(constructLane(0, UI));
-		lanes.add(constructLane(1, ENDPOINT));
-		lanes.add(constructLane(2, Constants.MICROSERVICE));
+		lanes.add(constructLane(1, RESOURCES));
+		lanes.add(constructLane(2, MICROSERVICES));
 		lanes.add(constructLane(3, BACKEND));
 		return lanes;
 	}

@@ -1,6 +1,5 @@
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregator.health;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -10,9 +9,11 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import be.ordina.msdashboard.aggregator.AbstractAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
+import be.ordina.msdashboard.model.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,23 +31,21 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	@Autowired
 	private Environment environment;
 
-	@Cacheable(value = Constants.GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	@Cacheable(value = Constants.HEALTH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchCombinedDependencies() {
-		Node taskResponses = buildAggregatedDependenciesListFromTaskResponses(getFutureTasks());
+		Node taskResponses = buildAggregatedDependenciesFromTaskResponses(getFutureTasks());
 		return taskResponses;
 	}
 
-	private Node buildAggregatedDependenciesListFromTaskResponses(final List<FutureTask<Node>> tasks) {
-		List<Node> nodes = new ArrayList<>();
+	private Node buildAggregatedDependenciesFromTaskResponses(final List<FutureTask<Node>> tasks) {
 		NodeBuilder nodeBuilder = NodeBuilder.node();
 		for (FutureTask<Node> task : tasks) {
 			String key = null;
 			try {
 				key = ((IdentifiableFutureTask) task).getId();
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
-				LOG.debug("task {} is done {}", key, task.isDone());
+				LOG.debug("Task {} is done {}", key, task.isDone());
 				value.setId(key);
-				nodes.add(value);
 				nodeBuilder.withLinkedNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.debug("Problem getting results for task: {} caused by: {}", key, e.toString());
@@ -57,7 +56,7 @@ public class HealthIndicatorsAggregator extends AbstractAggregator<Node> {
 	}
 
 	@Override
-	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final String serviceId, final String serviceHost, final int servicePort) {
-		return new SingleServiceHealthCollectorTask(serviceId, servicePort, serviceHost, originRequest, environment.getProperty("management.context-path"));
+	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final Service service) {
+		return new SingleServiceHealthCollectorTask(service, originRequest, environment.getProperty("management.context-path"));
 	}
 }

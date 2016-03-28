@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "od:echo": {
+      "href": "http://jboss0014.bc:22321/ordering-onedrive/echo{?echoMessage}",
+      "templated": true
+    },
+    "od:domain": {
+      "href": "http://jboss0014.bc:22321/ordering-onedrive/domain/{domainName}/availability",
+      "templated": true
+    },
+    "od:order": {
+      "href": "http://jboss0014.bc:22321/ordering-onedrive/order"
+    },
+    "curies": [
+      {
+        "href": "/ordering-onedrive/generated-docs/api-guide.html#resources-{rel}",
+        "name": "od",
+        "templated": true
+      }
+    ]
+  }
+}

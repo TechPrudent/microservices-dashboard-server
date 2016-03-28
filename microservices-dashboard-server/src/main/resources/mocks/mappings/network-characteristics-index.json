@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/network-characteristics"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "network-characteristics-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

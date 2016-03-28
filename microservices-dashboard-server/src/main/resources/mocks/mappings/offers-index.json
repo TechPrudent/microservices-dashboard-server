@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/offers"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "offers-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

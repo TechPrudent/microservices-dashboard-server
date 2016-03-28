@@ -1,0 +1,58 @@
+{
+  "_links": {
+    "bc:uploadZip": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{?description}",
+      "templated": true
+    },
+    "bc:uploadConfigFiles": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}{?description}",
+      "templated": true
+    },
+    "bc:getAllVersions": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/",
+      "templated": true
+    },
+    "bc:getActiveConfig": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/active",
+      "templated": true
+    },
+    "bc:getActiveConfigFile": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/active/file/{file:.+}",
+      "templated": true
+    },
+    "bc:getConfigByVersion": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}",
+      "templated": true
+    },
+    "bc:activateConfig": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}/activate",
+      "templated": true
+    },
+    "bc:archiveConfig": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}/archive",
+      "templated": true
+    },
+    "bc:downloadZipConfigFile": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}/file/{file:.+}",
+      "templated": true
+    },
+    "bc:downloadConfigFile": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}/file/",
+      "templated": true
+    },
+    "bc:processorDescriptions": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/"
+    },
+    "bc:deleteConfig": {
+      "href": "http://jboss0019.bc:22101/webshop-business-configuration/config/{ext}/version/{version}/delete",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/webshop-business-configuration/generated-docs/api-guide.html#resources-{rel}",
+        "name": "bc",
+        "templated": true
+      }
+    ]
+  }
+}

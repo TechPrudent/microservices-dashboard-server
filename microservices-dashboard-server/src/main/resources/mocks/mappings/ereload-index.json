@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ereload"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ereload-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

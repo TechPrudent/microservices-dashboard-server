@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/user-application-trusts"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "user-application-trusts-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
