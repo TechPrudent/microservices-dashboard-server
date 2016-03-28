@@ -18,6 +18,8 @@ public class IndexToNodeConverter {
 	private static final String CURIES = "curies";
 	private static final String HREF = "href";
 	private static final String CURIE_NAME = "name";
+	private static final String RESOURCE = "RESOURCE";
+	private static final String UP = "UP";
 
 	public Node convert(final Map<String, Object> source, final Service service) {
 		if (source.containsKey(LINKS)) {
@@ -42,6 +44,8 @@ public class IndexToNodeConverter {
 					Map<String, Object> details = new HashMap<>();
 					details.put("url", (String) link.get(HREF));
 					details.put("docs", resolveDocs((List<Map<String, Object>>) links.get(CURIES), linkKey, service));
+					details.put("type", RESOURCE);
+					details.put("status", UP);
 					node.havingDetails(details);
 
 					masterNode.getLinkedNodes().add(node.build());
