@@ -24,6 +24,7 @@ public class DependenciesGraphResourceJsonBuilder {
 	private static final String MULTIGRAPH = "multigraph";
 	private static final String GRAPH = "graph";
 	private static final String LANES = "lanes";
+	private static final String TYPES = "types";
 	private static final String NODES = "nodes";
 	private static final String LINKS = "links";
 	private static final String UI = "UI Components";
@@ -31,6 +32,12 @@ public class DependenciesGraphResourceJsonBuilder {
 	private static final String MICROSERVICES = "Microservices";
 	private static final String BACKEND = "Backends";
 	private static final String DESCRIPTION = "description";
+	private static final String DB = "DB";
+	private static final String MICROSERVICE = "MICROSERVICE";
+	private static final String REST = "REST";
+	private static final String SOAP = "SOAP";
+	private static final String JMS = "JMS";
+	private static final String RESOURCE = "RESOURCE";
 
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 	private IndexesAggregator indexesAggregator;
@@ -157,6 +164,17 @@ public class DependenciesGraphResourceJsonBuilder {
 		return lanes;
 	}
 
+	private List<String> constructTypes() {
+		List<String> types = new ArrayList<>();
+		types.add(DB);
+		types.add(MICROSERVICE);
+		types.add(REST);
+		types.add(SOAP);
+		types.add(JMS);
+		types.add(RESOURCE);
+		return types;
+	}
+
 	private Map<Object, Object> constructLane(final int lane, final String type) {
 		Map<Object, Object> laneMap = newHashMap();
 		laneMap.put(Constants.LANE, lane);
@@ -187,5 +205,6 @@ public class DependenciesGraphResourceJsonBuilder {
 		graph.put(MULTIGRAPH, false);
 		graph.put(GRAPH, new String[0]);
 		graph.put(LANES, constructLanes());
+		graph.put(TYPES, constructTypes());
 	}
 }
