@@ -1,11 +1,11 @@
 {
   "_links": {
     "qm:cart": {
-      "href": "http://jboss0019.bc:22041/quote-management/carts/{hash}{?language}",
+      "href": "http://host0019.local:8041/quote-management/carts/{hash}{?language}",
       "templated": true
     },
     "qm:cartByCustomer": {
-      "href": "http://jboss0019.bc:22041/quote-management/carts?customerId={customerId}{&language}",
+      "href": "http://host0019.local:8041/quote-management/carts?customerId={customerId}{&language}",
       "templated": true
     },
     "curies": [

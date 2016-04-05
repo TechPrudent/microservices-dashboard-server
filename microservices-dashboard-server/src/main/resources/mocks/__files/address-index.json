@@ -1,44 +1,44 @@
 {
   "_links": {
-    "ad:city": {
-      "href": "http://jboss0015.bc:22301/address/cities?lang={lang}&query={query}",
+    "add:city": {
+      "href": "http://host0015.local:8301/address/cities?lang={lang}&query={query}",
       "templated": true
     },
-    "ad:street": {
-      "href": "http://jboss0015.bc:22301/address/cities/{cityCode}/streets?lang={lang}&name={name}",
+    "add:street": {
+      "href": "http://host0015.local:8301/address/cities/{cityCode}/streets?lang={lang}&name={name}",
       "templated": true
     },
-    "ad:lookup": {
-      "href": "http://jboss0015.bc:22301/address/lookup?languageContext={languageContext}&mainKey={mainKey}{&subKey,language}",
+    "add:lookup": {
+      "href": "http://host0015.local:8301/address/lookup?languageContext={languageContext}&mainKey={mainKey}{&subKey,language}",
       "templated": true
     },
-    "ad:validation": {
-      "href": "http://jboss0015.bc:22301/address/validation?requestId={requestId}&city={city}&street={street}&number={number}{&numberSuffix,block,box,floor,apartment,language,unitDetails}",
+    "add:validation": {
+      "href": "http://host0015.local:8301/address/validation?requestId={requestId}&city={city}&street={street}&number={number}{&numberSuffix,block,box,floor,apartment,language,unitDetails}",
       "templated": true
     },
-    "ad:validation-post": {
-      "href": "http://jboss0015.bc:22301/address/validation"
+    "add:validation-new": {
+      "href": "http://host0015.local:8301/address/validation"
     },
-    "ad:kialapoints": {
-      "href": "http://jboss0015.bc:22301/address/kiala{?zip,date}",
+    "add:kiala-points": {
+      "href": "http://host0015.local:8301/address/kiala{?zip,date}",
       "templated": true
     },
-    "ad:kialapoints_beta": {
-      "href": "http://jboss0015.bc:22301/address/kiala?zip={zip}",
+    "add:kiala-points_beta": {
+      "href": "http://host0015.local:8301/address/kiala?zip={zip}",
       "templated": true
     },
-    "ad:kialapoint": {
-      "href": "http://jboss0015.bc:22301/address/kiala/{kpid}{?zip}",
+    "add:kiala-point": {
+      "href": "http://host0015.local:8301/address/kiala/{kpid}{?zip}",
       "templated": true
     },
-    "ad:kialapoint_beta": {
-      "href": "http://jboss0015.bc:22301/address/kiala/{kpid}?zip={zip}",
+    "add:kiala-point_beta": {
+      "href": "http://host0015.local:8301/address/kiala/{kpid}?zip={zip}",
       "templated": true
     },
     "curies": [
       {
         "href": "/address/generated-docs/api-guide.html#resources-{rel}",
-        "name": "ad",
+        "name": "add",
         "templated": true
       }
     ]

@@ -1,13 +1,13 @@
 {
   "_links": {
-    "cg:group": {
-      "href": "http://jboss0019.bc:22241/customer-group/customer-group-fls/{groupId}",
+    "cugr:group": {
+      "href": "http://host0019.local:8241/customer-group/customer-group/{groupId}",
       "templated": true
     },
     "curies": [
       {
         "href": "/customer-group/generated-docs/api-guide.html#resources-{rel}",
-        "name": "cg",
+        "name": "cugr",
         "templated": true
       }
     ]

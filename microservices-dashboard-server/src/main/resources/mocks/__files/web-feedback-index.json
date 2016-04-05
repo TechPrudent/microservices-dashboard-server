@@ -1,11 +1,11 @@
 {
   "_links": {
     "wf:echo": {
-      "href": "http://jboss0018.bc:22301/web-feedback/echo{?echoMessage}",
+      "href": "http://host0018.local:8301/web-feedback/echo{?echoMessage}",
       "templated": true
     },
     "wf:feedback": {
-      "href": "http://jboss0018.bc:22301/web-feedback/supportarticle/{id}/feedback",
+      "href": "http://host0018.local:8301/web-feedback/supportarticle/{id}/feedback",
       "templated": true
     },
     "curies": [

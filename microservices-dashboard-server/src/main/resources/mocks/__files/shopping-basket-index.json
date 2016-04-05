@@ -1,169 +1,169 @@
 {
   "_links": {
     "sc:fulfilment": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/fulfilment"
+      "href": "http://host0015.local:8341/shopping-basket/fulfilment"
     },
     "sc:cartLocation": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/exists"
+      "href": "http://host0015.local:8341/shopping-basket/carts/exists"
     },
     "sc:cart": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}{?validate}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}{?validate}",
       "templated": true
     },
     "sc:installationPoints": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/installation-points",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/installation-points",
       "templated": true
     },
     "sc:validInstallationPoint": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/installation-points/{secretNumber}/validate",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/installation-points/{secretNumber}/validate",
       "templated": true
     },
     "sc:installationDate": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/installationDate",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/installationDate",
       "templated": true
     },
     "sc:kialaId": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/kialaId",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/kialaId",
       "templated": true
     },
     "sc:dynalogicInstallationDate": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/dynalogicInstallDate",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/dynalogicInstallDate",
       "templated": true
     },
     "sc:statusCheckout": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/statusCheckout",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/statusCheckout",
       "templated": true
     },
     "sc:shopId": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/shop{?shopId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/shop{?shopId}",
       "templated": true
     },
     "sc:backends": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/backends",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/backends",
       "templated": true
     },
     "sc:cartItemMove": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/items/{cartItemId}/move",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/items/{cartItemId}/move",
       "templated": true
     },
     "sc:product": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/products/{productId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/products/{productId}",
       "templated": true
     },
     "sc:cartItems": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/items{?specialEvent,shopId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/items{?specialEvent,shopId}",
       "templated": true
     },
     "sc:cartItem": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/items/{cartItemId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/items/{cartItemId}",
       "templated": true
     },
     "sc:customer": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/customer",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/customer",
       "templated": true
     },
     "sc:customerAuthorizations": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/customerAuthorizations",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/customerAuthorizations",
       "templated": true
     },
     "sc:address": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/address/{addressId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/address/{addressId}",
       "templated": true
     },
     "sc:addresses": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/address",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/address",
       "templated": true
     },
     "sc:wizard": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/cart-configuration/{cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/cart-configuration/{cartId}",
       "templated": true
     },
     "sc:partialWizard": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/cart-configuration/partial/{cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/cart-configuration/partial/{cartId}",
       "templated": true
     },
     "sc:action": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/cart-configuration/action/{cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/cart-configuration/action/{cartId}",
       "templated": true
     },
     "sc:actions": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/cart-configuration/actions/{cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/cart-configuration/actions/{cartId}",
       "templated": true
     },
     "sc:products": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/cart-configuration/{cartId}/upselling-options",
+      "href": "http://host0015.local:8341/shopping-basket/cart-configuration/{cartId}/upselling-options",
       "templated": true
     },
     "sc:order": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order?cartId={cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/order?cartId={cartId}",
       "templated": true
     },
     "sc:send": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/send?cartId={cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/order/send?cartId={cartId}",
       "templated": true
     },
     "sc:sendCart": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/breakRetrieve"
+      "href": "http://host0015.local:8341/shopping-basket/order/breakRetrieve"
     },
     "sc:pay": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/payment?cartId={cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/order/payment?cartId={cartId}",
       "templated": true
     },
     "sc:reserve": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/reservation?cartId={cartId}",
+      "href": "http://host0015.local:8341/shopping-basket/order/reservation?cartId={cartId}",
       "templated": true
     },
     "sc:verify": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/payment/success"
+      "href": "http://host0015.local:8341/shopping-basket/order/payment/success"
     },
     "sc:cancel": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/payment/failed"
+      "href": "http://host0015.local:8341/shopping-basket/order/payment/failed"
     },
     "sc:productReservation": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/order/{masterOrderId}?email={email}",
+      "href": "http://host0015.local:8341/shopping-basket/order/{masterOrderId}?email={email}",
       "templated": true
     },
     "sc:voucher": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/voucher/{voucherReferenceId}",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/voucher/{voucherReferenceId}",
       "templated": true
     },
     "sc:vouchers": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/voucher",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/voucher",
       "templated": true
     },
     "sc:cartAvailable": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/availability/{cdbId}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/availability/{cdbId}",
       "templated": true
     },
     "sc:cartQuote": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/carts/{hash}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/carts/{hash}",
       "templated": true
     },
     "sc:quoteOrder": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/carts/{hash}/order{?cdbId}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/carts/{hash}/order{?cdbId}",
       "templated": true
     },
     "sc:quoteConfirm": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/carts/{hash}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/carts/{hash}",
       "templated": true
     },
     "sc:cartForLead": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/lead/{cartId}/forLead",
+      "href": "http://host0015.local:8341/shopping-basket/internal/lead/{cartId}/forLead",
       "templated": true
     },
     "sc:cardIdsForLead": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/lead/cartIdsForLead"
+      "href": "http://host0015.local:8341/shopping-basket/internal/lead/cartIdsForLead"
     },
     "sc:flagLeadDone": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/lead/{cartId}/flagLead/{leadStatus}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/lead/{cartId}/flagLead/{leadStatus}",
       "templated": true
     },
     "sc:identifyByName": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/carts/{cartId}/identify",
+      "href": "http://host0015.local:8341/shopping-basket/carts/{cartId}/identify",
       "templated": true
     },
     "sc:failedOrders": {
-      "href": "http://jboss0015.bc:22341/shopping-basket/internal/failedOrders{?limit,orderId}",
+      "href": "http://host0015.local:8341/shopping-basket/internal/failedOrders{?limit,orderId}",
       "templated": true
     },
     "curies": [

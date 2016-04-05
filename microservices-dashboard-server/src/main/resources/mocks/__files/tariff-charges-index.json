@@ -1,7 +1,7 @@
 {
   "_links": {
     "tc:priceplan": {
-      "href": "http://jboss0019.bc:22021/tariff-charges/priceplan/{priceplanId}",
+      "href": "http://host0019.local:8021/tariff-charges/priceplan/{priceplanId}",
       "templated": true
     },
     "curies": [

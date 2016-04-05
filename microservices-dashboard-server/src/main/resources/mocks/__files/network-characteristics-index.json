@@ -1,7 +1,7 @@
 {
   "_links": {
     "nc:connectivity-access": {
-      "href": "http://jboss0015.bc:22281/network-characteristics/connectivityAccess/{lamKey}",
+      "href": "http://host0015.local:8281/network-characteristics/connectivityAccess/{lamKey}",
       "templated": true
     },
     "curies": [

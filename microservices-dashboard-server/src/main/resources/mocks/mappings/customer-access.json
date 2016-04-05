@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-access/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-access.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

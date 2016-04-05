@@ -1,7 +1,7 @@
 {
   "_links": {
     "rp:usage": {
-      "href": "http://jboss0018.bc:22241/real-time-usage-prepaid/usage/{msisdn}",
+      "href": "http://host0018.local:8241/real-time-usage-prepaid/usage/{msisdn}",
       "templated": true
     },
     "curies": [

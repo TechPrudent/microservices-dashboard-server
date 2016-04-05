@@ -1,67 +1,67 @@
 {
   "_links": {
     "wbre:cartValidation": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/cart/validate"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/cart/validate"
     },
     "wbre:cartOrganization": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/cart/organize/cart"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/cart/organize/cart"
     },
     "wbre:upsell": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/cart/upselling-products"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/cart/upselling-products"
     },
     "wbre:wizard": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/wizard/initial"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/wizard/initial"
     },
     "wbre:wizardInitial": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/wizard/partial"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/wizard/partial"
     },
     "wbre:wizardFinal": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/wizard/final"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/wizard/final"
     },
     "wbre:wizardAction": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/wizard/action"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/wizard/action"
     },
     "wbre:wizardActions": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/wizard/actions"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/wizard/actions"
     },
     "wbre:deliveryMethods": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/delivery/methods"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/delivery/methods"
     },
     "wbre:cartPaymentDetails": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/payment-details/cart"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/payment-details/cart"
     },
     "wbre:ogoneReservation": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/payment-details/ogone/reservation-check"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/payment-details/ogone/reservation-check"
     },
     "wbre:ogoneAccount": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/payment-details/ogone/account"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/payment-details/ogone/account"
     },
     "wbre:ogoneReservationAccount": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/payment-details/ogone/account/reservation"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/payment-details/ogone/account/reservation"
     },
     "wbre:defaultOrder": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/default/generate"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/default/generate"
     },
     "wbre:breakRetrieveOrder": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/break/generate"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/break/generate"
     },
     "wbre:saltoQuote": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/retrieve/generate"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/retrieve/generate"
     },
     "wbre:saltoImport": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/retrieve/import"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/retrieve/import"
     },
     "wbre:instantFulfilment": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/instantfulfilment/generate"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/instantfulfilment/generate"
     },
     "wbre:cartBackends": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/order/backend"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/order/backend"
     },
     "wbre:createLead": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/lead/create"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/lead/create"
     },
     "wbre:liveChat": {
-      "href": "http://jboss0019.bc:22081/webshop-businessrules-engine/livechat"
+      "href": "http://host0019.local:8081/webshop-businessrules-engine/livechat"
     },
     "curies": [
       {

@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "GET",
-    "url": "/ereload/actuator/health"
+    "url": "/marketing/actuator/health"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "ereload.json",
+    "bodyFileName": "marketing.json",
     "headers": {
       "Content-Type": "application/json"
     }

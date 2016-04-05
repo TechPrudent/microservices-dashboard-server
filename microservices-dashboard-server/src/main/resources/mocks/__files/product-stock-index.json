@@ -1,40 +1,40 @@
 {
   "_links": {
     "ps:echo": {
-      "href": "http://jboss0018.bc:22201/product-stock/echo{?echoMessage}",
+      "href": "http://host0018.local:8201/product-stock/echo{?echoMessage}",
       "templated": true
     },
     "ps:productStocks": {
-      "href": "http://jboss0018.bc:22201/product-stock/productStocks"
+      "href": "http://host0018.local:8201/product-stock/productStocks"
     },
     "ps:productStock": {
-      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock",
+      "href": "http://host0018.local:8201/product-stock/product/{productId}/productStock",
       "templated": true
     },
     "ps:updateProductStock": {
-      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock",
+      "href": "http://host0018.local:8201/product-stock/product/{productId}/productStock",
       "templated": true
     },
     "ps:productStockChange": {
-      "href": "http://jboss0018.bc:22201/product-stock/product/{productId}/productStock/change",
+      "href": "http://host0018.local:8201/product-stock/product/{productId}/productStock/change",
       "templated": true
     },
     "ps:productStockChanges": {
-      "href": "http://jboss0018.bc:22201/product-stock/productStocks/change"
+      "href": "http://host0018.local:8201/product-stock/productStocks/change"
     },
     "ps:productStocksCC": {
-      "href": "http://jboss0018.bc:22201/product-stock/shops/productStockAvailabilities"
+      "href": "http://host0018.local:8201/product-stock/shops/productStockAvailabilities"
     },
     "ps:productStockLocator": {
-      "href": "http://jboss0018.bc:22201/product-stock/ProductStockLocator/{type}/{locationId}",
+      "href": "http://host0018.local:8201/product-stock/ProductStockLocator/{type}/{locationId}",
       "templated": true
     },
     "ps:productStockReservation": {
-      "href": "http://jboss0018.bc:22201/product-stock/order/{orderId}/stockreservation?email={email}",
+      "href": "http://host0018.local:8201/product-stock/order/{orderId}/stockreservation?email={email}",
       "templated": true
     },
     "ps:cancelReservation": {
-      "href": "http://jboss0018.bc:22201/product-stock/order/{orderId}/stockreservation",
+      "href": "http://host0018.local:8201/product-stock/order/{orderId}/stockreservation",
       "templated": true
     },
     "curies": [

@@ -1,10 +1,10 @@
 {
   "_links": {
     "ua:avatar": {
-      "href": "http://jboss0018.bc:22161/user-avatar/user/avatar"
+      "href": "http://host0018.local:8161/user-avatar/user/avatar"
     },
     "ua:avatarById": {
-      "href": "http://jboss0018.bc:22161/user-avatar/user/{globalId}/avatar",
+      "href": "http://host0018.local:8161/user-avatar/user/{globalId}/avatar",
       "templated": true
     },
     "curies": [

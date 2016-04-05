@@ -1,10 +1,10 @@
 {
   "_links": {
     "uat:application-trusts": {
-      "href": "http://jboss0018.bc:22321/user-application-trusts/user/application/trusts"
+      "href": "http://host0018.local:8321/user-application-trusts/user/application/trusts"
     },
     "uat:application-trust": {
-      "href": "http://jboss0018.bc:22321/user-application-trusts/user/application/trusts/{app-id}"
+      "href": "http://host0018.local:8321/user-application-trusts/user/application/trusts/{app-id}"
     },
     "curies": [
       {

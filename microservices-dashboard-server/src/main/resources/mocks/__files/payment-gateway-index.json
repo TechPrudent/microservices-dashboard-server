@@ -1,18 +1,18 @@
 {
   "_links": {
     "pg:sign": {
-      "href": "http://jboss0018.bc:22101/payment-gateway/ogone/sign"
+      "href": "http://host0018.local:8101/payment-gateway/ogone/sign"
     },
     "pg:verify": {
-      "href": "http://jboss0018.bc:22101/payment-gateway/ogone/verify?account={account}",
+      "href": "http://host0018.local:8101/payment-gateway/ogone/verify?account={account}",
       "templated": true
     },
     "pg:voucher": {
-      "href": "http://jboss0018.bc:22101/payment-gateway/voucher/{voucherReferenceId}",
+      "href": "http://host0018.local:8101/payment-gateway/voucher/{voucherReferenceId}",
       "templated": true
     },
     "pg:redeem": {
-      "href": "http://jboss0018.bc:22101/payment-gateway/voucher/{voucherReferenceId}",
+      "href": "http://host0018.local:8101/payment-gateway/voucher/{voucherReferenceId}",
       "templated": true
     },
     "curies": [

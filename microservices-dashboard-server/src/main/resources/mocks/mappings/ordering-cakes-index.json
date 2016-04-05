@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ordering-cakes"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ordering-cakes-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

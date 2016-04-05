@@ -1,21 +1,21 @@
 {
   "_links": {
-    "ib:assignedproducts": {
-      "href": "http://jboss0018.bc:22081/installbase/assigned-products?customerId={customerId}{&maxResults}",
+    "inst:products": {
+      "href": "http://host0018.local:8081/installbase/products?customerId={customerId}{&maxResults}",
       "templated": true
     },
-    "ib:serviceinformation": {
-      "href": "http://jboss0018.bc:22081/installbase/msisdn/{msisdn}",
+    "inst:services": {
+      "href": "http://host0018.local:8081/installbase/services/{serviceId}",
       "templated": true
     },
-    "ib:rootassignedproduct": {
-      "href": "http://jboss0018.bc:22081/installbase/customer/{customerId}/assigned-product/",
+    "inst:roots": {
+      "href": "http://host0018.local:8081/installbase/customer/{customerId}/roots/",
       "templated": true
     },
     "curies": [
       {
         "href": "/installbase/generated-docs/api-guide.html#resources-{rel}",
-        "name": "ib",
+        "name": "inst",
         "templated": true
       }
     ]

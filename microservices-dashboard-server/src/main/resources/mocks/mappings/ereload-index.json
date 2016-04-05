@@ -1,11 +1,11 @@
 {
   "request": {
     "method": "GET",
-    "url": "/ereload"
+    "url": "/marketing"
   },
   "response": {
     "status": 200,
-    "bodyFileName": "ereload-index.json",
+    "bodyFileName": "marketing-index.json",
     "headers": {
       "Content-Type": "application/json"
     }

@@ -1,15 +1,15 @@
 {
   "_links": {
     "sm:echo": {
-      "href": "http://jboss0018.bc:22281/shop-management/echo{?echoMessage}",
+      "href": "http://host0018.local:8281/shop-management/echo{?echoMessage}",
       "templated": true
     },
     "sm:shops": {
-      "href": "http://jboss0018.bc:22281/shop-management/shops{?clickAndCollect}",
+      "href": "http://host0018.local:8281/shop-management/shops{?clickAndCollect}",
       "templated": true
     },
     "sm:shop": {
-      "href": "http://jboss0018.bc:22281/shop-management/shop/{id}?context={context}",
+      "href": "http://host0018.local:8281/shop-management/shop/{id}?context={context}",
       "templated": true
     },
     "curies": [
