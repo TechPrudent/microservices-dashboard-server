@@ -20,6 +20,17 @@
         <url>http://el2604.bc:8585/ms-toolbox/dependencies.git/</url>
         <tag>dependencies-1.5.0</tag>
     </scm>
+    
+    <distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://el1881.bc:8081/nexus/content/repositories/MicroserviceReleases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://el1881.bc:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
     <groupId>be.ordina</groupId>
     <artifactId>microservices-dashboard-server</artifactId>
