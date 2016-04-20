@@ -9,6 +9,8 @@ management:
 
 services:
   mock: true
+redis:
+  mock: false
 
 spring:
   jackson:
@@ -21,7 +23,7 @@ spring:
   aop:
     proxyTargetClass: true
   redis:
-      host: localhost
+      host: el2604.bc
       port: 6379
       pool:
         max-wait: 10000
