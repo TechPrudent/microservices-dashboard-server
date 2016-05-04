@@ -30,10 +30,10 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 			try {
 				key = ((IdentifiableFutureTask) task).getId();
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
-				LOG.debug("Task {} is done {}", key, task.isDone());
+				LOG.debug("Task {} is done: {}", key, task.isDone());
 				uiNode.withLinkedNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				LOG.debug("Problem getting results for task: {} caused by: {}", key, e.toString());
+				LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
 		}
 		LOG.debug("Finished fetching pacts");
