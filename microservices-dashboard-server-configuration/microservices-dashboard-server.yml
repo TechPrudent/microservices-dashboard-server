@@ -10,7 +10,7 @@ management:
 services:
   mock: true
 redis:
-  mock: false
+  mock: true
 
 spring:
   jackson:
@@ -41,3 +41,8 @@ eureka:
     enabled: false
     serviceUrl:
       defaultZone: http://localhost:7878/serviceregistry/eureka/
+
+pact-broker:
+  url: http://localhost:8089
+  latest-url: /pacts/latest
+  self-href-jsonPath: $.pacts[*]._links.self[0].href
