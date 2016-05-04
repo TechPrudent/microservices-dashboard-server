@@ -15,7 +15,7 @@
     </properties>
 
     <groupId>be.ordina</groupId>
-    <artifactId>microservices-dashboard-server</artifactId>
+    <artifactId>microservices-dashboard-server-sample</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
