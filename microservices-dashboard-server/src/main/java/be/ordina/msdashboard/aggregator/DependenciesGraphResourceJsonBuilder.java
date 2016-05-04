@@ -9,9 +9,12 @@ import java.util.Map;
 
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.services.RedisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +22,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 @Component
 public class DependenciesGraphResourceJsonBuilder {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DependenciesGraphResourceJsonBuilder.class);
 
 	private static final String DIRECTED = "directed";
 	private static final String MULTIGRAPH = "multigraph";
@@ -41,6 +46,7 @@ public class DependenciesGraphResourceJsonBuilder {
 
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 	private IndexesAggregator indexesAggregator;
+	private PactsAggregator pactsAggregator;
 
 	private RedisService redisService;
 
@@ -49,10 +55,12 @@ public class DependenciesGraphResourceJsonBuilder {
 	private final Map<String, Object> graph;
 
 	@Autowired
-	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final IndexesAggregator indexesAggregator, final RedisService redisService,
-			final VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
+	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final IndexesAggregator indexesAggregator,
+												final PactsAggregator pactsAggregator, final RedisService redisService,
+												final VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
 		this.healthIndicatorsAggregator = healthIndicatorsAggregator;
 		this.indexesAggregator = indexesAggregator;
+		this.pactsAggregator = pactsAggregator;
 		this.redisService = redisService;
 		this.virtualAndRealDependencyIntegrator = virtualAndRealDependencyIntegrator;
 		graph = new HashMap<>();
@@ -62,16 +70,18 @@ public class DependenciesGraphResourceJsonBuilder {
 	public Map<String, Object> build() {
 		Node healthNode = healthIndicatorsAggregator.fetchCombinedDependencies();
 		Node indexNode = indexesAggregator.fetchIndexes();
+		Node uiNode = pactsAggregator.fetchUIComponents();
 		List<Node> microservicesAndBackends = healthNode.getLinkedNodes();
 		List<Node> resources = indexNode.getLinkedNodes();
+		List<Node> uiComponents = uiNode.getLinkedNodes();
 		List<Node> virtualNodes = redisService.getAllNodes();
 		if (!virtualNodes.isEmpty()) {
 			virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(microservicesAndBackends, resources, virtualNodes);
 		}
-		return createGraph(microservicesAndBackends, resources);
+		return createGraph(microservicesAndBackends, resources, uiComponents);
 	}
 
-	private Map<String, Object> createGraph(final List<Node> microservicesAndBackends, List<Node> resources) {
+	private Map<String, Object> createGraph(final List<Node> microservicesAndBackends, List<Node> resources, List<Node> uiComponents) {
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		List<Map<String, Integer>> links = new ArrayList<>();
 
@@ -100,7 +110,26 @@ public class DependenciesGraphResourceJsonBuilder {
 			String linkedMicroservice = resource.getLinkedNodes().get(0).getId();
 			int resourceNodeId = nodes.size() - 1;
 			int linkedMicroserviceNodeId = findNode(linkedMicroservice, nodes);
-			links.add(createLink(resourceNodeId, linkedMicroserviceNodeId));
+			if (linkedMicroserviceNodeId != -1) {
+				links.add(createLink(resourceNodeId, linkedMicroserviceNodeId));
+			} else {
+				LOG.warn("Unable to resolve a link from {} to {} (destination not found)", resource.getId(), linkedMicroservice);
+			}
+		}
+		for (Node uiComponent : uiComponents) {
+			Map<String, Object> uiComponentNode = createUiComponentNode(uiComponent);
+			nodes.add(uiComponentNode);
+			int uiComponentNodeId = nodes.size() - 1;
+			uiComponent.getLinkedNodes().stream()
+					.map(linkedResource -> linkedResource.getId())
+					.forEach(linkedResourceId -> {
+						int linkedResourceNodeId = findNode(linkedResourceId, nodes);
+						if (linkedResourceNodeId != -1) {
+							links.add(createLink(uiComponentNodeId, linkedResourceNodeId));
+						} else {
+							LOG.warn("Unable to resolve a link from {} to {} (destination not found)", uiComponent.getId(), linkedResourceId);
+						}
+					});
 		}
 		graph.put(NODES, nodes);
 		graph.put(LINKS, links);
@@ -137,6 +166,10 @@ public class DependenciesGraphResourceJsonBuilder {
 	}
 
 	private Map<String, Object> createResourceNode(final Node node) {
+		return createNode(node.getId(), node.getLane(), node.getDetails());
+	}
+
+	private Map<String, Object> createUiComponentNode(final Node node) {
 		return createNode(node.getId(), node.getLane(), node.getDetails());
 	}
 

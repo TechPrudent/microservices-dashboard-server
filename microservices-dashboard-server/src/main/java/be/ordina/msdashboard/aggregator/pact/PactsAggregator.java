@@ -1,6 +1,8 @@
-package be.ordina.msdashboard.aggregator.index;
+package be.ordina.msdashboard.aggregator.pact;
 
 import be.ordina.msdashboard.aggregator.EurekaBasedAggregator;
+import be.ordina.msdashboard.aggregator.PactBrokerBasedAggregator;
+import be.ordina.msdashboard.aggregator.index.SingleServiceIndexCollectorTask;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
@@ -14,32 +16,32 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.*;
 
 @Component
-public class IndexesAggregator extends EurekaBasedAggregator<Node> {
+public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(IndexesAggregator.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PactsAggregator.class);
 
 	private static final long TIMEOUT = 17000L;
 
-	@Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Node fetchIndexes() {
-		NodeBuilder indexesNode = new NodeBuilder();
+	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	public Node fetchUIComponents() {
+		NodeBuilder uiNode = new NodeBuilder();
 		for (FutureTask<Node> task : getFutureTasks()) {
 			String key = null;
 			try {
 				key = ((IdentifiableFutureTask) task).getId();
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				LOG.debug("Task {} is done {}", key, task.isDone());
-				indexesNode.withLinkedNodes(value.getLinkedNodes());
+				uiNode.withLinkedNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.debug("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
 		}
-		LOG.debug("Finished fetching combined indexes");
-		return indexesNode.build();
+		LOG.debug("Finished fetching pacts");
+		return uiNode.build();
 	}
 
 	@Override
-	protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final Service service) {
-		return new SingleServiceIndexCollectorTask(service, originRequest);
+	protected Callable<Node> instantiateAggregatorTask(String pactUrl) {
+		return new SinglePactCollectorTask(pactUrl);
 	}
 }
