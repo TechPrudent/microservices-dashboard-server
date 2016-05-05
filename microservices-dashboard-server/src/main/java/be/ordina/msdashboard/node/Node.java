@@ -19,22 +19,14 @@ public class Node {
     @JsonProperty(ID)
     private String id;
 
-    @JsonProperty(DETAILS)
-    private Map<String, Object> details;
-
     @JsonProperty(LANE)
     private Integer lane;
 
+    @JsonProperty(DETAILS)
+    private Map<String, Object> details;
+
     @JsonProperty(LINKED_NODES)
     private List<Node> linkedNodes;
-
-    public void setLane(Integer lane) {
-        this.lane = lane;
-    }
-
-    public Integer getLane() {
-        return lane;
-    }
 
     public void setId(String id) {
         this.id = id;
@@ -44,15 +36,12 @@ public class Node {
         return id;
     }
 
-    public List<Node> getLinkedNodes() {
-        if (linkedNodes == null) {
-            linkedNodes = new ArrayList<>();
-        }
-        return linkedNodes;
+    public void setLane(Integer lane) {
+        this.lane = lane;
     }
 
-    public void setLinkedNodes(List<Node> linkedNodes) {
-        this.linkedNodes = linkedNodes;
+    public Integer getLane() {
+        return lane;
     }
 
     public Map<String, Object> getDetails() {
@@ -64,6 +53,17 @@ public class Node {
 
     public void setDetails(Map<String, Object> details) {
         this.details = details;
+    }
+
+    public List<Node> getLinkedNodes() {
+        if (linkedNodes == null) {
+            linkedNodes = new ArrayList<>();
+        }
+        return linkedNodes;
+    }
+
+    public void setLinkedNodes(List<Node> linkedNodes) {
+        this.linkedNodes = linkedNodes;
     }
 
     @Override
@@ -87,9 +87,9 @@ public class Node {
     @Override
     public String toString() {
         return "Node{" +
-                "details=" + details +
-                ", id='" + id + '\'' +
+                "id='" + id + '\'' +
                 ", lane=" + lane +
+                ", details=" + details +
                 ", linkedNodes=" + linkedNodes +
                 '}';
     }
