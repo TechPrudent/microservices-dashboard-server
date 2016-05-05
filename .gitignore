@@ -1,8 +1,9 @@
-microservices-dashboard-server/.settings
-microservices-dashboard-server/.classpath
-microservices-dashboard-server/.project
-microservices-dashboard-server/target/
+.settings
+.classpath
+.project
+target/
+
 *.iml
 .idea/
 .ssh/
-microservices-dashboard-server/.factorypath
+.factorypath/
