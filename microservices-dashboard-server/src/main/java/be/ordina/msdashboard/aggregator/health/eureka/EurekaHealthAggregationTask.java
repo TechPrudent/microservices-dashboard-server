@@ -43,7 +43,7 @@ public class EurekaHealthAggregationTask {
         }
 
         if (StringUtils.isEmpty(uriString)) {
-            logger.error("Could't retrieve the healthcheck URI for instance '{}'", eurekaServiceInstance.getServiceId());
+            logger.error("Couldn't retrieve the healthcheck URI for instance '{}'", eurekaServiceInstance.getServiceId());
             return null;
         }
 
