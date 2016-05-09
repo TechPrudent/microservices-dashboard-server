@@ -103,7 +103,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		assertThat(CollectionUtils.isEqualCollection(expectedNodeList, returnedNodeList)).isTrue();
 
 		List<Map<String, Integer>> expectedLinks = getExpectedLinks();
-		List<Map<String, Integer>> returnedLinks = (List<Map<String, Integer>>) returnedMap.get("links");
+		Set<Map<String, Integer>> returnedLinks = (Set<Map<String, Integer>>) returnedMap.get("links");
 		assertThat(CollectionUtils.isEqualCollection(expectedLinks, returnedLinks)).isTrue();
 
 	}
