@@ -2,10 +2,7 @@ package be.ordina.msdashboard.aggregator;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
@@ -83,7 +80,7 @@ public class DependenciesGraphResourceJsonBuilder {
 
 	private Map<String, Object> createGraph(final List<Node> microservicesAndBackends, List<Node> resources, List<Node> uiComponents) {
 		List<Map<String, Object>> nodes = new ArrayList<>();
-		List<Map<String, Integer>> links = new ArrayList<>();
+		Set<Map<String, Integer>> links = new HashSet<>();
 
 		for (Node microservice : microservicesAndBackends) {
 			String microserviceName = microservice.getId();
@@ -181,7 +178,8 @@ public class DependenciesGraphResourceJsonBuilder {
 		return node;
 	}
 
-	private Map<String, Integer> createLink(final int source, final int target) {
+	@VisibleForTesting
+	Map<String, Integer> createLink(final int source, final int target) {
 		Map<String, Integer> link = new HashMap<>();
 		link.put("source", source);
 		link.put("target", target);

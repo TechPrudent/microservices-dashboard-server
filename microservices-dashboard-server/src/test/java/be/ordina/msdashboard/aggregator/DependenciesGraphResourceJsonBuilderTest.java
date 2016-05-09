@@ -12,10 +12,7 @@ import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
 import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static be.ordina.msdashboard.constants.Constants.TYPE;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
@@ -244,5 +241,13 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		expectedLinks.add(link8);
 		expectedLinks.add(link9);
 		return expectedLinks;
+	}
+
+	@Test
+	public void cannotAddDuplicateLinks() {
+		Set<Map<String, Integer>> links = new HashSet<>();
+		links.add(dependenciesGraphResourceJsonBuilder.createLink(100,150));
+		links.add(dependenciesGraphResourceJsonBuilder.createLink(100,150));
+		assertThat(links.size()).isEqualTo(1);
 	}
 }
