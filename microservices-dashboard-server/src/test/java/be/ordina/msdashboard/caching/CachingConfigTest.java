@@ -42,11 +42,13 @@ public class CachingConfigTest {
         when(cachingProperties.isEvict()).thenReturn(false);
 
         CacheCleaningBean cacheCleaningBean = cachingConfig.cacheCleaningBean(redisService);
-
         assertThat(cacheCleaningBean).isNotNull();
+
+        cacheCleaningBean.clean();
 
         verify(redisService, times(0)).evictHealthsCache();
         verify(redisService, times(0)).evictIndexesCache();
+        verify(redisService, times(0)).evictPactsCache();
     }
 
     @Test
@@ -56,11 +58,13 @@ public class CachingConfigTest {
         when(cachingProperties.isEvict()).thenReturn(true);
 
         CacheCleaningBean cacheCleaningBean = cachingConfig.cacheCleaningBean(redisService);
-
         assertThat(cacheCleaningBean).isNotNull();
+
+        cacheCleaningBean.clean();
 
         verify(redisService, times(1)).evictHealthsCache();
         verify(redisService, times(1)).evictIndexesCache();
+        verify(redisService, times(1)).evictPactsCache();
     }
 
 }

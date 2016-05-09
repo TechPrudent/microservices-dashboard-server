@@ -74,4 +74,8 @@ public class RedisService {
 	@CacheEvict(value = Constants.INDEX_CACHE_NAME, allEntries = true)
 	public void evictIndexesCache() {
 	}
+
+	@CacheEvict(value = Constants.PACTS_CACHE_NAME, allEntries = true)
+	public void evictPactsCache() {
+	}
 }

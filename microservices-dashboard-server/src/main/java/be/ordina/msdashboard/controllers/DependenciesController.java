@@ -8,6 +8,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import java.util.List;
 import java.util.Map;
 
+import be.ordina.msdashboard.caching.CacheCleaningBean;
 import be.ordina.msdashboard.services.DependenciesResourceService;
 import be.ordina.msdashboard.services.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class DependenciesController {
 
 	@Autowired
 	private RedisService redisService;
+
+	@Autowired
+	private CacheCleaningBean cacheCleaningBean;
 
 	@RequestMapping(value = "/graph", produces = "application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
@@ -61,8 +65,8 @@ public class DependenciesController {
 		redisService.flushDB();
 	}
 
-	@RequestMapping(value = "evictCache", method = POST)
-	public void evictCache (){
-		redisService.evictHealthsCache();
+	@RequestMapping(value = "/evictCache", method = POST)
+	public void evictCache(){
+		cacheCleaningBean.clean();
 	}
 }

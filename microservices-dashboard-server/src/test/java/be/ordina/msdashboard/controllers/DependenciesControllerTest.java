@@ -1,5 +1,6 @@
 package be.ordina.msdashboard.controllers;
 
+import be.ordina.msdashboard.caching.CacheCleaningBean;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.services.DependenciesResourceService;
 import be.ordina.msdashboard.services.RedisService;
@@ -29,6 +30,9 @@ public class DependenciesControllerTest {
 
     @Mock
     private RedisService redisService;
+
+    @Mock
+    private CacheCleaningBean cacheCleaningBean;
 
     @Test
     public void getDependenciesGraphJson() {
@@ -89,7 +93,7 @@ public class DependenciesControllerTest {
     public void evictCache() {
         dependenciesController.evictCache();
 
-        verify(redisService).evictHealthsCache();
+        verify(cacheCleaningBean).clean();
     }
 
 }

@@ -79,7 +79,7 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 		node.setLinkedNodes((List) nodeCollection);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
-			LOG.debug("URI: {} Total time: {}", uriString, totalTime);
+			LOG.debug("Finished URI: {} Total time: {}", uriString, totalTime);
 		}
 		return node;
 	}

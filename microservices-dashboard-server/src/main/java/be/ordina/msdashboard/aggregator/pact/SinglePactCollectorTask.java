@@ -44,7 +44,7 @@ public class SinglePactCollectorTask implements Callable<Node> {
 		Node node = pactToNodeConverter.convert(pact, pactUrl);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
-			LOG.debug("URI: {} Total time: {}", pactUrl, totalTime);
+			LOG.debug("Finished URI: {} Total time: {}", pactUrl, totalTime);
 		}
 		return node;
 	}

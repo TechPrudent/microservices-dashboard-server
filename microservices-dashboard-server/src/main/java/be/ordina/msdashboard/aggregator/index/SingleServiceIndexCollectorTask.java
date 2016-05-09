@@ -9,13 +9,13 @@ import com.google.common.annotations.VisibleForTesting;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.Assert;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -60,11 +60,13 @@ public class SingleServiceIndexCollectorTask implements Callable<Node> {
 
 		LOG.debug("Calling URI: {}", uriString);
 
-		Map<String, Object> responseRest = restTemplate.getForObject(uriString, Map.class);
-		Node node = indexToNodeConverter.convert(responseRest, service);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.valueOf("application/hal+json")));
+		ResponseEntity<Map> responseRest = restTemplate.exchange(uriString, HttpMethod.GET, new HttpEntity<byte[]>(headers), Map.class);
+		Node node = indexToNodeConverter.convert(responseRest.getBody(), service);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
-			LOG.debug("URI: {} Total time: {}", uriString, totalTime);
+			LOG.debug("Finished URI: {} Total time: {}", uriString, totalTime);
 		}
 		return node;
 	}

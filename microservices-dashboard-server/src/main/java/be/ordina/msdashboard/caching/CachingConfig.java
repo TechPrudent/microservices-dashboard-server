@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.services.RedisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -21,6 +23,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 @EnableCaching
 @EnableConfigurationProperties(CachingProperties.class)
 public class CachingConfig {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CachingConfig.class);
 
 	@Autowired
 	private CachingProperties cachingProperties;
@@ -52,7 +56,6 @@ public class CachingConfig {
 	}
 
 	@Bean
-	@Scope(value = "refresh", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CacheCleaningBean cacheCleaningBean(RedisService redisService){
 		return new CacheCleaningBean(redisService, cachingProperties.isEvict());
 	}
