@@ -85,10 +85,11 @@ public class DependenciesGraphResourceJsonBuilder {
 		for (Node microservice : microservicesAndBackends) {
 			String microserviceName = microservice.getId();
 			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
-			if (!isNodeAlreadyThere(nodes, microserviceName)) {
+			Optional<Integer> nodeIndex = getNodeIndex(nodes, microserviceName);
+			if (!nodeIndex.isPresent()) {
 				nodes.add(microserviceNode);
 			}
-			int microserviceNodeId = nodes.size() - 1;
+			int microserviceNodeId = nodeIndex.orElse(nodes.size() - 1);
 			List<Node> dependencyNodes = microservice.getLinkedNodes();
 			removeEurekaDescription(dependencyNodes);
 			for (Node dependencyNode : dependencyNodes) {
@@ -222,13 +223,14 @@ public class DependenciesGraphResourceJsonBuilder {
 		}
 	}
 
-	private boolean isNodeAlreadyThere(final List<Map<String, Object>> nodes, final String microserviceId) {
-		for (Map<String, Object> node : nodes) {
+	private Optional<Integer> getNodeIndex(final List<Map<String, Object>> nodes, final String microserviceId) {
+		for (int i = 0; i < nodes.size(); i++) {
+			Map<String, Object> node = nodes.get(i);
 			if (microserviceId.equals(node.get(Constants.ID))) {
-				return true;
+				return Optional.of(i);
 			}
 		}
-		return false;
+		return Optional.empty();
 	}
 
 	private void initGraph(final Map<String, Object> graph) {
