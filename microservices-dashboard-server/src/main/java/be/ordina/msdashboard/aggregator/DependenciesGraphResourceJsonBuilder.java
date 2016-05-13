@@ -1,5 +1,7 @@
 package be.ordina.msdashboard.aggregator;
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.*;
@@ -78,12 +80,12 @@ public class DependenciesGraphResourceJsonBuilder {
 		return createGraph(microservicesAndBackends, resources, uiComponents);
 	}
 
-	private Map<String, Object> createGraph(final List<Node> microservicesAndBackends, List<Node> resources, List<Node> uiComponents) {
+	private Map<String, Object> createGraph(final List<Node> microservicesWithTheirBackends, List<Node> resources, List<Node> uiComponents) {
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		Set<Map<String, Integer>> links = new HashSet<>();
 
-		for (Node microservice : microservicesAndBackends) {
-			String microserviceName = microservice.getId();
+		for (Node microservice : microservicesWithTheirBackends) {
+			String microserviceName = convertMicroserviceName(microservice.getId());
 			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
 			Optional<Integer> nodeIndex = getNodeIndex(nodes, microserviceName);
 			if (!nodeIndex.isPresent()) {
@@ -93,6 +95,9 @@ public class DependenciesGraphResourceJsonBuilder {
 			List<Node> dependencyNodes = microservice.getLinkedNodes();
 			removeEurekaDescription(dependencyNodes);
 			for (Node dependencyNode : dependencyNodes) {
+				if (Constants.MICROSERVICE.equals(dependencyNode.getDetails().get(Constants.TYPE))) {
+					dependencyNode.setId(convertMicroserviceName(dependencyNode.getId()));
+				}
 				int dependencyNodeId = findNode(dependencyNode.getId(), nodes);
 				if (dependencyNodeId == -1) {
 					Integer lane = determineLane(dependencyNode.getDetails());
@@ -132,6 +137,10 @@ public class DependenciesGraphResourceJsonBuilder {
 		graph.put(NODES, nodes);
 		graph.put(LINKS, links);
 		return graph;
+	}
+
+	private String convertMicroserviceName(String name) {
+		return LOWER_CAMEL.to(LOWER_HYPHEN, name);
 	}
 
 	@VisibleForTesting
