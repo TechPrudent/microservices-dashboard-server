@@ -10,16 +10,8 @@ import java.util.List;
  *
  * @author Tim Ysewyn
  */
-public abstract class Aggregator {
+public interface Aggregator {
 
-    public final List<Node> getNodes() {
-        List<Node> nodes = fetchNodes();
-        if (nodes == null) {
-            nodes = Collections.emptyList();
-        }
-        return nodes;
-    }
-
-    protected abstract List<Node> fetchNodes();
+    List<Node> getNodes();
 
 }

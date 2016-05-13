@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Tim Ysewyn
  */
-public class EurekaHealthAggregator extends HealthAggregator {
+public class EurekaHealthAggregator implements HealthAggregator {
 
     private DiscoveryClient discoveryClient;
 
@@ -23,7 +23,7 @@ public class EurekaHealthAggregator extends HealthAggregator {
     }
 
     @Override
-    protected List<Node> fetchNodes() {
+    public List<Node> getNodes() {
         List<EurekaHealthAggregationTask> aggregationTasks = new ArrayList<>();
         discoveryClient.getServices().stream().forEach(
                 serviceId -> discoveryClient.getInstances(serviceId).stream().forEach(

@@ -5,6 +5,6 @@ package be.ordina.msdashboard.aggregator;
  *
  * @author Tim Ysewyn
  */
-public abstract class HealthAggregator extends Aggregator {
+public interface HealthAggregator extends Aggregator {
 
 }
