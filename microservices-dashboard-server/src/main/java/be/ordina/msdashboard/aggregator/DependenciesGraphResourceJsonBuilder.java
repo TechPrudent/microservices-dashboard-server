@@ -121,8 +121,11 @@ public class DependenciesGraphResourceJsonBuilder {
 		}
 		for (Node uiComponent : uiComponents) {
 			Map<String, Object> uiComponentNode = createUiComponentNode(uiComponent);
-			nodes.add(uiComponentNode);
-			int uiComponentNodeId = nodes.size() - 1;
+			Optional<Integer> nodeIndex = getNodeIndexByLane(nodes, uiComponent.getId(), 0);
+			if (!nodeIndex.isPresent()) {
+				nodes.add(uiComponentNode);
+			}
+			int uiComponentNodeId = nodeIndex.orElse(nodes.size() - 1);
 			uiComponent.getLinkedNodes().stream()
 					.map(linkedResource -> linkedResource.getId())
 					.forEach(linkedResourceId -> {
@@ -232,10 +235,20 @@ public class DependenciesGraphResourceJsonBuilder {
 		}
 	}
 
-	private Optional<Integer> getNodeIndex(final List<Map<String, Object>> nodes, final String microserviceId) {
+	private Optional<Integer> getNodeIndex(final List<Map<String, Object>> nodes, final String nodeId) {
 		for (int i = 0; i < nodes.size(); i++) {
 			Map<String, Object> node = nodes.get(i);
-			if (microserviceId.equals(node.get(Constants.ID))) {
+			if (nodeId.equals(node.get(Constants.ID))) {
+				return Optional.of(i);
+			}
+		}
+		return Optional.empty();
+	}
+
+	private Optional<Integer> getNodeIndexByLane(final List<Map<String, Object>> nodes, final String nodeId, final int lane) {
+		for (int i = 0; i < nodes.size(); i++) {
+			Map<String, Object> node = nodes.get(i);
+			if (lane == (Integer) node.get(Constants.LANE) && nodeId.equals(node.get(Constants.ID))) {
 				return Optional.of(i);
 			}
 		}
