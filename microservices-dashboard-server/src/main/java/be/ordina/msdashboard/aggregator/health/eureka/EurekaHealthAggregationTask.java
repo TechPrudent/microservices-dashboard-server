@@ -55,7 +55,7 @@ public class EurekaHealthAggregationTask {
         ResponseEntity<EurekaHealthInfo> response = restTemplate.exchange(uriString, HttpMethod.GET, null, EurekaHealthInfo.class);
 
         if (!response.hasBody()) {
-            logger.error("Could't retrieve the healthcheck data for instance '{}'", eurekaServiceInstance.getServiceId());
+            logger.error("Couldn't retrieve the healthcheck data for instance '{}'", eurekaServiceInstance.getServiceId());
             return null;
         }
 
