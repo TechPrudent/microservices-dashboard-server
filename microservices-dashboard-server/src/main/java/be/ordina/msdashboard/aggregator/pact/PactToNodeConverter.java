@@ -1,17 +1,12 @@
 package be.ordina.msdashboard.aggregator.pact;
 
+import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import com.jayway.jsonpath.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.EmbeddedValueResolverAware;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringValueResolver;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +16,6 @@ import java.util.Map;
 public class PactToNodeConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PactToNodeConverter.class);
-	private static final String UI_COMPONENT = "UI_COMPONENT";
 	private static final String UP = "UP";
 	private static final String relPath = "rel://";
 
@@ -42,7 +36,7 @@ public class PactToNodeConverter {
 		Map<String, Object> details = new HashMap<>();
 		details.put("url", pactUrl);
 		details.put("docs", pactUrl);
-		details.put("type", UI_COMPONENT);
+		details.put("type", Constants.UI_COMPONENT);
 		details.put("status", UP);
 		node.havingDetails(details);
 

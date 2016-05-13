@@ -87,7 +87,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		doReturn(dependencies.getLinkedNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anyListOf(Node.class), anyListOf(Node.class), anyListOf(Node.class));
 		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
 		doReturn(new Node()).when(indexesAggregator).fetchIndexes();
-		doReturn(new Node()).when(pactsAggregator).fetchUIComponents();
+		doReturn(new Node()).when(pactsAggregator).fetchPactNodes();
 
 
 		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();

@@ -23,21 +23,21 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 	private static final long TIMEOUT = 17000L;
 
 	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Node fetchUIComponents() {
-		NodeBuilder uiNode = new NodeBuilder();
+	public Node fetchPactNodes() {
+		NodeBuilder pactNode = new NodeBuilder();
 		for (FutureTask<Node> task : getFutureTasks()) {
 			String key = null;
 			try {
 				key = ((IdentifiableFutureTask) task).getId();
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				LOG.debug("Task {} is done: {}", key, task.isDone());
-				uiNode.withLinkedNode(value);
+				pactNode.withLinkedNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
 		}
 		LOG.debug("Finished fetching pacts");
-		return uiNode.build();
+		return pactNode.build();
 	}
 
 	@Override
