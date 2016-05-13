@@ -12,22 +12,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>4.2.5.RELEASE</spring.version>
         <spring.cloud.version>1.0.5.RELEASE</spring.cloud.version>
-        <spring.cloud.netflix.version>1.1.0.RC2</spring.cloud.netflix.version>
+        <spring.cloud.netflix.version>1.1.0.RELEASE</spring.cloud.netflix.version>
         <jackson.version>2.7.4</jackson.version>
         <slf4j.version>1.7.21</slf4j.version>
         <powermock.version>1.6.5</powermock.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/libs-milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencies>
         <!-- Spring Framework -->
