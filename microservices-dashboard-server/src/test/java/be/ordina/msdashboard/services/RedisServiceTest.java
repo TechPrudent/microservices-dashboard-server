@@ -1,6 +1,7 @@
 package be.ordina.msdashboard.services;
 
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.store.RedisStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,7 @@ public class RedisServiceTest {
 	private static final String nodeAsJson= "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
 
 	@InjectMocks
-	private RedisService redisService;
+	private RedisStore redisService;
 
 	@Mock
 	private RedisTemplate<String, Node> redisTemplate;
@@ -46,14 +48,14 @@ public class RedisServiceTest {
 
 		doReturn(node).when(opsForValue).get("nodeId");
 
-		List<Node> nodes = redisService.getAllNodes();
+		Collection<Node> nodes = redisService.getAllNodes();
 
 		verify(redisTemplate).keys("virtual:*");
 		verify(redisTemplate).opsForValue();
 		verify(opsForValue).get("nodeId");
 
 		assertThat(nodes).isNotEmpty();
-		assertThat(nodes.get(0)).isEqualTo(node);
+		assertThat(nodes.stream().findFirst().get()).isEqualTo(node);
 	}
 
 	@Test

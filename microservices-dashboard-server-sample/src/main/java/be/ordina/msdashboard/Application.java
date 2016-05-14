@@ -37,7 +37,7 @@ public class Application extends WebMvcConfigurerAdapter {
 		return new CommonAnnotationBeanPostProcessor();
 	}
 	@Bean
-	public RedisTemplate<String,Node> redisTemplate(final RedisConnectionFactory factory){
+	public RedisTemplate<String,Node> redisTemplate(final RedisConnectionFactory factory) {
 		RedisTemplate<String, Node> virtualNodeTemplate = new RedisTemplate<>();
 		virtualNodeTemplate.setConnectionFactory(factory);
 		virtualNodeTemplate.setKeySerializer(new StringRedisSerializer());

@@ -5,29 +5,33 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import be.ordina.msdashboard.caching.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.services.DependenciesResourceService;
-import be.ordina.msdashboard.services.RedisService;
-import org.springframework.beans.factory.annotation.Autowired;
+import be.ordina.msdashboard.store.NodeStore;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
 
 import be.ordina.msdashboard.model.Node;
 
 @CrossOrigin(maxAge = 3600)
-@RestController
-public class DependenciesController {
+@ResponseBody
+public class NodesController {
 
-	@Autowired
+	public NodesController(DependenciesResourceService dependenciesResourceService, NodeStore nodeStore,
+						   CacheCleaningBean cacheCleaningBean) {
+		this.dependenciesResourceService = dependenciesResourceService;
+		this.redisService = nodeStore;
+		this.cacheCleaningBean = cacheCleaningBean;
+	}
+
 	private DependenciesResourceService dependenciesResourceService;
 
-	@Autowired
-	private RedisService redisService;
+	private NodeStore redisService;
 
-	@Autowired
 	private CacheCleaningBean cacheCleaningBean;
 
 	@RequestMapping(value = "/graph", produces = "application/json")
@@ -46,7 +50,7 @@ public class DependenciesController {
 	}
 
 	@RequestMapping(value = "/node", method = GET)
-	public List<Node> getAllNodes() {
+	public Collection<Node> getAllNodes() {
 		return redisService.getAllNodes();
 	}
 

@@ -1,4 +1,4 @@
-package be.ordina.msdashboard;
+package be.ordina.msdashboard.converters;
 
 import be.ordina.msdashboard.converters.JsonToObjectConverter;
 import be.ordina.msdashboard.converters.ObjectToJsonConverter;

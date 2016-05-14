@@ -1,6 +1,7 @@
 package be.ordina.msdashboard;
 
 import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.converters.NodeSerializer;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import org.junit.Test;

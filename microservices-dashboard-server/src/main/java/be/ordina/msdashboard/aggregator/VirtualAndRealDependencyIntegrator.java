@@ -1,9 +1,9 @@
 package be.ordina.msdashboard.aggregator;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import be.ordina.msdashboard.model.Node;
 @Component
 public class VirtualAndRealDependencyIntegrator {
 
-	public List<Node> integrateVirtualNodesWithReal(List<Node> microservicesAndBackends, final List<Node> indexes, final List<Node> virtualNodes) {
+	public List<Node> integrateVirtualNodesWithReal(List<Node> microservicesAndBackends, final List<Node> indexes, final Collection<Node> virtualNodes) {
 		Set<Node> agregatedNodes = new HashSet<>();
 		for (Node microserviceOrBackend : microservicesAndBackends) {
 			for (Node virtualNode : virtualNodes) {

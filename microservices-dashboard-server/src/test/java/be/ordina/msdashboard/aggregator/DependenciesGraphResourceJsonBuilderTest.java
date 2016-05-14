@@ -18,7 +18,7 @@ import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.model.NodeBuilder;
-import be.ordina.msdashboard.services.RedisService;
+import be.ordina.msdashboard.store.NodeStore;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +47,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	private IndexesAggregator indexesAggregator;
 
 	@Mock
-	private RedisService redisService;
+	private NodeStore redisService;
 
 	@Mock
 	private PactsAggregator pactsAggregator;

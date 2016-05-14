@@ -1,7 +1,10 @@
 package be.ordina.msdashboard.caching;
 
+import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CachingProperties;
+import be.ordina.msdashboard.config.RedisConfiguration;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.services.RedisService;
+import be.ordina.msdashboard.store.RedisStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,7 +20,7 @@ import static org.mockito.Mockito.*;
 public class CachingConfigTest {
 
     @InjectMocks
-    private CachingConfig cachingConfig;
+    private RedisConfiguration cachingConfig;
 
     @Mock
     private CachingProperties cachingProperties;
@@ -37,7 +40,7 @@ public class CachingConfigTest {
 
     @Test
     public void shouldNotEvictCache() {
-        RedisService redisService = mock(RedisService.class);
+        RedisStore redisService = mock(RedisStore.class);
 
         when(cachingProperties.isEvict()).thenReturn(false);
 
@@ -53,7 +56,7 @@ public class CachingConfigTest {
 
     @Test
     public void shouldEvictCache() {
-        RedisService redisService = mock(RedisService.class);
+        RedisStore redisService = mock(RedisStore.class);
 
         when(cachingProperties.isEvict()).thenReturn(true);
 

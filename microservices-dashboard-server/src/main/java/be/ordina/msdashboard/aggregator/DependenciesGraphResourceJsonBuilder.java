@@ -11,7 +11,7 @@ import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.services.RedisService;
+import be.ordina.msdashboard.store.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class DependenciesGraphResourceJsonBuilder {
 	private IndexesAggregator indexesAggregator;
 	private PactsAggregator pactsAggregator;
 
-	private RedisService redisService;
+	private NodeStore redisService;
 
 	private VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator;
 
@@ -36,7 +36,7 @@ public class DependenciesGraphResourceJsonBuilder {
 
 	@Autowired
 	public DependenciesGraphResourceJsonBuilder(final HealthIndicatorsAggregator healthIndicatorsAggregator, final IndexesAggregator indexesAggregator,
-												final PactsAggregator pactsAggregator, final RedisService redisService,
+												final PactsAggregator pactsAggregator, final NodeStore redisService,
 												final VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator) {
 		this.healthIndicatorsAggregator = healthIndicatorsAggregator;
 		this.indexesAggregator = indexesAggregator;
@@ -54,7 +54,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		List<Node> microservicesAndBackends = healthNode.getLinkedNodes();
 		List<Node> resources = indexNode.getLinkedNodes();
 		List<Node> pactComponents = pactNode.getLinkedNodes();
-		List<Node> virtualNodes = redisService.getAllNodes();
+		Collection<Node> virtualNodes = redisService.getAllNodes();
 		if (!virtualNodes.isEmpty()) {
 			virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(microservicesAndBackends, resources, virtualNodes);
 		}
