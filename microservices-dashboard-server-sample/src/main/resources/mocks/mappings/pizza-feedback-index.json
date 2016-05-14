@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pizza-feedback"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pizza-feedback-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/address/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "address.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

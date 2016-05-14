@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/webshop-accounts/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "webshop-accounts.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

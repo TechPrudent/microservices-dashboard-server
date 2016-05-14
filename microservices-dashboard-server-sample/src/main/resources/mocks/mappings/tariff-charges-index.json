@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/tariff-charges"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "tariff-charges-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

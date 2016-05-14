@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/loyalty-program/actuator/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "loyalty-program.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

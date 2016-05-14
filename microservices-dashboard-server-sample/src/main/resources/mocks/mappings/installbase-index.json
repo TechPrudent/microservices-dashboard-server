@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/installbase"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "installbase-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

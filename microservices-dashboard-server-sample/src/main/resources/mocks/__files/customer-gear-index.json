@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "cuge:gear": {
+      "href": "http://host0015.local:8261/customer-gear/stuff/{serviceID}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-gear/generated-docs/api-guide.html#resources-{rel}",
+        "name": "cuge",
+        "templated": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/admin/actuator/health"
+  },
+  "response": {
+    "status": 500,
+    "bodyFileName": "admin.json",
+    "headers": {
+      "Content-Type": "application/vnd.error+json;charset=UTF-8"
+    }
+  }
+}

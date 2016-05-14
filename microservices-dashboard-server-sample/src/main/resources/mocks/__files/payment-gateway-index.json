@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "pay:signature": {
+      "href": "http://host0018.local:8101/payment-gateway/signature"
+    },
+    "pay:verification": {
+      "href": "http://host0018.local:8101/payment-gateway/verification?account={account}",
+      "templated": true
+    },
+    "pay:voucher": {
+      "href": "http://host0018.local:8101/payment-gateway/voucher/{voucherReferenceId}",
+      "templated": true
+    },
+    "pay:voucher-redemption": {
+      "href": "http://host0018.local:8101/payment-gateway/voucher/{voucherReferenceId}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/payment-gateway/generated-docs/api-guide.html#resources-{rel}",
+        "name": "pay",
+        "templated": true
+      }
+    ]
+  }
+}

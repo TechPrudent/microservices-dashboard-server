@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-access"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-access-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/address"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "address-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "_links": {
+    "cufi:validate": {
+      "href": "http://host0019.local:8061/customer-finance/validate{?cdbId,vatNumber,birthDate,firstName,lastName,city,street,number,numberSuffix,zipCode}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/customer-finance/generated-docs/api-guide.html#resources-{rel}",
+        "name": "cufi",
+        "templated": true
+      }
+    ]
+  }
+}

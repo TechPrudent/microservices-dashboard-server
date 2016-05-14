@@ -12,15 +12,22 @@ This response can be queried by the microservices-dashboard GUI application.
 
 ## Building from source
 
-Microservices-dashboard-server requires Java 7 or later and is built using maven:
+Microservices-dashboard-server requires Java 8 or later and is built using maven:
 
-```
+```bash
 mvn install
 ```
 
-## Running locally
+## Building the sample from source
 
-To run this application locally, build from source and run the following command:
+```bash
+cd ./microservices-dashboard-sample
+mvn install
+```
+
+## Running the sample locally
+
+To run the sample application locally, build it from source and run the following command:
 
 ```
 java -jar target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
@@ -44,7 +51,7 @@ For now, two major functional resources are exposed:
 For remote debugging, run the following command:
 
 ```
-./java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
+java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
 
 To enable Spring debug logging, add ```--debug``` to the command.

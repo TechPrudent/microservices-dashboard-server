@@ -1,0 +1,18 @@
+{
+  "_links": {
+    "ca:fixed-access": {
+      "href": "http://host0018.local:8141/customer-access/customers/{customerIds}/fixed",
+      "templated": true
+    },
+    "ca:mobile-access": {
+      "href": "http://host0018.local:8141/customer-access/mobile"
+    },
+    "curies": [
+      {
+        "href": "/customer-access/generated-docs/api-guide.html#resources-{rel}",
+        "name": "ca",
+        "templated": true
+      }
+    ]
+  }
+}

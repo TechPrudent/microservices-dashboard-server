@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-finance"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-finance-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
