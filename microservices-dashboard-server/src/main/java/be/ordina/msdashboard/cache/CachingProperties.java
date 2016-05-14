@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("spring.cache")
 public class CachingProperties {
 
-	private String redisCachePrefix;
-	private long defaultExpiration;
-	private boolean evict;
+	private String redisCachePrefix = "DEFAULT_PREFIX_";
+	private long defaultExpiration = 30;
+	private boolean evict = true;
 
 	public boolean isEvict() {
 		return evict;

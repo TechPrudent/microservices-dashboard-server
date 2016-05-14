@@ -8,7 +8,7 @@ import org.springframework.core.type.AnnotationMetadata;
  *
  * @author Andreas Evers
  */
-public class MicroserviceDashboardServerImportSelector implements DeferredImportSelector {
+public class MicroservicesDashboardServerImportSelector implements DeferredImportSelector {
 
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {

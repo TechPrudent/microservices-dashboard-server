@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.annotations.VisibleForTesting;
 
-@Component
 public class DependenciesGraphResourceJsonBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DependenciesGraphResourceJsonBuilder.class);

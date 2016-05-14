@@ -9,15 +9,15 @@ import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
 import be.ordina.msdashboard.aggregator.DependenciesResourceJsonBuilder;
 import be.ordina.msdashboard.model.Node;
 
-@Service
 public class DependenciesResourceService {
 
-	@Autowired
 	private DependenciesResourceJsonBuilder dependenciesResourceJsonBuilder;
-
-	@Autowired
-
 	private DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder;
+
+	public DependenciesResourceService(DependenciesResourceJsonBuilder dependenciesResourceJsonBuilder, DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder) {
+		this.dependenciesResourceJsonBuilder = dependenciesResourceJsonBuilder;
+		this.dependenciesGraphResourceJsonBuilder = dependenciesGraphResourceJsonBuilder;
+	}
 
 	public Node getDependenciesResourceJson() {
 		return dependenciesResourceJsonBuilder.build();

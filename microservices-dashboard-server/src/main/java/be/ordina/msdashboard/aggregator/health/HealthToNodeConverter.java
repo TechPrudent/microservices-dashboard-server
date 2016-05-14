@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import be.ordina.msdashboard.model.Node;
 
-@Component
 public class HealthToNodeConverter {
 
 	private static final String STATUS = "status";

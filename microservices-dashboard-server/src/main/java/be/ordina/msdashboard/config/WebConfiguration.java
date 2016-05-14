@@ -1,6 +1,13 @@
 package be.ordina.msdashboard.config;
 
+import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
+import be.ordina.msdashboard.aggregator.DependenciesResourceJsonBuilder;
+import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
+import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CachingProperties;
 import be.ordina.msdashboard.controllers.NodesController;
 import be.ordina.msdashboard.properties.Labels;
 import be.ordina.msdashboard.services.DependenciesResourceService;
@@ -15,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
@@ -28,10 +36,13 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
     private ApplicationContext applicationContext;
 
     @Autowired
-    public NodeStore nodeStore;
+    private NodeStore nodeStore;
 
     @Autowired
-    public CacheCleaningBean cacheCleaningBean;
+    private CacheCleaningBean cacheCleaningBean;
+
+    @Autowired
+    private HealthIndicatorsAggregator healthIndicatorsAggregator;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -51,8 +62,43 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public DependenciesResourceService dependenciesResourceService() {
-        return new DependenciesResourceService();
+        return new DependenciesResourceService(dependenciesResourceJsonBuilder(), dependenciesGraphResourceJsonBuilder());
     }
+
+    @Bean
+    public DependenciesResourceJsonBuilder dependenciesResourceJsonBuilder() {
+        return new DependenciesResourceJsonBuilder(healthIndicatorsAggregator);
+    }
+
+    @Bean
+    public DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder() {
+        return new DependenciesGraphResourceJsonBuilder(healthIndicatorsAggregator,
+                indexesAggregator(),
+                pactsAggregator(),
+                nodeStore,
+                virtualAndRealDependencyIntegrator());
+    }
+
+    @Bean
+    public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
+        return new HealthIndicatorsAggregator(environment);
+    }
+
+    @Bean
+    public IndexesAggregator indexesAggregator() {
+        return new IndexesAggregator();
+    }
+
+    @Bean
+    public PactsAggregator pactsAggregator() {
+        return new PactsAggregator();
+    }
+
+    @Bean
+    public VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator() {
+        return new VirtualAndRealDependencyIntegrator();
+    }
+
 
     @Bean
     @ConditionalOnMissingBean

@@ -1,6 +1,6 @@
 package be.ordina.msdashboard;
 
-import be.ordina.msdashboard.config.MicroserviceDashboardServerImportSelector;
+import be.ordina.msdashboard.config.MicroservicesDashboardServerImportSelector;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(MicroserviceDashboardServerImportSelector.class)
-public @interface EnableMicroserviceDashboardServer {
+@Import(MicroservicesDashboardServerImportSelector.class)
+public @interface EnableMicroservicesDashboardServer {
 
 }

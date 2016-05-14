@@ -27,11 +27,11 @@ public abstract class PactBrokerBasedAggregator<T> {
 	private static final int CORE_POOL_SIZE = 30;
 	private static final int MAX_POOL_SIZE = 50;
 
-	@Value("${pact-broker.url}")
+	@Value("${pact-broker.url:'http://localhost:8089'}")
 	private String pactBrokerUrl;
-	@Value("${pact-broker.latest-url}")
+	@Value("${pact-broker.latest-url:'/pacts/latest'}")
 	private String latestPactsUrl;
-	@Value("${pact-broker.self-href-jsonPath}")
+	@Value("${pact-broker.self-href-jsonPath:'test'}")
 	private String selfHrefJsonPath;
 	@Autowired
 	private DiscoveryClient discoveryClient;

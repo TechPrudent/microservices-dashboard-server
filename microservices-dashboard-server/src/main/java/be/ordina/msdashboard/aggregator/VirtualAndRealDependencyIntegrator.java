@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import be.ordina.msdashboard.model.Node;
 
-@Component
 public class VirtualAndRealDependencyIntegrator {
 
 	public List<Node> integrateVirtualNodesWithReal(List<Node> microservicesAndBackends, final List<Node> indexes, final Collection<Node> virtualNodes) {

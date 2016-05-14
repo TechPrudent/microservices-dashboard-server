@@ -21,15 +21,17 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-@Component
 public class HealthIndicatorsAggregator extends EurekaBasedAggregator<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private static final long TIMEOUT = 17000L;
 
-	@Autowired
 	private Environment environment;
+
+	public HealthIndicatorsAggregator(Environment environment) {
+		this.environment = environment;
+	}
 
 	@Cacheable(value = Constants.HEALTH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchCombinedDependencies() {

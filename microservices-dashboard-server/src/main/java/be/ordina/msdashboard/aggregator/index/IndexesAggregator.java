@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.*;
 
-@Component
 public class IndexesAggregator extends EurekaBasedAggregator<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IndexesAggregator.class);

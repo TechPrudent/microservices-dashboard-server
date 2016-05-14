@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.*;
 
-@Component
 public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PactsAggregator.class);
