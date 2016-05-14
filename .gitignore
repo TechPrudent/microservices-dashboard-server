@@ -6,15 +6,3 @@ microservices-dashboard-server/target/
 .idea/
 .ssh/
 microservices-dashboard-server/.factorypath
-dependencies-configuration/.classpath
-dependencies/target/
-dependencies/.settings/
-dependencies/.classpath
-dependencies-ear/target/
-dependencies-ear/.settings/
-dependencies-ear/.project
-dependencies-configuration/target/
-dependencies-configuration/.project
-dependencies-configuration/.settings/
-dependencies/.factorypath
-dependencies/.project
