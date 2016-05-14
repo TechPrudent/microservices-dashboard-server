@@ -1,5 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://esrvj6i1.web.bc:22121/configuration
-      failFast: true

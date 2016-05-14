@@ -1,18 +1,14 @@
 package be.ordina.msdashboard.aggregator.pact;
 
-import be.ordina.msdashboard.aggregator.EurekaBasedAggregator;
 import be.ordina.msdashboard.aggregator.PactBrokerBasedAggregator;
-import be.ordina.msdashboard.aggregator.index.SingleServiceIndexCollectorTask;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
-import be.ordina.msdashboard.model.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.*;
 
 @Component

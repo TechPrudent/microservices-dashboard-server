@@ -1,13 +1,9 @@
 package be.ordina.msdashboard;
 
 import be.ordina.msdashboard.constants.Constants;
-import be.ordina.msdashboard.converters.JsonToObjectConverter;
-import be.ordina.msdashboard.converters.ObjectToJsonConverter;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import org.junit.Test;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
 
 import java.io.UnsupportedEncodingException;
 
