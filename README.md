@@ -29,7 +29,7 @@ mvn install
 
 To run the sample application locally, build it from source and run the following command:
 
-```
+```bash
 java -jar target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
 
@@ -50,7 +50,7 @@ For now, two major functional resources are exposed:
 
 For remote debugging, run the following command:
 
-```
+```bash
 java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
 
