@@ -5,6 +5,7 @@
   },
   "response": {
     "status": 200,
+    "fixedDelayMilliseconds": 2000,
     "bodyFileName": "pacts-service1-service3.json",
     "headers": {
       "Content-Type": "application/json"

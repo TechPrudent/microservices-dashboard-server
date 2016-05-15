@@ -5,6 +5,7 @@ import be.ordina.msdashboard.services.InMemoryRedis;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -55,13 +56,18 @@ public class MicroservicesDashboardServerApplicationTest {
 
     @Test
     public void exposesGraph() throws IOException {
+        long startTime = System.currentTimeMillis();
         @SuppressWarnings("rawtypes")
         ResponseEntity<String> entity = new TestRestTemplate()
                 .getForEntity("http://localhost:" + port + "/graph", String.class);
+        long totalTime = System.currentTimeMillis() - startTime;
         assertThat(HttpStatus.OK).isEqualTo(entity.getStatusCode());
         String body = entity.getBody();
         JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/response.json")),
                 removeBlankNodes(body), JSONCompareMode.LENIENT);
+        assertThat(totalTime).isLessThan(9000);
+        // assertThat(totalTime).isLessThan(4500); // should be the case after reactive improvements
+        System.out.println("Time spent waiting for /graph: " + totalTime);
     }
 
     private static String load(final String fileName)

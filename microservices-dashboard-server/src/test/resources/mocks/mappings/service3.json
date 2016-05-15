@@ -5,6 +5,7 @@
   },
   "response": {
     "status": 200,
+    "fixedDelayMilliseconds": 2000,
     "bodyFileName": "service3.json",
     "headers": {
       "Content-Type": "application/json"

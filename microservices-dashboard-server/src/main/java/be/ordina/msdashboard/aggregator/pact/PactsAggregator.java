@@ -46,6 +46,8 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 		return new SinglePactCollectorTask(pactUrl);
 	}
 
+	// REACTIVE WAY
+
 	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchPactNodesWithObservable() {
 		NodeBuilder pactNode = new NodeBuilder();
