@@ -29,7 +29,7 @@ Build the microservices-dashboard-server project from source (see below), and ad
 </dependency>
 ```
 
-Pull in the Microservices Dashboard Server configuration via adding @EnableMicroservicesDashboardServer to your configuration:
+Pull in the Microservices Dashboard Server configuration via adding `@EnableMicroservicesDashboardServer` to your configuration:
 
 ```java
 @Configuration
