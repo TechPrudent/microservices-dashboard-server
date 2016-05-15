@@ -29,13 +29,13 @@ Build the microservices-dashboard-server project from source (see below), and ad
 </dependency>
 ```
 
-Pull in the Boot Admin Server configuration via adding @EnableAdminServer to your configuration:
+Pull in the Microservices Dashboard Server configuration via adding @EnableMicroservicesDashboardServer to your configuration:
 
 ```java
 @Configuration
 @EnableAutoConfiguration
-@EnableAdminServer
-public class SpringBootAdminApplication {
+@EnableMicroservicesDashboardServer
+public class MicroservicesDashboardServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
