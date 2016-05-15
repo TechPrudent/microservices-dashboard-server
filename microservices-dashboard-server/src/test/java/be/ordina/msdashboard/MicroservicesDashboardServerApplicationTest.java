@@ -65,7 +65,7 @@ public class MicroservicesDashboardServerApplicationTest {
         String body = entity.getBody();
         JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/response.json")),
                 removeBlankNodes(body), JSONCompareMode.LENIENT);
-        assertThat(totalTime).isLessThan(9000);
+        assertThat(totalTime).isLessThan(10000);
         // assertThat(totalTime).isLessThan(4500); // should be the case after reactive improvements
         System.out.println("Time spent waiting for /graph: " + totalTime);
     }

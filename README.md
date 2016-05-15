@@ -10,6 +10,42 @@ It will query other Spring Boot applications for their actuator endpoints (such 
 After gathering these details from all available applications, it will aggregate these into a single response.
 This response can be queried by the microservices-dashboard GUI application.
 
+## Setting up the server
+
+There are two ways of getting up and running with the microservices-dashboard-server.
+Either by creating a new Spring Boot application and enhancing it with our dependency and annotation, or by using the sample project.
+
+### Using a vanilla Spring Boot application
+
+First you need to setup your server. To do this just setup a simple boot project (using [start.spring.io](start.spring.io) for example).
+
+Build the microservices-dashboard-server project from source (see below), and add the artefact as a depencency to your new Spring Boot's dependencies:
+
+```xml
+<dependency>
+	<groupId>be.ordina</groupId>
+	<artifactId>microservices-dashboard-server</artifactId>
+	<version>x.y.z</version>
+</dependency>
+```
+
+Pull in the Boot Admin Server configuration via adding @EnableAdminServer to your configuration:
+
+```java
+@Configuration
+@EnableAutoConfiguration
+@EnableAdminServer
+public class SpringBootAdminApplication {
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
+}
+```
+
+### Using the microservices-dashboard-server-sample project
+
+Simply build the sample project from source (see below) and run it (also see below).
+
 ## Building from source
 
 Microservices-dashboard-server requires Java 8 or later and is built using maven:
