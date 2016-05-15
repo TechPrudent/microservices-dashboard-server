@@ -49,7 +49,7 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 				.append(service.getPort())
 				.append("/")
 				.append(service.getId())
-				.append(managementContextPath)
+				.append(managementContextPath!=null?managementContextPath:"")
 				.append("/")
 				.append(HEALTH);
 		return builder.toString();

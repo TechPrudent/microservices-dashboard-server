@@ -28,11 +28,11 @@ public abstract class PactBrokerBasedAggregator<T> {
 	private static final int MAX_POOL_SIZE = 50;
 
 	@Value("${pact-broker.url:'http://localhost:8089'}")
-	private String pactBrokerUrl;
+	protected String pactBrokerUrl;
 	@Value("${pact-broker.latest-url:'/pacts/latest'}")
-	private String latestPactsUrl;
+	protected String latestPactsUrl;
 	@Value("${pact-broker.self-href-jsonPath:'test'}")
-	private String selfHrefJsonPath;
+	protected String selfHrefJsonPath;
 	@Autowired
 	private DiscoveryClient discoveryClient;
 	private TaskExecutor taskExecutor;
@@ -66,6 +66,8 @@ public abstract class PactBrokerBasedAggregator<T> {
 		}
 		return JsonPath.read(latestPacts, selfHrefJsonPath);
 	}
+
+
 
 	private List<FutureTask<T>> launchSinglePactCollectorTasks(final List<String> pactUrls) {
 		List<FutureTask<T>> tasks = new ArrayList<FutureTask<T>>();

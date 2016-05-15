@@ -11,20 +11,25 @@ spring:
       indent_output: true
   boot:
     admin.url: http://localhost:8085
-  jmx:
-    default-domain: dependencies
-  aop:
-    proxyTargetClass: true
+  redis:
+    host: localhost
+    port: 6379
+    pool:
+      max-wait: 10000
+
+redis.mock: true
+
+# Microservices platform integration
+admin:
+  url: http://localhost:8085
 
 eureka:
-  instance:
-    appGroupName: microservices
   client:
     enabled: false
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:7878/eureka/
 
-endpoints:
-  jmx:
-    uniqueNames: true
-
+pact-broker:
+  url: http://localhost:8089
+  latest-url: /pacts/latest
+  self-href-jsonPath: $.pacts[*]._links.self[0].href

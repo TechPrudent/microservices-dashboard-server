@@ -2,14 +2,15 @@ package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CachingProperties;
+import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.converters.NodeSerializer;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.services.InMemoryRedis;
 import be.ordina.msdashboard.store.NodeStore;
 import be.ordina.msdashboard.store.RedisStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -53,8 +54,8 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public CacheCleaningBean cacheCleaningBean(RedisStore redisStore){
-        return new CacheCleaningBean(redisStore, cachingProperties.isEvict());
+    public CacheCleaningBean cacheCleaningBean(@Qualifier("nodeStore") NodeCache nodeCache){
+        return new CacheCleaningBean(nodeCache, cachingProperties.isEvict());
     }
 
     @Bean

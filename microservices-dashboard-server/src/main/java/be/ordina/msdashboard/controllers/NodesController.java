@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import be.ordina.msdashboard.model.Node;
 
 @CrossOrigin(maxAge = 3600)
+@RestController
 @ResponseBody
 public class NodesController {
 

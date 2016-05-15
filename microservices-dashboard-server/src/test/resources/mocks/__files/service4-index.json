@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "svc4:svc4rsc1": {
+      "href": "http://host0014.local:8281/svc2rsc1",
+      "templated": true
+    },
+    "svc4:svc4rsc1": {
+      "href": "http://host0014.local:8281/svc2rsc2",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/awards/generated-docs/api-guide.html#resources-{rel}",
+        "name": "svc4",
+        "templated": true
+      }
+    ]
+  }
+}

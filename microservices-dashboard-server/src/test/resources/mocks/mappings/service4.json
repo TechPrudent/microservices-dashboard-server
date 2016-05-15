@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/service4/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "service4.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

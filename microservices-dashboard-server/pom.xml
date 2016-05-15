@@ -145,9 +145,9 @@
             <version>1.0.10</version>
         </dependency>
         <dependency>
-            <groupId>com.netflix.rxjava</groupId>
-            <artifactId>rxjava-apache-http</artifactId>
-            <version>0.20.7</version>
+            <groupId>io.reactivex</groupId>
+            <artifactId>rxnetty</artifactId>
+            <version>0.4.4</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -177,6 +177,11 @@
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
             <version>1.53</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.0.30.Final</version>
         </dependency>
     </dependencies>
 

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pacts/provider/service3/consumer/service1/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pacts-service1-service3.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
