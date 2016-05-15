@@ -2,6 +2,7 @@ package be.ordina.msdashboard.aggregator.index;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
 import be.ordina.msdashboard.InMemoryMockedConfiguration;
+import be.ordina.msdashboard.model.Node;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -12,8 +13,10 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import rx.Subscriber;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { IndexesAggregatorTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class })
@@ -28,9 +31,22 @@ public class IndexesAggregatorTest {
     @Test
     public void shouldReturnOneNode() {
         indexesAggregator.fetchIndexesWithObservable()
-                         .subscribe(node -> {
-                             assertThat(node).isNotNull();
-                             logger.info("Node: {}", node);
+                         .subscribe(new Subscriber<Node>() {
+                             @Override
+                             public void onCompleted() {
+                                 logger.info("Completed!");
+                             }
+
+                             @Override
+                             public void onError(Throwable e) {
+                                 fail("should not reach here", e);
+                             }
+
+                             @Override
+                             public void onNext(Node node) {
+                                 assertThat(node).isNotNull();
+                                 logger.info("Node: {}", node);
+                             }
                          });
     }
 
