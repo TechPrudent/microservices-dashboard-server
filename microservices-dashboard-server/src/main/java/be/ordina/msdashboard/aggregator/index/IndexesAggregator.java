@@ -64,7 +64,6 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         return new SingleServiceIndexCollectorTask(service, originRequest);
     }
 
-    @Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
     public Observable<Node> fetchIndexesWithObservable() {
         return Observable.from(discoveryClient.getServices())
                          .flatMap(service -> {
