@@ -19,7 +19,7 @@ Either by creating a new Spring Boot application and enhancing it with our depen
 
 First you need to setup your server. To do this just setup a simple boot project (using [start.spring.io](start.spring.io) for example).
 
-Build the microservices-dashboard-server project from source (see below), and add the artefact as a depencency to your new Spring Boot's dependencies:
+Build the microservices-dashboard-server project from source (see below), and add the artefact as a dependency to your new Spring Boot's dependencies:
 
 ```xml
 <dependency>
