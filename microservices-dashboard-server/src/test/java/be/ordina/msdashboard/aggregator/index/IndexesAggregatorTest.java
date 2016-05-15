@@ -1,7 +1,7 @@
 package be.ordina.msdashboard.aggregator.index;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
-import be.ordina.msdashboard.InMemoryMockedServices;
+import be.ordina.msdashboard.InMemoryMockedConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = { IndexesAggregatorTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedServices.class })
-@WebIntegrationTest({ "server.port=0", "spring.cloud.config.enabled=false", "services.mock=true" })
+@SpringApplicationConfiguration(classes = { IndexesAggregatorTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class })
+@WebIntegrationTest({ "server.port=0", "spring.cloud.config.enabled=false" })
 public class IndexesAggregatorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexesAggregatorTest.class);
