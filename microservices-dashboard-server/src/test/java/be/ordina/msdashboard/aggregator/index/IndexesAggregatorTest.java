@@ -29,12 +29,15 @@ public class IndexesAggregatorTest {
     private IndexesAggregator indexesAggregator;
 
     @Test
-    public void shouldReturnOneNode() {
+    public void shouldReturnThreeNode() {
         indexesAggregator.fetchIndexesWithObservable()
                          .subscribe(new Subscriber<Node>() {
+
+                             private int countNodes = 0;
+
                              @Override
                              public void onCompleted() {
-                                 logger.info("Completed!");
+                                 assertThat(countNodes).isEqualTo(3);
                              }
 
                              @Override
@@ -44,6 +47,7 @@ public class IndexesAggregatorTest {
 
                              @Override
                              public void onNext(Node node) {
+                                 ++countNodes;
                                  assertThat(node).isNotNull();
                                  logger.info("Node: {}", node);
                              }

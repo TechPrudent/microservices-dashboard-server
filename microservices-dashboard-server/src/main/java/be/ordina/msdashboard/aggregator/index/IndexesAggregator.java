@@ -145,10 +145,6 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                              }
 
                              return node.build();
-                         })
-                         .reduce(new Node(), (node, nextNode) -> {
-                             node.getLinkedNodes().add(nextNode);
-                             return node;
                          });
     }
 }
