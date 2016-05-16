@@ -4,7 +4,7 @@
       "href": "http://host0015.local:8301/svc3rsc1",
       "templated": true
     },
-    "svc3:svc3rsc1": {
+    "svc3:svc3rsc2": {
       "href": "http://host0015.local:8301/svc3rsc2",
       "templated": true
     },
