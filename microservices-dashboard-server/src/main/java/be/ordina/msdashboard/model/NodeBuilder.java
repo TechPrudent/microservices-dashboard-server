@@ -8,7 +8,7 @@ public class NodeBuilder {
 	private Map<String, Object> details;
 	private Integer lane;
 	@Deprecated
-	private Set<Node> linkedNodes;
+	private Set<Node> linkedToNodes;
 	private Set<String> linkedToNodeIds;
 	private Set<String> linkedFromNodeIds;
 
@@ -27,8 +27,8 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder havingLinkedNodes(final Set<Node> linkedNodes) {
-		this.linkedNodes = linkedNodes;
+	public NodeBuilder havingLinkedToNodes(final Set<Node> linkedToNodes) {
+		this.linkedToNodes = linkedToNodes;
 		return this;
 	}
 
@@ -50,11 +50,11 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder withLinkedNode(final Node node) {
-		if (linkedNodes == null) {
-			linkedNodes = new HashSet<>();
+	public NodeBuilder withLinkedToNode(final Node node) {
+		if (linkedToNodes == null) {
+			linkedToNodes = new HashSet<>();
 		}
-		linkedNodes.add(node);
+		linkedToNodes.add(node);
 		return this;
 	}
 
@@ -75,7 +75,7 @@ public class NodeBuilder {
 	}
 
 	public NodeBuilder withLinkedNodes(final Collection<Node> nodes) {
-		nodes.stream().forEach(this::withLinkedNode);
+		nodes.stream().forEach(this::withLinkedToNode);
 		return this;
 	}
 
@@ -83,7 +83,7 @@ public class NodeBuilder {
 		Node node = new Node();
 		node.setId(id);
 		node.setLane(lane);
-		node.setLinkedToNodes(linkedNodes);
+		node.setLinkedToNodes(linkedToNodes);
 		node.setLinkedToNodeIds(linkedToNodeIds);
 		node.setLinkedFromNodeIds(linkedFromNodeIds);
 		node.setDetails(details);

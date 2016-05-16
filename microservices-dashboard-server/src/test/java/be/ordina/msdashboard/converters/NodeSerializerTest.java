@@ -19,7 +19,7 @@ public class NodeSerializerTest {
 							   .withId("key1")
 							   .withDetail("type", Constants.MICROSERVICE)
 							   .withDetail(Constants.STATUS, "UP")
-							   .withLinkedNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
+							   .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
 							   .build();
 
 		String nodeAsJson = "{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"},\"linkedToNodes\":[]}]}";

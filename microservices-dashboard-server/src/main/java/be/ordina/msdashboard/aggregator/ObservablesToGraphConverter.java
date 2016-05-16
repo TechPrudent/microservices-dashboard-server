@@ -12,9 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func1;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static be.ordina.msdashboard.constants.Constants.*;
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
@@ -50,11 +53,11 @@ public class ObservablesToGraphConverter {
 
 	public Map<String, Object> build() {
 		Node healthNode = healthIndicatorsAggregator.fetchCombinedDependencies();
-		Node indexNode = indexesAggregator.fetchIndexes();
+		//Node indexNode = indexesAggregator.fetchIndexes();
 		Collection<Node> virtualNodesFromRedis = redisService.getAllNodes();
 
-		Observable<Node> microservicesAndBackends = Observable.from(new Node[]{});
-		Observable<Node> resources = Observable.from(new Node[]{});
+		Observable<Node> microservicesAndBackends = Observable.from(healthNode.getLinkedToNodes());
+		Observable<Node> resources = indexesAggregator.fetchIndexesWithObservable();
 		Observable<Node> pactComponents = pactsAggregator.fetchPactNodesAsObservable();
 		Observable<Node> virtualNodes = Observable.from(new Node[]{});
 //		Observable.zip(microservicesAndBackends, resources, pactComponents, (m, r, p) -> {
@@ -66,9 +69,6 @@ public class ObservablesToGraphConverter {
 	}
 
 	private Map<String, Object> createGraph(final Observable<Node> microservicesWithTheirBackends, Observable<Node> resources, Observable<Node> pactComponents) {
-		//List<Map<String, Object>> nodes = new ArrayList<>();
-		//Set<Map<String, Integer>> links = new HashSet<>();
-
 		Observable<Map<String, Object>> displayableMicroservices = microservicesWithTheirBackends.map(node -> {
 			Set<Map<String, Object>> displayableNodes = new HashSet<>();
 			String microserviceName = convertMicroserviceName(node.getId());
@@ -85,76 +85,47 @@ public class ObservablesToGraphConverter {
 			}
 			return Observable.from(displayableNodes);
 		}).flatMap(el -> el);
-//		for (Node microservice : microservicesWithTheirBackends) {
-//			String microserviceName = convertMicroserviceName(microservice.getId());
-//			Map<String, Object> microserviceNode = createMicroserviceNode(microserviceName, microservice);
-//			Optional<Integer> nodeIndex = getNodeIndex(nodes, microserviceName);
-//			if (!nodeIndex.isPresent()) {
-//				nodes.add(microserviceNode);
-//			}
-//			int microserviceNodeId = nodeIndex.orElse(nodes.size() - 1);
-//			Set<Node> dependencyNodes = microservice.getLinkedToNodes();
-//			removeEurekaDescription(dependencyNodes);
-//			for (Node dependencyNode : dependencyNodes) {
-//				if (MICROSERVICE.equals(dependencyNode.getDetails().get(TYPE))) {
-//					dependencyNode.setId(convertMicroserviceName(dependencyNode.getId()));
-//				}
-//				int dependencyNodeId = findNodeIndex(dependencyNode.getId(), nodes);
-//				if (dependencyNodeId == -1) {
-//					Integer lane = determineLane(dependencyNode.getDetails());
-//					nodes.add(createNode(dependencyNode.getId(), lane, dependencyNode.getDetails()));
-//					dependencyNodeId = nodes.size() - 1;
-//				}
-//				links.add(createLink(microserviceNodeId, dependencyNodeId));
-//			}
-//		}
-		Observable<Map<String, Object>> displayableResources = resources.map(mapToDisplayableNode()).flatMap(el -> el);
-//		for (Node resource : resources) {
-//			Map<String, Object> resourceNode = createResourceNode(resource);
-//			nodes.add(resourceNode);
-//			String linkedMicroservice = resource.getLinkedToNodes().iterator().next().getId();
-//			int resourceNodeId = nodes.size() - 1;
-//			int linkedMicroserviceNodeId = findNodeIndex(linkedMicroservice, nodes);
-//			if (linkedMicroserviceNodeId != -1) {
-//				links.add(createLink(resourceNodeId, linkedMicroserviceNodeId));
-//			} else {
-//				LOG.warn("Unable to resolve a link from {} to {} (destination not found)", resource.getId(), linkedMicroservice);
-//			}
-//		}
-		Observable<Map<String, Object>> displayablePactComponents = pactComponents.map(mapToDisplayableNode()).flatMap(el -> el);
-//		for (Node pactComponent : pactComponents) {
-//			Map<String, Object> pactComponentNode = createPactComponentNode(pactComponent);
-//			Optional<Integer> nodeIndex = getNodeIndex(nodes, pactComponent.getId());
-//			if (!nodeIndex.isPresent()) {
-//				nodes.add(pactComponentNode);
-//			}
-//			int pactNodeId = nodeIndex.orElse(nodes.size() - 1);
-//			pactComponent.getLinkedToNodes().stream()
-//					.map(linkedNode -> linkedNode.getId())
-//					.forEach(linkedNodeId -> {
-//						int resolvedLinkedNodeId = findNodeIndex(linkedNodeId, nodes);
-//						if (resolvedLinkedNodeId != -1) {
-//							links.add(createLink(pactNodeId, resolvedLinkedNodeId));
-//						} else {
-//							LOG.warn("Unable to resolve a link from {} to {} (destination not found)", pactComponent.getId(), linkedNodeId);
-//						}
-//					});
-//		}
+
 		Observable<Node> mergedObservable = Observable.merge(microservicesWithTheirBackends, resources, pactComponents);
+		Observable<Map<String, Object>> displayableNodesAndLinks = reduceToNodesAndLinksMap(mergedObservable).map(mapToDisplayableNode());
+		displayableNodesAndLinks.subscribe(element -> {
+			graph.put(NODES, element.get(NODES));
+			graph.put(LINKS, element.get(LINKS));
+		});
+
+		return graph;
+	}
+
+	private Func1<Map<String, Object>, Map<String, Object>> mapToDisplayableNode() {
+		return map -> {
+			List<Node> nodes = (List<Node>) map.get(NODES);
+			Set<Map<String, Object>> displayableNodes = nodes.stream().map(node -> {
+				return createDisplayableNode(node);
+			}).collect(Collectors.toSet());
+			map.replace(NODES, displayableNodes);
+			return map;
+		};
+	}
+
+	private Observable<Map<String, Object>> reduceToNodesAndLinksMap(Observable<Node> mergedObservable) {
 		Map initialExistingNodes = new HashMap<>();
 		initialExistingNodes.put(NODES, new ArrayList<>());
 		initialExistingNodes.put(LINKS, new HashSet<>());
 		Observable<Map<String, Object>> reduced = mergedObservable.reduce(initialExistingNodes, (Map<String, Object> returnedNodesAndLinks, Node node) -> {
 				List<Node> existingNodes = (List<Node>) returnedNodesAndLinks.get(NODES);
+				//System.out.println("Current existing nodes: " + existingNodes);
 				int existingNodeIndex;
 				Optional<Integer> nodeIndex = findNodeIndexByNode(existingNodes, node);
+
 				if (!nodeIndex.isPresent()) {
+					//System.out.println("NodeIndex not found, adding node: " + node);
 					existingNodes.add(node);
-					existingNodeIndex = existingNodes.size();
 				} else {
-					Node node1 = mergeNodes(existingNodes.get(nodeIndex.get()), node);
-					existingNodeIndex = nodeIndex.get();
+					//System.out.println("NodeIndex found: " + nodeIndex.get() + ", node: "+ node);
+					Node existingNode = existingNodes.get(nodeIndex.get());
+					existingNode.mergeWith(node);
 				}
+				existingNodeIndex = existingNodes.size();
 				Set<Map<String, Integer>> links = (Set<Map<String, Integer>>) returnedNodesAndLinks.get(LINKS);
 				Set<String> linkedToNodeIds = node.getLinkedToNodeIds();
 				for (String nodeId : linkedToNodeIds) {
@@ -170,15 +141,7 @@ public class ObservablesToGraphConverter {
 				}
 				return returnedNodesAndLinks;
 		});
-
-
-		//graph.put(NODES, nodes);
-		//graph.put(LINKS, links);
-		return graph;
-	}
-
-	private Node mergeNodes(Node node1, Node node2) {
-		return node1;
+		return reduced;
 	}
 
 	private Optional<Integer> findNodeIndexByNode(List<Node> existingNodes, Node node) {
@@ -194,15 +157,6 @@ public class ObservablesToGraphConverter {
 				.filter(node -> node.getId().equals(nodeId))
 				.map(node -> existingNodes.indexOf(node))
 				.findFirst();
-	}
-
-	private Func1<Node, Observable<Map<String, Object>>> mapToDisplayableNode() {
-		return node -> {
-			Set<Map<String, Object>> displayableNodes = new HashSet<>();
-			Map<String, Object> displayableNode = createDisplayableNode(node);
-			displayableNodes.add(displayableNode);
-			return Observable.from(displayableNodes);
-		};
 	}
 
 	private String convertMicroserviceName(String name) {
@@ -223,44 +177,44 @@ public class ObservablesToGraphConverter {
 		}
 	}
 
-	private Optional<Integer> findNodeIndex(final Map<String, Object> nodeToFind, final List<Map<String, Object>> nodes) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Map<String, Object> node = nodes.get(i);
-			if (nodeToFind.get(ID).equals(node.get(ID))) {
-				return Optional.of(i);
-			}
-		}
-		return Optional.empty();
-	}
+//	private Optional<Integer> findNodeIndex(final Map<String, Object> nodeToFind, final List<Map<String, Object>> nodes) {
+//		for (int i = 0; i < nodes.size(); i++) {
+//			Map<String, Object> node = nodes.get(i);
+//			if (nodeToFind.get(ID).equals(node.get(ID))) {
+//				return Optional.of(i);
+//			}
+//		}
+//		return Optional.empty();
+//	}
 
-	private int findNode(final String dependency, final List<Map<String, Object>> nodes) {
-		for (Map<String, Object> map : nodes) {
-			if (dependency.equals(map.get(ID))) {
-				return nodes.indexOf(map);
-			}
-		}
-		return -1;
-	}
+//	private int findNode(final String dependency, final List<Map<String, Object>> nodes) {
+//		for (Map<String, Object> map : nodes) {
+//			if (dependency.equals(map.get(ID))) {
+//				return nodes.indexOf(map);
+//			}
+//		}
+//		return -1;
+//	}
 
-	private Optional<Integer> getNodeIndex(final List<Map<String, Object>> nodes, final String nodeId) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Map<String, Object> node = nodes.get(i);
-			if (nodeId.equals(node.get(ID))) {
-				return Optional.of(i);
-			}
-		}
-		return Optional.empty();
-	}
+//	private Optional<Integer> getNodeIndex(final List<Map<String, Object>> nodes, final String nodeId) {
+//		for (int i = 0; i < nodes.size(); i++) {
+//			Map<String, Object> node = nodes.get(i);
+//			if (nodeId.equals(node.get(ID))) {
+//				return Optional.of(i);
+//			}
+//		}
+//		return Optional.empty();
+//	}
 
-	private Optional<Integer> getNodeIndexByLane(final List<Map<String, Object>> nodes, final String nodeId, final int lane) {
-		for (int i = 0; i < nodes.size(); i++) {
-			Map<String, Object> node = nodes.get(i);
-			if (lane == (Integer) node.get(Constants.LANE) && nodeId.equals(node.get(ID))) {
-				return Optional.of(i);
-			}
-		}
-		return Optional.empty();
-	}
+//	private Optional<Integer> getNodeIndexByLane(final List<Map<String, Object>> nodes, final String nodeId, final int lane) {
+//		for (int i = 0; i < nodes.size(); i++) {
+//			Map<String, Object> node = nodes.get(i);
+//			if (lane == (Integer) node.get(Constants.LANE) && nodeId.equals(node.get(ID))) {
+//				return Optional.of(i);
+//			}
+//		}
+//		return Optional.empty();
+//	}
 
 	@VisibleForTesting
 	Map<String, Object> createMicroserviceNode(final String microServicename, final Node node) {

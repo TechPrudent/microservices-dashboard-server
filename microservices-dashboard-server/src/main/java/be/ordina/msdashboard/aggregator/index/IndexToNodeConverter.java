@@ -36,7 +36,7 @@ public class IndexToNodeConverter {
 
 					node.withId(linkKey);
 					Node linkNode = NodeBuilder.node().withId(service.getId()).build();
-					node.withLinkedNode(linkNode);
+					node.withLinkedToNode(linkNode);
 					node.withLane(1);
 					Map<String, Object> details = new HashMap<>();
 					details.put("url", (String) link.get(HREF));

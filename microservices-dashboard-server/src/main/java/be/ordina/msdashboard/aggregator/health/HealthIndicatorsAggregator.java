@@ -16,10 +16,8 @@ import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.model.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 public class HealthIndicatorsAggregator extends EurekaBasedAggregator<Node> {
 
@@ -48,7 +46,7 @@ public class HealthIndicatorsAggregator extends EurekaBasedAggregator<Node> {
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				LOG.debug("Task {} is done: {}", key, task.isDone());
 				value.setId(key);
-				nodeBuilder.withLinkedNode(value);
+				nodeBuilder.withLinkedToNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}

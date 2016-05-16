@@ -6,7 +6,6 @@ import be.ordina.msdashboard.model.NodeBuilder;
 import com.jayway.jsonpath.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,7 @@ public class PactToNodeConverter {
 		node.withLane(0);
 		paths.stream().forEach(path -> {
 				Node linkNode = NodeBuilder.node().withId(convertPathToRel(path)).build();
-				node.withLinkedNode(linkNode);
+				node.withLinkedToNode(linkNode);
 		});
 		Map<String, Object> details = new HashMap<>();
 		details.put("url", pactUrl);

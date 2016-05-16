@@ -6,7 +6,6 @@ import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import com.jayway.jsonpath.JsonPath;
 import io.reactivex.netty.RxNetty;
-import net.minidev.json.JSONArray;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 				key = ((IdentifiableFutureTask) task).getId();
 				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				LOG.debug("Task {} is done: {}", key, task.isDone());
-				pactNode.withLinkedNode(value);
+				pactNode.withLinkedToNode(value);
 			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
 			}
@@ -51,7 +50,7 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchPactNodesWithObservable() {
 		NodeBuilder pactNode = new NodeBuilder();
-		fetchPactNodesAsObservable().subscribe(node -> pactNode.withLinkedNode(node));
+		fetchPactNodesAsObservable().subscribe(node -> pactNode.withLinkedToNode(node));
 		return pactNode.build();
 	}
 

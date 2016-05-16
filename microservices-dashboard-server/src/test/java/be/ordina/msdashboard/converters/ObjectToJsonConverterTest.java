@@ -7,8 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -20,7 +18,7 @@ public class ObjectToJsonConverterTest {
                                .withId("key1")
                                .withDetail("type", Constants.MICROSERVICE)
                                .withDetail(Constants.STATUS, "UP")
-                               .withLinkedNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
+                               .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
                                .build();
 
         ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();

@@ -12,24 +12,32 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
+
+	public Node() {
+		details = new HashMap<>();
+		linkedToNodeIds = new HashSet<>();
+		linkedFromNodeIds = new HashSet<>();
+		linkedToNodes = new HashSet<>();
+	}
+
 	@JsonProperty(ID)
 	private String id;
 
 	@JsonProperty(DETAILS)
-	private Map<String, Object> details;
+	private Map<String, Object> details = new HashMap<>();
 
 	@JsonProperty(LANE)
 	private Integer lane;
 
 	@Deprecated
 	@JsonProperty("linkedToNodes")
-	private Set<Node> linkedToNodes;
+	private Set<Node> linkedToNodes = new HashSet<>();
 
-	private Set<String> linkedToNodeIds;
+	private Set<String> linkedToNodeIds = new HashSet<>();
 
-	private Set<String> linkedFromNodeIds;
+	private Set<String> linkedFromNodeIds = new HashSet<>();
 
 	public void setLane(Integer lane) {
 		this.lane = lane;
@@ -48,9 +56,6 @@ public class Node {
 	}
 
 	public Set<Node> getLinkedToNodes() {
-		if(linkedToNodes ==null){
-			linkedToNodes = new HashSet<>();
-		}
 		return linkedToNodes;
 	}
 
@@ -59,8 +64,8 @@ public class Node {
 	}
 
 	public Set<String> getLinkedToNodeIds() {
-		if(linkedToNodeIds ==null){
-			linkedToNodeIds = new HashSet<>();
+		if (linkedToNodeIds == null) {
+			return new HashSet<>();
 		}
 		return linkedToNodeIds;
 	}
@@ -70,8 +75,8 @@ public class Node {
 	}
 
 	public Set<String> getLinkedFromNodeIds() {
-		if(linkedFromNodeIds ==null){
-			linkedFromNodeIds = new HashSet<>();
+		if (linkedFromNodeIds == null) {
+			return new HashSet<>();
 		}
 		return linkedFromNodeIds;
 	}
@@ -81,14 +86,34 @@ public class Node {
 	}
 
 	public Map<String, Object> getDetails() {
-		if(details==null){
-			details = new HashMap<>();
+		if (details == null) {
+			return new HashMap<>();
 		}
 		return details;
 	}
 
 	public void setDetails(Map<String, Object> details) {
 		this.details = details;
+	}
+
+	public void mergeWith(Node node) {
+		if (linkedToNodeIds == null) {
+			linkedToNodeIds = node.getLinkedToNodeIds();
+		} else {
+			linkedToNodeIds.addAll(node.getLinkedToNodeIds());
+		}
+		if (linkedFromNodeIds == null) {
+			linkedFromNodeIds = node.getLinkedFromNodeIds();
+		} else {
+			linkedFromNodeIds.addAll(node.getLinkedFromNodeIds());
+		}
+		if (details == null) {
+			details = node.getDetails();
+		} else {
+			details.forEach((k, v) -> node.getDetails().merge(k, v, (v1, v2) -> {
+				return v1;
+			}));
+		}
 	}
 
 	@Override

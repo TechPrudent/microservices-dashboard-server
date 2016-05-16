@@ -2,7 +2,6 @@ package be.ordina.msdashboard.aggregator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doReturn;
 
@@ -25,7 +24,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -65,27 +63,27 @@ public class DependenciesGraphResourceJsonBuilderTest {
 				NodeBuilder.node().withId("key1")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
-						.withLinkedNode(NodeBuilder.node().withId("1a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("1b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("1c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("1b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("1c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build(),
 
 				NodeBuilder.node().withId("key2")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
-						.withLinkedNode(NodeBuilder.node().withId("2a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("2b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("2c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("2a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("2b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("2c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build(),
 				NodeBuilder.node().withId("key3")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
-						.withLinkedNode(NodeBuilder.node().withId("3a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("3b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
-						.withLinkedNode(NodeBuilder.node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("3a").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("3b").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
+						.withLinkedToNode(NodeBuilder.node().withId("3c").withDetail(STATUS, "DOWN").withDetail("type", "SOAP").build())
 						.build()
 		);
-	Node dependencies = NodeBuilder.node().havingLinkedNodes(microservicesAndBackends).build();
+	Node dependencies = NodeBuilder.node().havingLinkedToNodes(microservicesAndBackends).build();
 		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
 		doReturn(dependencies.getLinkedToNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anySetOf(Node.class), anySetOf(Node.class), anySetOf(Node.class));
 		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
