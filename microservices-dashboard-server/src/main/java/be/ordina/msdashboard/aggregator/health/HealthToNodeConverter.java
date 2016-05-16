@@ -5,8 +5,6 @@ import static be.ordina.msdashboard.constants.Constants.TYPE;
 
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-
 import be.ordina.msdashboard.model.Node;
 
 public class HealthToNodeConverter {
@@ -35,8 +33,9 @@ public class HealthToNodeConverter {
 					Node nestedNode = new Node();
 					nestedNode.setId(key);
 					copyDetails((Map<String, Object>) source.get(key), nestedNode.getDetails());
-					node.getLinkedNodes().add(nestedNode);
-//					node.getLinkedNodes().add(convertMapToNode((Map)nested));
+					node.getLinkedToNodes().add(nestedNode);
+					nestedNode.getLinkedFromNodeIds().add(node.getId());
+//					node.getLinkedToNodes().add(convertMapToNode((Map)nested));
 				} else {
 					ownDetails.put(key, source.get(key));
 				}

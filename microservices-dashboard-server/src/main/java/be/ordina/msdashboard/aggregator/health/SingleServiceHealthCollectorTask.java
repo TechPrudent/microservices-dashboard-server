@@ -1,10 +1,12 @@
 package be.ordina.msdashboard.aggregator.health;
 
+import static com.google.common.collect.Collections2.*;
 import static org.springframework.http.HttpMethod.GET;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,10 +75,10 @@ public class SingleServiceHealthCollectorTask implements Callable<Node> {
 				new HttpEntity<Map>(headers),
 				Map.class);
 		Node node = healthToNodeConverter.convert(responseRest.getBody());
-		Collection<Node> nodeCollection = node.getLinkedNodes();
-		nodeCollection = Collections2.filter(nodeCollection, dependenciesListFilterPredicate);
+		Collection<Node> nodeCollection = node.getLinkedToNodes();
+		nodeCollection = filter(nodeCollection, dependenciesListFilterPredicate);
 		nodeCollection = toolBoxDependenciesModifier.modify(nodeCollection);
-		node.setLinkedNodes((List) nodeCollection);
+		node.setLinkedToNodes((Set) nodeCollection);
 		if (LOG.isDebugEnabled()) {
 			long totalTime = new DateTime().getMillis() - startTime;
 			LOG.debug("Finished URI: {} Total time: {}", uriString, totalTime);

@@ -9,13 +9,14 @@ import static be.ordina.msdashboard.constants.Constants.TYPE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import be.ordina.msdashboard.model.Node;
 
 public class ToolBoxDependenciesModifier {
 
 	public Collection<Node> modify(final Collection<Node> source) {
-		Collection<Node> modified = new ArrayList<>();
+		Collection<Node> modified = new HashSet<>();
 		for (Node node : source) {
 			if (DISCOVERY.equals(node.getId()) || CONFIGSERVER.equals(node.getId())) {
 				node.getDetails().put(TYPE, MICROSERVICE);

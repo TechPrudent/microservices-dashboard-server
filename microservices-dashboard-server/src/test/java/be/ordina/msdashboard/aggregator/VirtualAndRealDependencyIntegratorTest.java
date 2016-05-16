@@ -4,11 +4,14 @@ package be.ordina.msdashboard.aggregator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -18,17 +21,18 @@ public class VirtualAndRealDependencyIntegratorTest {
 	@Test
 	public void shouldIntegrateVirtualNodesToReal() throws Exception {
 		VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator = new VirtualAndRealDependencyIntegrator();
-		List<Node> integratedDependencies = virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(getRealDependencies(), null, getVirtualDependencies());
+		Set<Node> integratedDependencies = virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(getRealDependencies(), null, getVirtualDependencies());
 		assertThat(integratedDependencies.size()).isEqualTo(4);
-		assertThat(integratedDependencies.get(0).getLinkedNodes().size()).isEqualTo(4);
-		assertThat(integratedDependencies.get(0).getLinkedNodes().get(0).getId()).isEqualTo("1a");
-		assertThat(integratedDependencies.get(0).getLinkedNodes().get(1).getId()).isEqualTo("1b");
-		assertThat(integratedDependencies.get(0).getLinkedNodes().get(2).getId()).isEqualTo("1c");
-		assertThat(integratedDependencies.get(0).getLinkedNodes().get(3).getId()).isEqualTo("1d");
+		assertThat(integratedDependencies.iterator().next().getLinkedToNodes().size()).isEqualTo(4);
+		Iterator<Node> nodeIterator = integratedDependencies.iterator().next().getLinkedToNodes().iterator();
+		assertThat(nodeIterator.next().getId()).isEqualTo("1a");
+		assertThat(nodeIterator.next().getId()).isEqualTo("1b");
+		assertThat(nodeIterator.next().getId()).isEqualTo("1c");
+		assertThat(nodeIterator.next().getId()).isEqualTo("1d");
 	}
 
-	private List<Node> getRealDependencies() {
-		return Lists.newArrayList(
+	private Set<Node> getRealDependencies() {
+		return Sets.newHashSet(
 				NodeBuilder.node().withId("key1")
 						.withDetail("type", Constants.MICROSERVICE)
 						.withDetail(Constants.STATUS, "UP")
@@ -54,8 +58,8 @@ public class VirtualAndRealDependencyIntegratorTest {
 		);
 	}
 
-	private List<Node> getVirtualDependencies() {
-		return Lists.newArrayList(
+	private Set<Node> getVirtualDependencies() {
+		return Sets.newHashSet(
 				NodeBuilder.node().withId("key1")
 						.withDetail("type", Constants.MICROSERVICE)
 						.withDetail(Constants.STATUS, "UP")

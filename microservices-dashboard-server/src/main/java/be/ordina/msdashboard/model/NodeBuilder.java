@@ -7,7 +7,10 @@ public class NodeBuilder {
 	private String id;
 	private Map<String, Object> details;
 	private Integer lane;
-	private List<Node> linkedNodes;
+	@Deprecated
+	private Set<Node> linkedNodes;
+	private Set<String> linkedToNodeIds;
+	private Set<String> linkedFromNodeIds;
 
 	public NodeBuilder withId(final String id) {
 		this.id = id;
@@ -24,8 +27,18 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder havingLinkedNodes(final List<Node> linkedNodes) {
+	public NodeBuilder havingLinkedNodes(final Set<Node> linkedNodes) {
 		this.linkedNodes = linkedNodes;
+		return this;
+	}
+
+	public NodeBuilder havingLinkedToNodeIds(final Set<String> linkedToNodeIds) {
+		this.linkedToNodeIds = linkedToNodeIds;
+		return this;
+	}
+
+	public NodeBuilder havingLinkedFromNodeIds(final Set<String> linkedFromNodeIds) {
+		this.linkedFromNodeIds = linkedFromNodeIds;
 		return this;
 	}
 
@@ -39,9 +52,25 @@ public class NodeBuilder {
 
 	public NodeBuilder withLinkedNode(final Node node) {
 		if (linkedNodes == null) {
-			linkedNodes = new ArrayList<>();
+			linkedNodes = new HashSet<>();
 		}
 		linkedNodes.add(node);
+		return this;
+	}
+
+	public NodeBuilder withLinkedToNodeId(final String nodeId) {
+		if (linkedToNodeIds == null) {
+			linkedToNodeIds = new HashSet<>();
+		}
+		linkedToNodeIds.add(nodeId);
+		return this;
+	}
+
+	public NodeBuilder withLinkedFromNodeId(final String nodeId) {
+		if (linkedFromNodeIds == null) {
+			linkedFromNodeIds = new HashSet<>();
+		}
+		linkedFromNodeIds.add(nodeId);
 		return this;
 	}
 
@@ -54,7 +83,9 @@ public class NodeBuilder {
 		Node node = new Node();
 		node.setId(id);
 		node.setLane(lane);
-		node.setLinkedNodes(linkedNodes);
+		node.setLinkedToNodes(linkedNodes);
+		node.setLinkedToNodeIds(linkedToNodeIds);
+		node.setLinkedFromNodeIds(linkedFromNodeIds);
 		node.setDetails(details);
 		return node;
 	}

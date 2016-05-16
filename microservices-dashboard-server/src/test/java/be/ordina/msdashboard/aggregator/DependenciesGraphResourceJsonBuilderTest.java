@@ -3,6 +3,7 @@ package be.ordina.msdashboard.aggregator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Mockito.doReturn;
 
 import static be.ordina.msdashboard.constants.Constants.DETAILS;
@@ -19,10 +20,12 @@ import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.store.NodeStore;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -58,7 +61,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuild() throws Exception {
-		List<Node> microservicesAndBackends = Lists.newArrayList(
+		Set<Node> microservicesAndBackends = Sets.newHashSet(
 				NodeBuilder.node().withId("key1")
 						.withDetail("type", MICROSERVICE)
 						.withDetail(STATUS, "UP")
@@ -84,7 +87,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 		);
 	Node dependencies = NodeBuilder.node().havingLinkedNodes(microservicesAndBackends).build();
 		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
-		doReturn(dependencies.getLinkedNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anyListOf(Node.class), anyListOf(Node.class), anyListOf(Node.class));
+		doReturn(dependencies.getLinkedToNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anySetOf(Node.class), anySetOf(Node.class), anySetOf(Node.class));
 		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
 		doReturn(new Node()).when(indexesAggregator).fetchIndexes();
 		doReturn(new Node()).when(pactsAggregator).fetchPactNodes();

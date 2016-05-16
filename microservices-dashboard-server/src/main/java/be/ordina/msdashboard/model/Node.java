@@ -5,10 +5,7 @@ import static be.ordina.msdashboard.constants.Constants.DETAILS;
 import static be.ordina.msdashboard.constants.Constants.ID;
 import static be.ordina.msdashboard.constants.Constants.LANE;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,8 +23,13 @@ public class Node {
 	@JsonProperty(LANE)
 	private Integer lane;
 
-	@JsonProperty("linkedNodes")
-	private List<Node> linkedNodes;
+	@Deprecated
+	@JsonProperty("linkedToNodes")
+	private Set<Node> linkedToNodes;
+
+	private Set<String> linkedToNodeIds;
+
+	private Set<String> linkedFromNodeIds;
 
 	public void setLane(Integer lane) {
 		this.lane = lane;
@@ -45,15 +47,37 @@ public class Node {
 		return id;
 	}
 
-	public List<Node> getLinkedNodes() {
-		if(linkedNodes ==null){
-			linkedNodes = new ArrayList<>();
+	public Set<Node> getLinkedToNodes() {
+		if(linkedToNodes ==null){
+			linkedToNodes = new HashSet<>();
 		}
-		return linkedNodes;
+		return linkedToNodes;
 	}
 
-	public void setLinkedNodes(List<Node> linkedNodes) {
-		this.linkedNodes = linkedNodes;
+	public void setLinkedToNodes(Set<Node> linkedToNodes) {
+		this.linkedToNodes = linkedToNodes;
+	}
+
+	public Set<String> getLinkedToNodeIds() {
+		if(linkedToNodeIds ==null){
+			linkedToNodeIds = new HashSet<>();
+		}
+		return linkedToNodeIds;
+	}
+
+	public void setLinkedToNodeIds(Set<String> linkedToNodeIds) {
+		this.linkedToNodeIds = linkedToNodeIds;
+	}
+
+	public Set<String> getLinkedFromNodeIds() {
+		if(linkedFromNodeIds ==null){
+			linkedFromNodeIds = new HashSet<>();
+		}
+		return linkedFromNodeIds;
+	}
+
+	public void setLinkedFromNodeIds(Set<String> linkedFromNodeIds) {
+		this.linkedFromNodeIds = linkedFromNodeIds;
 	}
 
 	public Map<String, Object> getDetails() {
@@ -91,7 +115,7 @@ public class Node {
 				"details=" + details +
 				", id='" + id + '\'' +
 				", lane=" + lane +
-				", linkedNodes=" + linkedNodes +
+				", linkedToNodes=" + linkedToNodes +
 				'}';
 	}
 }

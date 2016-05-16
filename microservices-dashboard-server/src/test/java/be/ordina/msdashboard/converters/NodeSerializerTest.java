@@ -1,7 +1,6 @@
 package be.ordina.msdashboard.converters;
 
 import be.ordina.msdashboard.constants.Constants;
-import be.ordina.msdashboard.converters.NodeSerializer;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import org.junit.Test;
@@ -50,11 +49,12 @@ public class NodeSerializerTest {
 		assertThat(node.getDetails().size()).isEqualTo(2);
 		assertThat(node.getDetails().get("type")).isEqualTo(MICROSERVICE);
 		assertThat(node.getDetails().get(STATUS)).isEqualTo("UP");
-		assertThat(node.getLinkedNodes().size()).isEqualTo(1);
+		assertThat(node.getLinkedToNodes().size()).isEqualTo(1);
 
-		assertThat(node.getLinkedNodes().get(0).getId()).isEqualTo("1a");
-		assertThat(node.getLinkedNodes().get(0).getDetails().size()).isEqualTo(2);
-		assertThat(node.getLinkedNodes().get(0).getDetails().get("type")).isEqualTo("REST");
-		assertThat(node.getLinkedNodes().get(0).getDetails().get(STATUS)).isEqualTo("DOWN");
+		Node node1 = node.getLinkedToNodes().iterator().next();
+		assertThat(node1.getId()).isEqualTo("1a");
+		assertThat(node1.getDetails().size()).isEqualTo(2);
+		assertThat(node1.getDetails().get("type")).isEqualTo("REST");
+		assertThat(node1.getDetails().get(STATUS)).isEqualTo("DOWN");
 	}
 }

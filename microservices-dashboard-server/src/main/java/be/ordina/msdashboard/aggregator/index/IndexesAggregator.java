@@ -50,7 +50,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                 key = ((IdentifiableFutureTask) task).getId();
                 Node value = task.get(17_000L, TimeUnit.MILLISECONDS);
                 logger.debug("Task {} is done: {}", key, task.isDone());
-                indexesNode.withLinkedNodes(value.getLinkedNodes());
+                indexesNode.withLinkedNodes(value.getLinkedToNodes());
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 logger.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
             }
@@ -132,7 +132,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                              return node.build();
                          })
                          .reduce(new Node(), (node, nextNode) -> {
-                             node.getLinkedNodes().add(nextNode);
+                             node.getLinkedToNodes().add(nextNode);
                              return node;
                          });
     }

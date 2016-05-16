@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.stereotype.Component;
 
 import be.ordina.msdashboard.model.Node;
 
 public class VirtualAndRealDependencyIntegrator {
 
-	public List<Node> integrateVirtualNodesWithReal(List<Node> microservicesAndBackends, final List<Node> indexes, final Collection<Node> virtualNodes) {
+	public Set<Node> integrateVirtualNodesWithReal(Set<Node> microservicesAndBackends, final Set<Node> indexes, final Collection<Node> virtualNodes) {
 		Set<Node> agregatedNodes = new HashSet<>();
 		for (Node microserviceOrBackend : microservicesAndBackends) {
 			for (Node virtualNode : virtualNodes) {
@@ -28,8 +27,8 @@ public class VirtualAndRealDependencyIntegrator {
 	}
 
 	private void aggregateNodes(final Node realNode, final Node virtualNode) {
-		List<Node> realLinkedNodes = realNode.getLinkedNodes();
-		List<Node> virtualLinkedNodes = virtualNode.getLinkedNodes();
+		Set<Node> realLinkedNodes = realNode.getLinkedToNodes();
+		Set<Node> virtualLinkedNodes = virtualNode.getLinkedToNodes();
 		if (virtualLinkedNodes.size() > realLinkedNodes.size()) {
 			realLinkedNodes.addAll(CollectionUtils.subtract(virtualLinkedNodes, realLinkedNodes));
 		}

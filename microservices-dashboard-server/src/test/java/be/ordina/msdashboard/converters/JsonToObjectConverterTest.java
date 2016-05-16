@@ -14,7 +14,7 @@ public class JsonToObjectConverterTest {
 
     @Test
     public void shouldReturnNode() {
-        String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
+        String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
         JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
 
         Node node = converter.convert(nodeAsJson);
@@ -24,12 +24,12 @@ public class JsonToObjectConverterTest {
         assertThat(node.getDetails().size()).isEqualTo(2);
         assertThat(node.getDetails().get("type")).isEqualTo(MICROSERVICE);
         assertThat(node.getDetails().get(STATUS)).isEqualTo("UP");
-        assertThat(node.getLinkedNodes().size()).isEqualTo(1);
+        assertThat(node.getLinkedToNodes().size()).isEqualTo(1);
 
-        assertThat(node.getLinkedNodes().get(0).getId()).isEqualTo("1a");
-        assertThat(node.getLinkedNodes().get(0).getDetails().size()).isEqualTo(2);
-        assertThat(node.getLinkedNodes().get(0).getDetails().get("type")).isEqualTo("REST");
-        assertThat(node.getLinkedNodes().get(0).getDetails().get(STATUS)).isEqualTo("DOWN");
+        assertThat(node.getLinkedToNodes().iterator().next().getId()).isEqualTo("1a");
+        assertThat(node.getLinkedToNodes().iterator().next().getDetails().size()).isEqualTo(2);
+        assertThat(node.getLinkedToNodes().iterator().next().getDetails().get("type")).isEqualTo("REST");
+        assertThat(node.getLinkedToNodes().iterator().next().getDetails().get(STATUS)).isEqualTo("DOWN");
     }
 
     @Test

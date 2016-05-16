@@ -8,6 +8,7 @@ import static be.ordina.msdashboard.constants.Constants.TYPE;
 import static be.ordina.msdashboard.constants.Constants.VERSION;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import be.ordina.msdashboard.model.Node;
@@ -24,16 +25,17 @@ public class HealthToNodeConverterTest {
 		Map<String, Object> details = result.getDetails();
 		assertThat(details.get(STATUS)).isEqualTo("UP");
 		assertThat(details.get(TYPE)).isEqualTo(MICROSERVICE);
-		Node bciNode = result.getLinkedNodes().get(1);
-		assertThat(bciNode.getDetails().get(TYPE)).isEqualTo("SOAP");
-		assertThat(bciNode.getDetails().get(VERSION)).isEqualTo("4.0");
-		assertThat(bciNode.getDetails().get(GROUP)).isEqualTo("BCI");
-		assertThat(bciNode.getDetails().get(STATUS)).isEqualTo("UP");
-		Node cslNode = result.getLinkedNodes().get(0);
+		Iterator<Node> nodeIterator = result.getLinkedToNodes().iterator();
+		Node cslNode = nodeIterator.next();
 		assertThat(cslNode.getDetails().get(TYPE)).isEqualTo("SOAP");
 		assertThat(cslNode.getDetails().get(VERSION)).isEqualTo("Customer 4.0 (since 2012 CRC03)");
 		assertThat(cslNode.getDetails().get(GROUP)).isEqualTo("CSL");
 		assertThat(cslNode.getDetails().get(STATUS)).isEqualTo("UP");
+		Node bciNode = nodeIterator.next();
+		assertThat(bciNode.getDetails().get(TYPE)).isEqualTo("SOAP");
+		assertThat(bciNode.getDetails().get(VERSION)).isEqualTo("4.0");
+		assertThat(bciNode.getDetails().get(GROUP)).isEqualTo("BCI");
+		assertThat(bciNode.getDetails().get(STATUS)).isEqualTo("UP");
 	}
 
 	private Map<String, Object> getSourceMap() {

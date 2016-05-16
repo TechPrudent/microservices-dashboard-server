@@ -60,7 +60,7 @@ public class SingleServiceHealthCollectorTaskTest {
 	@Test
 	public void unmarshallsHealths() throws Exception {
 		Node node = task.call();
-		assertThat(node.getLinkedNodes().size()).isEqualTo(2);
+		assertThat(node.getLinkedToNodes().size()).isEqualTo(2);
 	}
 
 	private Node mockResponseEntity() {
@@ -89,9 +89,9 @@ public class SingleServiceHealthCollectorTaskTest {
 		diskSpaceNode.getDetails().put("threshold", 10485760);
 		diskSpaceNode.getDetails().put(GROUP, "CSL");
 
-		node.getLinkedNodes().add(bciNode);
-		node.getLinkedNodes().add(cslNode);
-		node.getLinkedNodes().add(diskSpaceNode);
+		node.getLinkedToNodes().add(bciNode);
+		node.getLinkedToNodes().add(cslNode);
+		node.getLinkedToNodes().add(diskSpaceNode);
 
 		return node;
 	}

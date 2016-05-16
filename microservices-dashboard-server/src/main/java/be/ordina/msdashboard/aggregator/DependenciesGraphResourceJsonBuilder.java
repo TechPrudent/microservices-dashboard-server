@@ -1,23 +1,21 @@
 package be.ordina.msdashboard.aggregator;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
-import static com.google.common.collect.Maps.newHashMap;
-
-import java.util.*;
-
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.store.NodeStore;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.*;
+
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
+import static com.google.common.collect.Maps.newHashMap;
 
 public class DependenciesGraphResourceJsonBuilder {
 
@@ -50,9 +48,9 @@ public class DependenciesGraphResourceJsonBuilder {
 		Node healthNode = healthIndicatorsAggregator.fetchCombinedDependencies();
 		Node indexNode = indexesAggregator.fetchIndexes();
 		Node pactNode = pactsAggregator.fetchPactNodes();
-		List<Node> microservicesAndBackends = healthNode.getLinkedNodes();
-		List<Node> resources = indexNode.getLinkedNodes();
-		List<Node> pactComponents = pactNode.getLinkedNodes();
+		Set<Node> microservicesAndBackends = healthNode.getLinkedToNodes();
+		Set<Node> resources = indexNode.getLinkedToNodes();
+		Set<Node> pactComponents = pactNode.getLinkedToNodes();
 		Collection<Node> virtualNodes = redisService.getAllNodes();
 		if (!virtualNodes.isEmpty()) {
 			virtualAndRealDependencyIntegrator.integrateVirtualNodesWithReal(microservicesAndBackends, resources, virtualNodes);
@@ -60,7 +58,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		return createGraph(microservicesAndBackends, resources, pactComponents);
 	}
 
-	private Map<String, Object> createGraph(final List<Node> microservicesWithTheirBackends, List<Node> resources, List<Node> pactComponents) {
+	private Map<String, Object> createGraph(final Set<Node> microservicesWithTheirBackends, Set<Node> resources, Set<Node> pactComponents) {
 		List<Map<String, Object>> nodes = new ArrayList<>();
 		Set<Map<String, Integer>> links = new HashSet<>();
 
@@ -72,7 +70,7 @@ public class DependenciesGraphResourceJsonBuilder {
 				nodes.add(microserviceNode);
 			}
 			int microserviceNodeId = nodeIndex.orElse(nodes.size() - 1);
-			List<Node> dependencyNodes = microservice.getLinkedNodes();
+			Set<Node> dependencyNodes = microservice.getLinkedToNodes();
 			removeEurekaDescription(dependencyNodes);
 			for (Node dependencyNode : dependencyNodes) {
 				if (Constants.MICROSERVICE.equals(dependencyNode.getDetails().get(Constants.TYPE))) {
@@ -90,7 +88,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		for (Node resource : resources) {
 			Map<String, Object> resourceNode = createResourceNode(resource);
 			nodes.add(resourceNode);
-			String linkedMicroservice = resource.getLinkedNodes().get(0).getId();
+			String linkedMicroservice = resource.getLinkedToNodes().iterator().next().getId();
 			int resourceNodeId = nodes.size() - 1;
 			int linkedMicroserviceNodeId = findNode(linkedMicroservice, nodes);
 			if (linkedMicroserviceNodeId != -1) {
@@ -106,7 +104,7 @@ public class DependenciesGraphResourceJsonBuilder {
 				nodes.add(pactComponentNode);
 			}
 			int pactNodeId = nodeIndex.orElse(nodes.size() - 1);
-			pactComponent.getLinkedNodes().stream()
+			pactComponent.getLinkedToNodes().stream()
 					.map(linkedNode -> linkedNode.getId())
 					.forEach(linkedNodeId -> {
 						int resolvedLinkedNodeId = findNode(linkedNodeId, nodes);
@@ -213,7 +211,7 @@ public class DependenciesGraphResourceJsonBuilder {
 		return laneMap;
 	}
 
-	private void removeEurekaDescription(final List<Node> dependencyNodes) {
+	private void removeEurekaDescription(final Set<Node> dependencyNodes) {
 		for (Node dependencyNode : dependencyNodes) {
 			if (Constants.DESCRIPTION.equals(dependencyNode.getId())) {
 				dependencyNodes.remove(dependencyNode);

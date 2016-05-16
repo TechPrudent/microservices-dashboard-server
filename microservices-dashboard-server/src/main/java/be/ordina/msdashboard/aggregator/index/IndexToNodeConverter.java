@@ -3,8 +3,6 @@ package be.ordina.msdashboard.aggregator.index;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.model.Service;
-import com.google.common.collect.Lists;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +45,7 @@ public class IndexToNodeConverter {
 					details.put("status", UP);
 					node.havingDetails(details);
 
-					masterNode.getLinkedNodes().add(node.build());
+					masterNode.getLinkedToNodes().add(node.build());
 
 				});
 		return masterNode;

@@ -61,14 +61,6 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 				.flatMap(el -> el);
 	}
 
-	@Test
-	public void printWiki() {
-		pactBrokerUrl = "http://echo.jsontest.com/url1/echo.jsontest.com/url2/echo.jsontest.com";
-		latestPactsUrl = "";
-		selfHrefJsonPath = "$..*";
-		getPactUrlsFromBroker().toBlocking().forEach(element -> System.out.println("Element: " + element));
-	}
-
 	private Observable<String> getPactUrlsFromBroker() {
 		return RxNetty.createHttpGet(pactBrokerUrl + latestPactsUrl)
 				.flatMap(response -> response.getContent())
@@ -88,5 +80,13 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 					return pactToNodeConverter.convert(response, url);
 				})
 				.doOnNext(System.out::println);
+	}
+
+	@Test
+	public void printWiki() {
+		pactBrokerUrl = "http://echo.jsontest.com/url1/echo.jsontest.com/url2/echo.jsontest.com";
+		latestPactsUrl = "";
+		selfHrefJsonPath = "$..*";
+		getPactUrlsFromBroker().toBlocking().forEach(element -> System.out.println("Element: " + element));
 	}
 }
