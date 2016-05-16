@@ -26,7 +26,7 @@ public class ObjectToJsonConverterTest {
         String nodeAsJson = converter.convert(node);
 
         assertThat(nodeAsJson).isNotNull();
-        assertThat(nodeAsJson).isEqualTo("{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"},\"linkedToNodes\":[]}]}");
+        assertThat(nodeAsJson).isEqualTo("{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}");
     }
 
     @Test

@@ -22,7 +22,7 @@ public class NodeSerializerTest {
 							   .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
 							   .build();
 
-		String nodeAsJson = "{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"},\"linkedToNodes\":[]}]}";
+		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
 
 		NodeSerializer nodeSerializer = new NodeSerializer();
 

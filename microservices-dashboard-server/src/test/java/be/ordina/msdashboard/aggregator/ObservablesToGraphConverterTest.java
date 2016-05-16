@@ -16,6 +16,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+import org.springframework.boot.test.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import rx.Observable;
 
 import java.io.FileNotFoundException;
@@ -68,8 +70,11 @@ public class ObservablesToGraphConverterTest {
         Mockito.when(redisService.getAllNodes())
                 .thenReturn(newHashSet());
 
+        long startTime = System.currentTimeMillis();
         Map<String, Object> graph = observablesToGraphConverter.build();
+        long totalTime = System.currentTimeMillis() - startTime;
 
+        System.out.println("Time spent waiting for processing: " + totalTime);
         ObjectToJsonConverter<Map<String, Object>> converter = new ObjectToJsonConverter<>();
         String nodeAsJson = converter.convert(graph);
         JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/ObservablesToGraphConverterTestResponse.json")),
