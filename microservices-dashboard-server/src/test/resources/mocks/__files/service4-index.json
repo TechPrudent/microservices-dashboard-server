@@ -1,11 +1,11 @@
 {
   "_links": {
     "svc4:svc4rsc1": {
-      "href": "http://host0014.local:8281/svc2rsc1",
+      "href": "http://host0014.local:8281/svc4rsc1",
       "templated": true
     },
     "svc4:svc4rsc2": {
-      "href": "http://host0014.local:8281/svc2rsc2",
+      "href": "http://host0014.local:8281/svc4rsc2",
       "templated": true
     },
     "curies": [
