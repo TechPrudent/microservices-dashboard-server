@@ -22,6 +22,8 @@ import rx.apache.http.ObservableHttp;
 import rx.apache.http.ObservableHttpResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -74,7 +76,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
     public Observable<Node> fetchIndexesWithObservable() {
         return Observable.from(discoveryClient.getServices())
                          .flatMap(this::createObservableHttpRequest)
-                         .map(triple -> this.parseRequestIntoNode(triple.getLeft(), triple.getMiddle(), triple.getRight()));
+                         .concatMap(this::parseRequestIntoNode);
     }
 
     private Observable<ImmutableTriple<String, ServiceInstance, JSONObject>> createObservableHttpRequest(String service) {
@@ -109,14 +111,14 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                              .filter(Objects::nonNull);
     }
 
-    private Node parseRequestIntoNode(String service, ServiceInstance serviceInstance, JSONObject source) {
-        NodeBuilder node = NodeBuilder.node()
-                                      .withId(service);
+    private Observable<Node> parseRequestIntoNode(ImmutableTriple<String, ServiceInstance, JSONObject> triple) {
+        String service = triple.getLeft();
+        ServiceInstance serviceInstance = triple.getMiddle();
+        JSONObject source = triple.getRight();
 
-        if (!source.has(LINKS)) {
-            logger.error("Index deserialization fails because no HAL _links was found at the root");
-            return node.build();
-        }
+        NodeBuilder serviceNode = NodeBuilder.node().withId(service);
+
+        List<Node> nodes = new ArrayList<>();
 
         JSONObject links = source.getJSONObject(LINKS);
 
@@ -126,9 +128,12 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                 .forEach(linkKey -> {
                     JSONObject link = links.getJSONObject(linkKey);
 
+                    serviceNode.withLinkedFromNodeId(linkKey);
+
                     NodeBuilder nodeBuilder = NodeBuilder.node()
                                                          .withId(linkKey)
                                                          .withLane(1)
+                                                         .withLinkedToNodeId(service)
                                                          .withDetail("url", link.getString(HREF))
                                                          .withDetail("type", RESOURCE)
                                                          .withDetail("status", UP);
@@ -148,9 +153,11 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                         }
                     }
 
-                    node.withLinkedToNode(nodeBuilder.build());
+                    nodes.add(nodeBuilder.build());
                 });
 
-        return node.build();
+        nodes.add(0, serviceNode.build());
+
+        return Observable.from(nodes);
     }
 }

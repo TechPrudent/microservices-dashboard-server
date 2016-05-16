@@ -23,6 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
+import static be.ordina.msdashboard.JsonHelper.load;
+import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -49,25 +51,11 @@ public class MicroservicesDashboardServerApplicationTest {
         long totalTime = System.currentTimeMillis() - startTime;
         assertThat(HttpStatus.OK).isEqualTo(entity.getStatusCode());
         String body = entity.getBody();
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/response.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestResponse.json")),
                 removeBlankNodes(body), JSONCompareMode.LENIENT);
         assertThat(totalTime).isLessThan(10000);
         // assertThat(totalTime).isLessThan(4500); // should be the case after reactive improvements
         System.out.println("Time spent waiting for /graph: " + totalTime);
-    }
-
-    private static String load(final String fileName)
-            throws FileNotFoundException {
-        try (Scanner scanner = new Scanner(new File(fileName))) {
-            final StringBuilder builder = new StringBuilder();
-            while (scanner.hasNextLine())
-                builder.append(scanner.nextLine()).append("\n");
-            return builder.toString().trim();
-        }
-    }
-
-    private static String removeBlankNodes(String string) {
-        return string.replaceAll("_:t\\d", "");
     }
 
     @Configuration

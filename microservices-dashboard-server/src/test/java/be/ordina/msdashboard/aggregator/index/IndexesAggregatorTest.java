@@ -42,7 +42,7 @@ public class IndexesAggregatorTest {
     }
 
     @Test
-    public void shouldReturnOneNodeWithTwoResources() {
+    public void shouldReturnThreeNodes() {
         Mockito.when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
         ServiceInstance instance = Mockito.mock(ServiceInstance.class);
         Mockito.when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
@@ -89,16 +89,13 @@ public class IndexesAggregatorTest {
         testSubscriber.assertNoErrors();
 
         List<Node> nodes = testSubscriber.getOnNextEvents();
-        assertThat(nodes).hasSize(1);
+        assertThat(nodes).hasSize(3);
 
-        Node node = nodes.get(0);
-        assertThat(node.getId()).isEqualTo("service");
+        Iterator<Node> iterator = nodes.iterator();
+        Node serviceNode = iterator.next();
+        assertThat(serviceNode.getId()).isEqualTo("service");
+        assertThat(serviceNode.getLinkedFromNodeIds()).contains("svc1:svc1rsc1", "svc1:svc1rsc2");
 
-        Set<Node> linkedNodes = node.getLinkedToNodes();
-        assertThat(linkedNodes).isNotNull();
-        assertThat(linkedNodes).hasSize(2);
-
-        Iterator<Node> iterator = linkedNodes.iterator();
         checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc1");
         checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc2");
 
@@ -108,8 +105,8 @@ public class IndexesAggregatorTest {
 
     private void checkResource(Node resource, String id, String url, String docs) {
         assertThat(resource.getId()).isEqualTo(id);
+        assertThat(resource.getLinkedToNodeIds()).contains("service");
         assertThat(resource.getLane()).isEqualTo(1);
-        assertThat(resource.getLinkedToNodes()).isEmpty();
         assertThat(resource.getDetails()).isNotEmpty();
 
         Map<String, Object> details = resource.getDetails();

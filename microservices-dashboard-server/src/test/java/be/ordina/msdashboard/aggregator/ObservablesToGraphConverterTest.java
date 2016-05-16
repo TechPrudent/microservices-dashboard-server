@@ -14,10 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import rx.Observable;
 
+import java.io.FileNotFoundException;
 import java.util.Map;
 
+import static be.ordina.msdashboard.JsonHelper.load;
+import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
 import static be.ordina.msdashboard.model.NodeBuilder.node;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -40,7 +45,7 @@ public class ObservablesToGraphConverterTest {
     private NodeStore redisService;
 
     @Test
-    public void retrieveGraph() {
+    public void retrieveGraph() throws FileNotFoundException {
         Mockito.when(healthIndicatorsAggregator.fetchCombinedDependencies())
                 .thenReturn(node().withId("masterNode").havingLinkedToNodes(newHashSet(
                         node().withId("service1").havingLinkedToNodeIds(newHashSet("backend1")).build(),
@@ -67,6 +72,7 @@ public class ObservablesToGraphConverterTest {
 
         ObjectToJsonConverter<Map<String, Object>> converter = new ObjectToJsonConverter<>();
         String nodeAsJson = converter.convert(graph);
-        System.out.println(nodeAsJson);
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/ObservablesToGraphConverterTestResponse.json")),
+                removeBlankNodes(nodeAsJson), JSONCompareMode.LENIENT);
     }
 }

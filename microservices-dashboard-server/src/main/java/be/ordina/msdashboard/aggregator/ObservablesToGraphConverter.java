@@ -99,9 +99,10 @@ public class ObservablesToGraphConverter {
 	private Func1<Map<String, Object>, Map<String, Object>> mapToDisplayableNode() {
 		return map -> {
 			List<Node> nodes = (List<Node>) map.get(NODES);
-			Set<Map<String, Object>> displayableNodes = nodes.stream().map(node -> {
-				return createDisplayableNode(node);
-			}).collect(Collectors.toSet());
+			List<Map<String, Object>> displayableNodes = new ArrayList<>();
+			for (Node node : nodes) {
+				displayableNodes.add(createDisplayableNode(node));
+			}
 			map.replace(NODES, displayableNodes);
 			return map;
 		};
@@ -120,12 +121,13 @@ public class ObservablesToGraphConverter {
 				if (!nodeIndex.isPresent()) {
 					//System.out.println("NodeIndex not found, adding node: " + node);
 					existingNodes.add(node);
+					existingNodeIndex = existingNodes.size() - 1;
 				} else {
 					//System.out.println("NodeIndex found: " + nodeIndex.get() + ", node: "+ node);
 					Node existingNode = existingNodes.get(nodeIndex.get());
 					existingNode.mergeWith(node);
+					existingNodeIndex = nodeIndex.get();
 				}
-				existingNodeIndex = existingNodes.size();
 				Set<Map<String, Integer>> links = (Set<Map<String, Integer>>) returnedNodesAndLinks.get(LINKS);
 				Set<String> linkedToNodeIds = node.getLinkedToNodeIds();
 				for (String nodeId : linkedToNodeIds) {
@@ -133,9 +135,9 @@ public class ObservablesToGraphConverter {
 					int existingLinkedNodeIndex;
 					if (!nodeIndex.isPresent()) {
 						existingNodes.add(createNodeById(nodeId));
-						existingLinkedNodeIndex = existingNodes.indexOf(node);
+						existingLinkedNodeIndex = existingNodes.size() - 1;
 					} else {
-						existingLinkedNodeIndex = existingNodes.indexOf(node);
+						existingLinkedNodeIndex = nodeIndex.get();
 					}
 					links.add(createLink(existingNodeIndex, existingLinkedNodeIndex));
 				}
