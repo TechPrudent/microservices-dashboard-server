@@ -19,6 +19,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
 import rx.apache.http.ObservableHttp;
+import rx.apache.http.ObservableHttpResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
@@ -72,7 +73,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
 
     public Observable<Node> fetchIndexesWithObservable() {
         return Observable.from(discoveryClient.getServices())
-                         .flatMap(service -> this.createObservableHttpRequest(service))
+                         .flatMap(this::createObservableHttpRequest)
                          .map(triple -> this.parseRequestIntoNode(triple.getLeft(), triple.getMiddle(), triple.getRight()));
     }
 
@@ -94,7 +95,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
                              .toObservable()
                              .filter(observableHttpResponse -> observableHttpResponse.getResponse().getStatusLine().getStatusCode() < 400)
-                             .flatMap(observableHttpResponse -> observableHttpResponse.getContent())
+                             .flatMap(ObservableHttpResponse::getContent)
                              .map(bytes -> {
                                  String response = new String(bytes);
                                  try {
@@ -105,7 +106,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                                      return null;
                                  }
                              })
-                             .filter(source -> Objects.nonNull(source));
+                             .filter(Objects::nonNull);
     }
 
     private Node parseRequestIntoNode(String service, ServiceInstance serviceInstance, JSONObject source) {
