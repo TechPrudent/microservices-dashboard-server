@@ -1,6 +1,7 @@
 package be.ordina.msdashboard;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -62,7 +63,7 @@ public class InMemoryMockedConfiguration {
 
                     @Override
                     public URI getUri() {
-                        return null;
+                        return URI.create(DefaultServiceInstance.getUri(this).toString() + "/" + getServiceId());
                     }
 
                     @Override
