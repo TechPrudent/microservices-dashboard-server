@@ -21,12 +21,13 @@ import rx.Observable;
 import rx.apache.http.ObservableHttp;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.*;
 
+/**
+ * @author Tim Ysewyn
+ */
 public class IndexesAggregator extends EurekaBasedAggregator<Node> {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexesAggregator.class);
@@ -67,84 +68,88 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         return new SingleServiceIndexCollectorTask(service, originRequest);
     }
 
+    // REACTIVE WAY
+
     public Observable<Node> fetchIndexesWithObservable() {
         return Observable.from(discoveryClient.getServices())
-                         .flatMap(service -> {
-                             if (logger.isDebugEnabled()) {
-                                 logger.debug("Getting instance for service {}", service);
-                             }
-                             ServiceInstance instance = discoveryClient.getInstances(service)
-                                                                       .get(0);
+                         .flatMap(service -> this.createObservableHttpRequest(service))
+                         .map(triple -> this.parseRequestIntoNode(triple.getLeft(), triple.getMiddle(), triple.getRight()));
+    }
 
-                             String uri = instance.getUri()
-                                                  .toString();
-                             if (logger.isDebugEnabled()) {
-                                 logger.debug("Calling {}...", uri);
-                             }
+    private Observable<ImmutableTriple<String, ServiceInstance, JSONObject>> createObservableHttpRequest(String service) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Getting instance for service {}", service);
+        }
+        ServiceInstance instance = discoveryClient.getInstances(service)
+                                                  .get(0);
 
-                             CloseableHttpAsyncClient client = HttpAsyncClients.createDefault();
-                             client.start();
-                             return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
-                                                  .toObservable()
-                                                  .filter(observableHttpResponse -> observableHttpResponse.getResponse().getStatusLine().getStatusCode() < 400)
-                                                  .flatMap(observableHttpResponse -> observableHttpResponse.getContent()
-                                                                                                           .map(bytes -> {
-                                                                                                               String response = new String(bytes);
-                                                                                                               try {
-                                                                                                                   return new ImmutableTriple<>(service, instance, new JSONObject(response));
-                                                                                                               } catch (JSONException e) {
-                                                                                                                   logger.error("An exception occurred: {}", e.getStackTrace());
-                                                                                                                   logger.error("Response: {}", response);
-                                                                                                                   return null;
-                                                                                                               }
-                                                                                                           }))
-                                                  .filter(source -> Objects.nonNull(source));
-                         })
-                         .map(triple -> {
-                             NodeBuilder node = NodeBuilder.node()
-                                                           .withId(triple.getLeft());
+        String uri = instance.getUri()
+                             .toString();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling {}...", uri);
+        }
 
-                             JSONObject source = triple.getRight();
+        CloseableHttpAsyncClient client = HttpAsyncClients.createDefault();
+        client.start();
+        return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
+                             .toObservable()
+                             .filter(observableHttpResponse -> observableHttpResponse.getResponse().getStatusLine().getStatusCode() < 400)
+                             .flatMap(observableHttpResponse -> observableHttpResponse.getContent())
+                             .map(bytes -> {
+                                 String response = new String(bytes);
+                                 try {
+                                     return new ImmutableTriple<>(service, instance, new JSONObject(response));
+                                 } catch (JSONException e) {
+                                     logger.error("An exception occurred: {}", e.getStackTrace());
+                                     logger.error("Response: {}", response);
+                                     return null;
+                                 }
+                             })
+                             .filter(source -> Objects.nonNull(source));
+    }
 
-                             if (!source.has(LINKS)) {
-                                 logger.error("Index deserialization fails because no HAL _links was found at the root");
-                             } else {
-                                 JSONObject links = source.getJSONObject(LINKS);
+    private Node parseRequestIntoNode(String service, ServiceInstance serviceInstance, JSONObject source) {
+        NodeBuilder node = NodeBuilder.node()
+                                      .withId(service);
 
-                                 ((Set<String>) links.keySet())
-                                         .stream()
-                                         .filter(linkKey -> !CURIES.equals(linkKey))
-                                         .forEach(linkKey -> {
-                                             JSONObject link = links.getJSONObject(linkKey);
+        if (!source.has(LINKS)) {
+            logger.error("Index deserialization fails because no HAL _links was found at the root");
+            return node.build();
+        }
 
-                                             NodeBuilder nodeBuilder = NodeBuilder.node()
-                                                                                  .withId(linkKey)
-                                                                                  .withLane(1)
-                                                                                  .withDetail("url", link.getString(HREF))
-                                                                                  .withDetail("type", RESOURCE)
-                                                                                  .withDetail("status", UP);
+        JSONObject links = source.getJSONObject(LINKS);
 
-                                             if (links.has(CURIES)) {
-                                                 String namespace = linkKey.substring(0, linkKey.indexOf(":"));
+        ((Set<String>) links.keySet())
+                .stream()
+                .filter(linkKey -> !CURIES.equals(linkKey))
+                .forEach(linkKey -> {
+                    JSONObject link = links.getJSONObject(linkKey);
 
-                                                 JSONArray curies = links.getJSONArray(CURIES);
-                                                 for (int i = 0; i < curies.length();) {
-                                                     JSONObject curie = curies.getJSONObject(i);
+                    NodeBuilder nodeBuilder = NodeBuilder.node()
+                                                         .withId(linkKey)
+                                                         .withLane(1)
+                                                         .withDetail("url", link.getString(HREF))
+                                                         .withDetail("type", RESOURCE)
+                                                         .withDetail("status", UP);
 
-                                                     if (curie.has(CURIE_NAME) && curie.getString(CURIE_NAME).equals(namespace)) {
-                                                         ServiceInstance instance = triple.getMiddle();
-                                                         String docs = instance.getUri().toString() + curie.getString(HREF).replace("{rel}", linkKey.substring(linkKey.indexOf(":") + 1));
-                                                         nodeBuilder.withDetail("docs", docs);
-                                                         break;
-                                                     }
-                                                 }
-                                             }
+                    if (links.has(CURIES)) {
+                        String namespace = linkKey.substring(0, linkKey.indexOf(":"));
 
-                                             node.withLinkedNode(nodeBuilder.build());
-                                         });
-                             }
+                        JSONArray curies = links.getJSONArray(CURIES);
+                        for (int i = 0; i < curies.length();) {
+                            JSONObject curie = curies.getJSONObject(i);
 
-                             return node.build();
-                         });
+                            if (curie.has(CURIE_NAME) && curie.getString(CURIE_NAME).equals(namespace)) {
+                                String docs = serviceInstance.getUri().toString() + curie.getString(HREF).replace("{rel}", linkKey.substring(linkKey.indexOf(":") + 1));
+                                nodeBuilder.withDetail("docs", docs);
+                                break;
+                            }
+                        }
+                    }
+
+                    node.withLinkedNode(nodeBuilder.build());
+                });
+
+        return node.build();
     }
 }
