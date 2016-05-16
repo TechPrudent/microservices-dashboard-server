@@ -93,14 +93,19 @@ public class Node {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 
 		Node node = (Node) o;
 
-		return id.equals(node.id);
+		if (!id.equals(node.id)) return false;
+		if (details != null ? !details.equals(node.details) : node.details != null) return false;
+		if (lane != null ? !lane.equals(node.lane) : node.lane != null) return false;
+		if (linkedToNodes != null ? !linkedToNodes.equals(node.linkedToNodes) : node.linkedToNodes != null)
+			return false;
+		if (linkedToNodeIds != null ? !linkedToNodeIds.equals(node.linkedToNodeIds) : node.linkedToNodeIds != null)
+			return false;
+		return !(linkedFromNodeIds != null ? !linkedFromNodeIds.equals(node.linkedFromNodeIds) : node.linkedFromNodeIds != null);
 
 	}
 

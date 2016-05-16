@@ -22,7 +22,7 @@ public class NodeSerializerTest {
 							   .withLinkedNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
 							   .build();
 
-		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"},\"linkedNodes\":[]}]}";
+		String nodeAsJson = "{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"linkedToNodeIds\":[],\"linkedFromNodeIds\":[],\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"},\"linkedToNodes\":[]}]}";
 
 		NodeSerializer nodeSerializer = new NodeSerializer();
 
@@ -39,7 +39,7 @@ public class NodeSerializerTest {
 
 	@Test
 	public void deserialize() {
-		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
+		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
 		NodeSerializer nodeSerializer = new NodeSerializer();
 
 		Node node = nodeSerializer.deserialize(nodeAsJson.getBytes());
