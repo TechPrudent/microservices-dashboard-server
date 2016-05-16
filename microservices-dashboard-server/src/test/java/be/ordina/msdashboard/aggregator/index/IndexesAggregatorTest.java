@@ -22,9 +22,7 @@ import rx.apache.http.ObservableHttpResponse;
 import rx.observers.TestSubscriber;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,12 +94,13 @@ public class IndexesAggregatorTest {
         Node node = nodes.get(0);
         assertThat(node.getId()).isEqualTo("service");
 
-        List<Node> linkedNodes = node.getLinkedNodes();
+        Set<Node> linkedNodes = node.getLinkedToNodes();
         assertThat(linkedNodes).isNotNull();
         assertThat(linkedNodes).hasSize(2);
 
-        checkResource(linkedNodes.get(0), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc1");
-        checkResource(linkedNodes.get(1), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc2");
+        Iterator<Node> iterator = linkedNodes.iterator();
+        checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc1");
+        checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc2");
 
         PowerMockito.verifyStatic();
         ObservableHttp.createRequest(Mockito.any(HttpAsyncRequestProducer.class), Mockito.any(HttpAsyncClient.class));
@@ -110,7 +109,7 @@ public class IndexesAggregatorTest {
     private void checkResource(Node resource, String id, String url, String docs) {
         assertThat(resource.getId()).isEqualTo(id);
         assertThat(resource.getLane()).isEqualTo(1);
-        assertThat(resource.getLinkedNodes()).isEmpty();
+        assertThat(resource.getLinkedToNodes()).isEmpty();
         assertThat(resource.getDetails()).isNotEmpty();
 
         Map<String, Object> details = resource.getDetails();
