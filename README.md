@@ -66,7 +66,7 @@ mvn install
 To run the sample application locally, build it from source and run the following command:
 
 ```bash
-java -jar target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
+java -jar target/microservices-dashboard-server-sample-1.0.0-SNAPSHOT.jar --spring.config.location=./microservices-dashboard-server-configuration/microservices-dashboard-server.yml
 ```
 
 If successful, you should see the following output in the log:
