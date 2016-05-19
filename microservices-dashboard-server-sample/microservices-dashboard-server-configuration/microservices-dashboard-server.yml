@@ -23,7 +23,7 @@ spring:
   aop:
     proxyTargetClass: true
   redis:
-      host: el2604.bc
+      host: localhost
       port: 6379
       pool:
         max-wait: 10000
