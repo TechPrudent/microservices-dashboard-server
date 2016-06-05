@@ -80,8 +80,7 @@ public class NodeBuilder {
 	}
 
 	public Node build() {
-		Node node = new Node();
-		node.setId(id);
+		Node node = new Node(id);
 		node.setLane(lane);
 		node.setLinkedToNodes(linkedToNodes);
 		node.setLinkedToNodeIds(linkedToNodeIds);

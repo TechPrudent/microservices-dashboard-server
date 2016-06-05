@@ -27,7 +27,7 @@ public class IndexToNodeConverter {
 	}
 
 	private Node convertLinksToNodes(final Map<String, Object> links, final Service service) {
-		Node masterNode = new Node();
+		Node masterNode = new Node("masternode");
 		links.keySet().stream()
 				.filter(linkKey -> !CURIES.equals(linkKey))
 				.forEach(linkKey -> {
@@ -63,6 +63,8 @@ public class IndexToNodeConverter {
 					builder.append(service.getHost())
 							.append(":")
 							.append(service.getPort())
+							.append("/")
+							.append(service.getId())
 							.append(docs);
 					return builder.toString();
 				})

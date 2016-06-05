@@ -22,18 +22,20 @@ public class PactToNodeConverter {
 		String provider = JsonPath.read(source, "$.provider.name");
 		String consumer = JsonPath.read(source, "$.consumer.name");
 
-		LOG.debug("Retrieved UI Component for consumer {} and producer {} with rels {}", consumer, provider, paths);
+		LOG.info("Retrieved UI Component for consumer {} and producer {} with rels {}", consumer, provider, paths);
 
 		NodeBuilder node = new NodeBuilder();
 		node.withId(consumer);
 		node.withLane(0);
 		paths.stream().forEach(path -> {
+				node.withLinkedToNodeId(convertPathToRel(path));
+				// TODO: Remove when deprecation finishes
 				Node linkNode = NodeBuilder.node().withId(convertPathToRel(path)).build();
 				node.withLinkedToNode(linkNode);
 		});
 		Map<String, Object> details = new HashMap<>();
 		details.put("url", pactUrl);
-		details.put("docs", pactUrl);
+		//details.put("docs", pactUrl);
 		details.put("type", Constants.UI_COMPONENT);
 		details.put("status", UP);
 		node.havingDetails(details);
@@ -48,7 +50,7 @@ public class PactToNodeConverter {
 		} else {
 			rel = path;
 		}
-		LOG.debug("Path '{}' resolved to rel '{}'", path, rel);
+		LOG.info("Path '{}' resolved to rel '{}'", path, rel);
 		return rel;
 	}
 }

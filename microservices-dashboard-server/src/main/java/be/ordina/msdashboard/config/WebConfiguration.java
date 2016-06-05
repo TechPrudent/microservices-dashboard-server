@@ -2,6 +2,7 @@ package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
 import be.ordina.msdashboard.aggregator.DependenciesResourceJsonBuilder;
+import be.ordina.msdashboard.aggregator.ObservablesToGraphConverter;
 import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
@@ -67,7 +68,9 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public DependenciesResourceService dependenciesResourceService() {
-        return new DependenciesResourceService(dependenciesResourceJsonBuilder(), dependenciesGraphResourceJsonBuilder());
+        return new DependenciesResourceService(dependenciesResourceJsonBuilder(),
+                dependenciesGraphResourceJsonBuilder(),
+                observablesToGraphConverter());
     }
 
     @Bean
@@ -85,8 +88,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
     }
 
     @Bean
+    public ObservablesToGraphConverter observablesToGraphConverter() {
+        return new ObservablesToGraphConverter(healthIndicatorsAggregator,
+                indexesAggregator(),
+                pactsAggregator(),
+                nodeStore);
+    }
+
+    @Bean
     public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
-        return new HealthIndicatorsAggregator(environment);
+        return new HealthIndicatorsAggregator(environment, discoveryClient);
     }
 
     @Bean

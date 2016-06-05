@@ -20,6 +20,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
 import rx.apache.http.ObservableHttp;
 import rx.apache.http.ObservableHttpResponse;
+import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.concurrent.*;
  */
 public class IndexesAggregator extends EurekaBasedAggregator<Node> {
 
-    private static final Logger logger = LoggerFactory.getLogger(IndexesAggregator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexesAggregator.class);
 
     private static final String LINKS = "_links";
     private static final String CURIES = "curies";
@@ -56,13 +57,13 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
             try {
                 key = ((IdentifiableFutureTask) task).getId();
                 Node value = task.get(17_000L, TimeUnit.MILLISECONDS);
-                logger.debug("Task {} is done: {}", key, task.isDone());
+                LOG.debug("Task {} is done: {}", key, task.isDone());
                 indexesNode.withLinkedNodes(value.getLinkedToNodes());
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                logger.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
+                LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
             }
         }
-        logger.debug("Finished fetching combined indexes");
+        LOG.debug("Finished fetching combined indexes");
         return indexesNode.build();
     }
 
@@ -73,25 +74,37 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
 
     // REACTIVE WAY
 
-    public Observable<Node> fetchIndexesWithObservable() {
+    public Observable<Node> fetchIndexesAsObservable() {
         return Observable.from(discoveryClient.getServices())
-                         .flatMap(this::createObservableHttpRequest)
-                         .concatMap(this::parseRequestIntoNode);
+                .subscribeOn(Schedulers.io())
+                .flatMap(this::createObservableHttpRequest)
+                .concatMap(this::parseRequestIntoNode)
+                .doOnNext(el -> LOG.info("Merged index node! " + el.getId()))
+                /*.doOnNext(el -> {
+                    LOG.info("Index node discovered!");
+                    try {
+                        LOG.info("Sleeping now for 10 seconds");
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                })*/;
     }
 
     private Observable<ImmutableTriple<String, ServiceInstance, JSONObject>> createObservableHttpRequest(String service) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Getting instance for service {}", service);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Getting instance for service {}", service);
         }
+        LOG.info("Discovering services for index");
         ServiceInstance instance = discoveryClient.getInstances(service)
                                                   .get(0);
 
         String uri = instance.getUri()
                              .toString();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Calling {}...", uri);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Calling {}...", uri);
         }
-
+        LOG.info("Index url discovered: " + uri);
         CloseableHttpAsyncClient client = HttpAsyncClients.createDefault();
         client.start();
         return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
@@ -103,8 +116,8 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                                  try {
                                      return new ImmutableTriple<>(service, instance, new JSONObject(response));
                                  } catch (JSONException e) {
-                                     logger.error("An exception occurred: {}", e.getStackTrace());
-                                     logger.error("Response: {}", response);
+                                     LOG.error("An exception occurred: {}", e.getStackTrace());
+                                     LOG.error("Response: {}", response);
                                      return null;
                                  }
                              })

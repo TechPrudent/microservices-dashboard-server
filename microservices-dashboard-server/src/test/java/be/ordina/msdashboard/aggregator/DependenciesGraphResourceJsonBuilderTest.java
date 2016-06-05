@@ -84,11 +84,11 @@ public class DependenciesGraphResourceJsonBuilderTest {
 						.build()
 		);
 	Node dependencies = NodeBuilder.node().havingLinkedToNodes(microservicesAndBackends).build();
-		doReturn(Lists.newArrayList(new Node())).when(redisService).getAllNodes();
+		doReturn(Lists.newArrayList(new Node("redisnode"))).when(redisService).getAllNodes();
 		doReturn(dependencies.getLinkedToNodes()).when(virtualAndRealDependencyIntegrator).integrateVirtualNodesWithReal(anySetOf(Node.class), anySetOf(Node.class), anySetOf(Node.class));
 		doReturn(dependencies).when(healthIndicatorsAggregator).fetchCombinedDependencies();
-		doReturn(new Node()).when(indexesAggregator).fetchIndexes();
-		doReturn(new Node()).when(pactsAggregator).fetchPactNodes();
+		doReturn(new Node("indexnode")).when(indexesAggregator).fetchIndexes();
+		doReturn(new Node("pactnode")).when(pactsAggregator).fetchPactNodes();
 
 
 		Map<String, Object> returnedMap = dependenciesGraphResourceJsonBuilder.build();
@@ -120,7 +120,7 @@ public class DependenciesGraphResourceJsonBuilderTest {
 
 	@Test
 	public void shouldCreateCorrectNode() {
-		Node node = new Node();
+		Node node = new Node("masternode");
 		node.getDetails().put(STATUS, "UP");
 		node.getDetails().put(TYPE, MICROSERVICE);
 		Map<String, Object> microserviceNode = dependenciesGraphResourceJsonBuilder.createMicroserviceNode("Awards", node);

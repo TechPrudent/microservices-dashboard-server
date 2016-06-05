@@ -4,10 +4,7 @@ import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.converters.ObjectToJsonConverter;
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.store.NodeStore;
-import com.google.common.collect.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,8 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.http.ResponseEntity;
 import rx.Observable;
 
 import java.io.FileNotFoundException;
@@ -48,13 +43,13 @@ public class ObservablesToGraphConverterTest {
 
     @Test
     public void retrieveGraph() throws FileNotFoundException {
-        Mockito.when(healthIndicatorsAggregator.fetchCombinedDependencies())
-                .thenReturn(node().withId("masterNode").havingLinkedToNodes(newHashSet(
+        Mockito.when(healthIndicatorsAggregator.fetchCombinedDependenciesAsObservable())
+                .thenReturn(Observable.from(newHashSet(
                         node().withId("service1").havingLinkedToNodeIds(newHashSet("backend1")).build(),
                         node().withId("service2").havingLinkedToNodeIds(newHashSet("backend2")).build(),
-                        node().withId("backend1").build(),
-                        node().withId("backend2").build())).build());
-        Mockito.when(indexesAggregator.fetchIndexesWithObservable())
+                        node().withId("backend1").havingLinkedFromNodeIds(newHashSet("service1")).build(),
+                        node().withId("backend2").havingLinkedFromNodeIds(newHashSet("service2")).build())));
+        Mockito.when(indexesAggregator.fetchIndexesAsObservable())
                 .thenReturn(Observable.from(newHashSet(
                         node().withId("svc1rsc1").havingLinkedToNodeIds(newHashSet("service1")).build(),
                         node().withId("svc1rsc2").havingLinkedToNodeIds(newHashSet("service1")).build(),

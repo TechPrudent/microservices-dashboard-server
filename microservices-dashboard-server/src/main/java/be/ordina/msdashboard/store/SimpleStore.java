@@ -2,6 +2,7 @@ package be.ordina.msdashboard.store;
 
 import be.ordina.msdashboard.converters.JsonToObjectConverter;
 import be.ordina.msdashboard.model.Node;
+import rx.Observable;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,11 @@ public class SimpleStore implements NodeStore {
     @Override
     public Collection<Node> getAllNodes() {
         return map.values();
+    }
+
+    @Override
+    public Observable<Node> getAllNodesAsObservable() {
+        return Observable.from(getAllNodes());
     }
 
     @Override

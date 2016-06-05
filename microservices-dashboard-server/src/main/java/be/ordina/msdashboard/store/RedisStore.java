@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
+import rx.Observable;
 
 public class RedisStore implements NodeCache, NodeStore {
 
@@ -39,6 +40,11 @@ public class RedisStore implements NodeCache, NodeStore {
 			results.add(node);
 		}
 		return results;
+	}
+
+	@Override
+	public Observable<Node> getAllNodesAsObservable() {
+		return Observable.from(getAllNodes());
 	}
 
 	@Override

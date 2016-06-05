@@ -30,7 +30,7 @@ public class DependenciesResourceServiceTest {
 
 	@Test
 	public void getDependenciesResourceJson() {
-		Node node = new Node();
+		Node node = new Node("testnode");
 
 		doReturn(node).when(dependenciesResourceJsonBuilder).build();
 

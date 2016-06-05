@@ -45,7 +45,7 @@ public class NodesControllerTest {
 
     @Test
     public void getDependenciesJson() {
-        doReturn(new Node()).when(dependenciesResourceService).getDependenciesResourceJson();
+        doReturn(new Node("testnode")).when(dependenciesResourceService).getDependenciesResourceJson();
 
         HttpEntity<Node> httpEntity = nodesController.getDependenciesJson();
 

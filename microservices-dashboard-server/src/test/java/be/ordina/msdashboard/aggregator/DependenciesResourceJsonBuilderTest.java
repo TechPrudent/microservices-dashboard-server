@@ -29,7 +29,7 @@ public class DependenciesResourceJsonBuilderTest {
 
 	@Test
 	public void testBuild() throws Exception {
-		doReturn(new Node()).when(healthIndicatorsAggregator).fetchCombinedDependencies();
+		doReturn(new Node("healthnode")).when(healthIndicatorsAggregator).fetchCombinedDependencies();
 
 		dependenciesResourceJsonBuilder.build();
 

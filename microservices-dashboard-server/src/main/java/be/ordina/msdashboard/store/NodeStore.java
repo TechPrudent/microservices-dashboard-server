@@ -1,6 +1,7 @@
 package be.ordina.msdashboard.store;
 
 import be.ordina.msdashboard.model.Node;
+import rx.Observable;
 
 import java.util.Collection;
 
@@ -13,6 +14,8 @@ public interface NodeStore {
     String VIRTUAL_FLAG = "virtual";
 
     Collection<Node> getAllNodes();
+
+    Observable<Node> getAllNodesAsObservable();
 
     void saveNode(String nodeData);
 

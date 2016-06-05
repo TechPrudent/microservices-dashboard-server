@@ -127,7 +127,7 @@
     "lane" : 3
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/generated-docs/api-guide.html#resources-svc1rsc1",
+      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc1",
       "status" : "UP"
@@ -136,7 +136,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/generated-docs/api-guide.html#resources-svc3rsc1",
+      "docs" : "http://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc3rsc1",
       "status" : "UP"
@@ -145,7 +145,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/generated-docs/api-guide.html#resources-svc1rsc3",
+      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc3",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc3",
       "status" : "UP"
@@ -154,7 +154,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/generated-docs/api-guide.html#resources-svc3rsc2",
+      "docs" : "http://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc3rsc2",
       "status" : "UP"
@@ -163,7 +163,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/generated-docs/api-guide.html#resources-svc1rsc2",
+      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc2",
       "status" : "UP"
@@ -172,7 +172,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/awards/generated-docs/api-guide.html#resources-svc4rsc2",
+      "docs" : "http://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0014.local:8281/svc4rsc2",
       "status" : "UP"
@@ -181,7 +181,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/awards/generated-docs/api-guide.html#resources-svc4rsc1",
+      "docs" : "http://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0014.local:8281/svc4rsc1",
       "status" : "UP"
@@ -201,73 +201,6 @@
   }, {
     "type" : "Backends",
     "lane" : 3
-  } ],
-  "links" : [ {
-    "source" : 0,
-    "target" : 2
-  }, {
-    "source" : 4,
-    "target" : 1
-  }, {
-    "source" : 15,
-    "target" : 10
-  }, {
-    "source" : 0,
-    "target" : 3
-  }, {
-    "source" : 0,
-    "target" : 1
-  }, {
-    "source" : 10,
-    "target" : 11
-  }, {
-    "source" : 12,
-    "target" : 0
-  }, {
-    "source" : 14,
-    "target" : 0
-  }, {
-    "source" : 10,
-    "target" : 5
-  }, {
-    "source" : 10,
-    "target" : 3
-  }, {
-    "source" : 10,
-    "target" : 1
-  }, {
-    "source" : 18,
-    "target" : 4
-  }, {
-    "source" : 0,
-    "target" : 18
-  }, {
-    "source" : 17,
-    "target" : 4
-  }, {
-    "source" : 16,
-    "target" : 0
-  }, {
-    "source" : 4,
-    "target" : 8
-  }, {
-    "source" : 4,
-    "target" : 6
-  }, {
-    "source" : 4,
-    "target" : 9
-  }, {
-    "source" : 0,
-    "target" : 13
-  }, {
-    "source" : 4,
-    "target" : 7
-  }, {
-    "source" : 4,
-    "target" : 5
-  }, {
-    "source" : 13,
-    "target" : 10
   } ],
   "multigraph" : false,
   "graph" : [ ]

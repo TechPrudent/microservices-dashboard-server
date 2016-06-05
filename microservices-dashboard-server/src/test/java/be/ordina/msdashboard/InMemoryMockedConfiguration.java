@@ -1,5 +1,7 @@
 package be.ordina.msdashboard;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @Configuration
 public class InMemoryMockedConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryMockedConfiguration.class);
 
     @Bean
     protected DiscoveryClient discoveryClient() {
@@ -75,6 +79,13 @@ public class InMemoryMockedConfiguration {
 
             @Override
             public List<String> getServices() {
+                // TODO: Make sure all calls to getServices and getServiceInstances are as observable in their own thread
+                /*try {
+                    LOG.info("Getting services from DiscoveryClient");
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }*/
                 return services;
             }
         };

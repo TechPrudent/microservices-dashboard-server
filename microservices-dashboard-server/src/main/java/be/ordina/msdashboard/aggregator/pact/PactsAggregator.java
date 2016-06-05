@@ -47,38 +47,68 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 
 	// REACTIVE WAY
 
-	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Node fetchPactNodesWithObservable() {
 		NodeBuilder pactNode = new NodeBuilder();
 		fetchPactNodesAsObservable().subscribe(node -> pactNode.withLinkedToNode(node));
 		return pactNode.build();
 	}
 
+	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Observable<Node> fetchPactNodesAsObservable() {
 		Observable<String> urls = getPactUrlsFromBroker();
 		return urls.map(url -> getNodesFromPacts(url))
-				.flatMap(el -> el);
+				.flatMap(el -> el)
+				.doOnNext(el -> LOG.info("Merged pact node! " + el.getId()))
+				/*.doOnNext(el -> {
+					LOG.info("Pact node discovered!");
+					try {
+						LOG.info("Sleeping now for 10 seconds");
+						Thread.sleep(10000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				})*/;
 	}
 
 	private Observable<String> getPactUrlsFromBroker() {
+		LOG.info("Discovering pact urls");
 		return RxNetty.createHttpGet(pactBrokerUrl + latestPactsUrl)
+				.filter(r -> {
+					if (r.getStatus().code() < 400) {
+						return true;
+					} else {
+						LOG.warn("Exception {} for call {} with headers {}", r.getStatus(), pactBrokerUrl + latestPactsUrl, r.getHeaders().entries());
+						return false;
+					}
+				})
 				.flatMap(response -> response.getContent())
 				.map(data -> data.toString(Charset.defaultCharset()))
+				.onErrorReturn(Throwable::toString)
 				.map(response -> (List<String>) JsonPath.read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> el.map(obj -> (String) obj))
-				.doOnNext(System.out::println);
+				.doOnNext(url -> LOG.info("Pact url discovered: " + url));
 	}
 
 	private Observable<Node> getNodesFromPacts(String url) {
 		return RxNetty.createHttpGet(url)
+				.filter(r -> {
+					if (r.getStatus().code() < 400) {
+						return true;
+					} else {
+						LOG.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
+						return false;
+					}
+				})
 				.flatMap(response -> response.getContent())
 				.map(data -> data.toString(Charset.defaultCharset()))
+				.onErrorReturn(Throwable::toString)
 				.map(response -> {
 					PactToNodeConverter pactToNodeConverter = new PactToNodeConverter();
 					return pactToNodeConverter.convert(response, url);
 				})
-				.doOnNext(System.out::println);
+				.doOnNext(node -> LOG.info("Pact node discovered in url: " + url));
 	}
 
 	@Test

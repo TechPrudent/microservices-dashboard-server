@@ -21,7 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public abstract class EurekaBasedAggregator<T> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EurekaBasedAggregator.class);
-	private static final String ZUUL_ID = "zuul";
+	protected static final String ZUUL_ID = "zuul";
 	private static final int CORE_POOL_SIZE = 30;
 	private static final int MAX_POOL_SIZE = 50;
 

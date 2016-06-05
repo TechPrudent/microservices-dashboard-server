@@ -64,26 +64,23 @@ public class SingleServiceHealthCollectorTaskTest {
 	}
 
 	private Node mockResponseEntity() {
-		Node node = new Node();
+		Node node = new Node("masternode");
 		node.getDetails().put(STATUS, "UP");
 		node.getDetails().put(TYPE, MICROSERVICE);
 
-		Node bciNode = new Node();
-		bciNode.setId("bciManageCustomerContact");
+		Node bciNode = new Node("bciManageCustomerContact");
 		bciNode.getDetails().put(STATUS, "UP");
 		bciNode.getDetails().put(VERSION, "4.0");
 		bciNode.getDetails().put(TYPE, "SOAP");
 		bciNode.getDetails().put(GROUP, "BCI");
 
-		Node cslNode = new Node();
-		cslNode.setId("cslCustomer");
+		Node cslNode = new Node("cslCustomer");
 		cslNode.getDetails().put(STATUS, "UP");
 		cslNode.getDetails().put(VERSION, "Customer 4.0 (since 2012 CRC03)");
 		cslNode.getDetails().put(TYPE, "SOAP");
 		cslNode.getDetails().put(GROUP, "CSL");
 
-		Node diskSpaceNode = new Node();
-		diskSpaceNode.setId("diskSpace");
+		Node diskSpaceNode = new Node("diskSpace");
 		diskSpaceNode.getDetails().put(STATUS, "UP");
 		diskSpaceNode.getDetails().put("free", 165026881536L);
 		diskSpaceNode.getDetails().put("threshold", 10485760);

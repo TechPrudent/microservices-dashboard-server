@@ -15,7 +15,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
 
-	public Node() {
+	public Node(String id) {
+		this.id = id;
 		details = new HashMap<>();
 		linkedToNodeIds = new HashSet<>();
 		linkedFromNodeIds = new HashSet<>();
@@ -56,6 +57,9 @@ public class Node {
 	}
 
 	public Set<Node> getLinkedToNodes() {
+		if (linkedToNodes == null) {
+			return new HashSet<>();
+		}
 		return linkedToNodes;
 	}
 
@@ -110,9 +114,13 @@ public class Node {
 		if (details == null) {
 			details = node.getDetails();
 		} else {
-			details.forEach((k, v) -> node.getDetails().merge(k, v, (v1, v2) -> {
-				return v1;
-			}));
+			details.forEach((k, v) -> {
+				if (v != null) {
+					node.getDetails().merge(k, v, (v1, v2) -> {
+						return v1;
+					});
+				}
+			});
 		}
 	}
 
@@ -136,6 +144,7 @@ public class Node {
 
 	@Override
 	public int hashCode() {
+		if (id == null) System.out.println("ID IS NULL: " + toString());
 		return id.hashCode();
 	}
 

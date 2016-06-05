@@ -44,7 +44,7 @@ public class RedisServiceTest {
 
 		doReturn(opsForValue).when(redisTemplate).opsForValue();
 
-		Node node = new Node();
+		Node node = new Node("redisnode");
 
 		doReturn(node).when(opsForValue).get("nodeId");
 
