@@ -2,6 +2,7 @@ package be.ordina.msdashboard.services;
 
 import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
 import be.ordina.msdashboard.aggregator.DependenciesResourceJsonBuilder;
+import be.ordina.msdashboard.aggregator.ObservablesToGraphConverter;
 import be.ordina.msdashboard.model.Node;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,9 @@ public class DependenciesResourceServiceTest {
 	@Mock
 	private DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder;
 
+	@Mock
+	private ObservablesToGraphConverter observablesToGraphConverter;
+
 	@Test
 	public void getDependenciesResourceJson() {
 		Node node = new Node("testnode");
@@ -46,10 +50,12 @@ public class DependenciesResourceServiceTest {
 		Map<String, Object> graph = Collections.emptyMap();
 
 		doReturn(graph).when(dependenciesGraphResourceJsonBuilder).build();
+		doReturn(graph).when(observablesToGraphConverter).build();
 
 		Map<String, Object> returnedGraph = dependenciesResourceService.getDependenciesGraphResourceJson();
 
-		verify(dependenciesGraphResourceJsonBuilder).build();
+		//verify(dependenciesGraphResourceJsonBuilder).build();
+		verify(observablesToGraphConverter).build();
 
 		assertThat(returnedGraph).isEqualTo(graph);
 	}

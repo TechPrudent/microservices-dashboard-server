@@ -85,7 +85,7 @@ public class IndexesAggregatorTest {
         Mockito.when(observableHttpResponse.getContent()).thenReturn(Observable.just(response.getBytes()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        indexesAggregator.fetchIndexesAsObservable().subscribe(testSubscriber);
+        indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
         testSubscriber.assertNoErrors();
 
         List<Node> nodes = testSubscriber.getOnNextEvents();

@@ -15,6 +15,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
 
+	Node() {
+		// For Jackson
+	}
+
 	public Node(String id) {
 		this.id = id;
 		details = new HashMap<>();
