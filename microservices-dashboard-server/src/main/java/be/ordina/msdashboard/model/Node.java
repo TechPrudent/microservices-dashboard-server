@@ -155,10 +155,12 @@ public class Node {
 	@Override
 	public String toString() {
 		return "Node{" +
-				"details=" + details +
-				", id='" + id + '\'' +
+				"id='" + id + '\'' +
+				", details=" + details +
 				", lane=" + lane +
 				", linkedToNodes=" + linkedToNodes +
+				", linkedToNodeIds=" + linkedToNodeIds +
+				", linkedFromNodeIds=" + linkedFromNodeIds +
 				'}';
 	}
 }
