@@ -70,9 +70,8 @@ public class MicroservicesDashboardServerApplicationTest {
         // System.out.println("BODY: " + body);
         System.out.println("Time spent waiting for /graph: " + totalTime);
 
-//        TODO: FIX ME! There seems to be a problem while concatenating all the seperate nodes
-//        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestResponse.json")),
-//                body, JSONCompareMode.LENIENT);
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestResponse.json")),
+                body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
         Map<String, List> r = m.readValue(body, Map.class);

@@ -22,6 +22,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * @author Andreas Evers
+ * @author Tim Ysewyn
  */
 public class ObservablesToGraphConverter {
 
@@ -76,7 +77,25 @@ public class ObservablesToGraphConverter {
 
 		Observable<Node> mergedObservable = Observable.mergeDelayError(microservicesWithTheirBackends, resources, pactComponents, virtualNodes)
 				.subscribeOn(Schedulers.io())
-				.doOnNext(el -> LOG.info("Merged node: " + el.getId()));
+				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
+				.reduce(new ArrayList<Node>(), (mergedNodes, node) -> {
+					Optional<Integer> nodeIndex = mergedNodes.stream()
+															 .filter(n -> n.getId().equals(node.getId()))
+															 .map(mergedNodes::indexOf)
+															 .findFirst();
+					if (nodeIndex.isPresent()) {
+						LOG.info("Node previously added, merging");
+						mergedNodes.get(nodeIndex.get()).mergeWith(node);
+					} else {
+						LOG.info("Node was not merged before, adding it to the list");
+						mergedNodes.add(node);
+					}
+
+					return mergedNodes;
+				})
+				.flatMap(Observable::from)
+				.doOnNext(node -> LOG.info("Merged node with id '{}'", node.getId()));
+
 		observablesIntoNodesAndLinksReducer
 				.reduceToNodesAndLinksMap(mergedObservable)
 				.map(mapToDisplayableNode())
