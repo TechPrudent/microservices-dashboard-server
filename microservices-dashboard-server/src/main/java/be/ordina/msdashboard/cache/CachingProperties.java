@@ -3,6 +3,9 @@ package be.ordina.msdashboard.cache;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Andreas Evers
+ */
 @Configuration
 @ConfigurationProperties("spring.cache")
 public class CachingProperties {

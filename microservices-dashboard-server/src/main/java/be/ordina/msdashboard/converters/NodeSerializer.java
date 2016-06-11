@@ -7,6 +7,9 @@ import org.springframework.data.redis.serializer.SerializationException;
 
 import be.ordina.msdashboard.model.Node;
 
+/**
+ * @author Andreas Evers
+ */
 public class NodeSerializer implements RedisSerializer<Node> {
 
 	@Override

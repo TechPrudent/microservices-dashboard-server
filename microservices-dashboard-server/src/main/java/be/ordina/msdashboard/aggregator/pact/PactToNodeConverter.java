@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Andreas Evers
+ */
 public class PactToNodeConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PactToNodeConverter.class);
@@ -28,10 +31,7 @@ public class PactToNodeConverter {
 		node.withId(consumer);
 		node.withLane(0);
 		paths.stream().forEach(path -> {
-				node.withLinkedToNodeId(convertPathToRel(path));
-				// TODO: Remove when deprecation finishes
-				Node linkNode = NodeBuilder.node().withId(convertPathToRel(path)).build();
-				node.withLinkedToNode(linkNode);
+			node.withLinkedToNodeId(convertPathToRel(path));
 		});
 		Map<String, Object> details = new HashMap<>();
 		details.put("url", pactUrl);

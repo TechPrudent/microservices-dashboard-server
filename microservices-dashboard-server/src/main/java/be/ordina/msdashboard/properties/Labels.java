@@ -2,6 +2,9 @@ package be.ordina.msdashboard.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * @author Andreas Evers
+ */
 @ConfigurationProperties("msdashboard.labels")
 public class Labels {
 	private String toolbox = "TOOLBOX";

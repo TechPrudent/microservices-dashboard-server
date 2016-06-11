@@ -1,21 +1,17 @@
 package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
-import be.ordina.msdashboard.aggregator.DependenciesResourceJsonBuilder;
 import be.ordina.msdashboard.aggregator.ObservablesToGraphConverter;
 import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.cache.CachingProperties;
 import be.ordina.msdashboard.controllers.NodesController;
 import be.ordina.msdashboard.properties.Labels;
 import be.ordina.msdashboard.services.DependenciesResourceService;
 import be.ordina.msdashboard.store.NodeStore;
-import be.ordina.msdashboard.store.RedisStore;
 import be.ordina.msdashboard.store.SimpleStore;
-import com.netflix.discovery.converters.Auto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -68,14 +64,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public DependenciesResourceService dependenciesResourceService() {
-        return new DependenciesResourceService(dependenciesResourceJsonBuilder(),
-                dependenciesGraphResourceJsonBuilder(),
-                observablesToGraphConverter());
-    }
-
-    @Bean
-    public DependenciesResourceJsonBuilder dependenciesResourceJsonBuilder() {
-        return new DependenciesResourceJsonBuilder(healthIndicatorsAggregator);
+        return new DependenciesResourceService(observablesToGraphConverter());
     }
 
     @Bean
@@ -97,7 +86,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
-        return new HealthIndicatorsAggregator(environment, discoveryClient);
+        return new HealthIndicatorsAggregator(discoveryClient);
     }
 
     @Bean

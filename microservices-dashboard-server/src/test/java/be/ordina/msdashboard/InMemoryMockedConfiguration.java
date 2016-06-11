@@ -79,7 +79,7 @@ public class InMemoryMockedConfiguration {
 
             @Override
             public List<String> getServices() {
-                // TODO: Make sure all calls to getServices and getServiceInstances are as observable in their own thread
+                //TODO: Make sure all calls to getServices and getServiceInstances are as observable in their own thread
                 /*try {
                     LOG.info("Getting services from DiscoveryClient");
                     Thread.sleep(2000);

@@ -11,6 +11,9 @@ import org.springframework.core.convert.converter.Converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
+/**
+ * @author Andreas Evers
+ */
 public class JsonToObjectConverter<T> implements Converter<String, T> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JsonToObjectConverter.class);

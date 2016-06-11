@@ -1,5 +1,8 @@
 package be.ordina.msdashboard.model;
 
+/**
+ * @author Andreas Evers
+ */
 public class Service {
 
     private String id;

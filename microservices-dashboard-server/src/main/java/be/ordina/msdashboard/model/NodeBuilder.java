@@ -2,6 +2,9 @@ package be.ordina.msdashboard.model;
 
 import java.util.*;
 
+/**
+ * @author Andreas Evers
+ */
 public class NodeBuilder {
 
 	private String id;

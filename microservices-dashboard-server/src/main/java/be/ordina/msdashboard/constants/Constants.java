@@ -1,5 +1,8 @@
 package be.ordina.msdashboard.constants;
 
+/**
+ * @author Andreas Evers
+ */
 public class Constants {
 	public static final String TOOLBOX = "TOOLBOX";
 	public static final String DISCOVERY = "discovery";

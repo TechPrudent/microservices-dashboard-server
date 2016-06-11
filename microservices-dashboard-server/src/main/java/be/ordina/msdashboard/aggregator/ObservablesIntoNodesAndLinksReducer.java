@@ -10,6 +10,9 @@ import rx.Observable;
 
 import java.util.*;
 
+/**
+ * @author Andreas Evers
+ */
 public class ObservablesIntoNodesAndLinksReducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(ObservablesIntoNodesAndLinksReducer.class);
@@ -63,9 +66,9 @@ public class ObservablesIntoNodesAndLinksReducer {
     }
 
     private Map initNodesAndLinks() {
-        Map initialExistingNodes = new HashMap<Object, Object>();
-        initialExistingNodes.put(Constants.NODES, new ArrayList<Object>());
-        initialExistingNodes.put(Constants.LINKS, new HashSet<Object>());
+        Map initialExistingNodes = new HashMap<String, Object>();
+        initialExistingNodes.put(Constants.NODES, new ArrayList<>());
+        initialExistingNodes.put(Constants.LINKS, new HashSet<>());
         return initialExistingNodes;
     }
 

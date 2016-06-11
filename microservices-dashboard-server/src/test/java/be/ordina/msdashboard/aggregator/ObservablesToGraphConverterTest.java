@@ -43,20 +43,20 @@ public class ObservablesToGraphConverterTest {
 
     @Test
     public void retrieveGraph() throws FileNotFoundException {
-        Mockito.when(healthIndicatorsAggregator.fetchCombinedDependenciesAsObservable())
+        Mockito.when(healthIndicatorsAggregator.aggregateNodes())
                 .thenReturn(Observable.from(newHashSet(
                         node().withId("service1").havingLinkedToNodeIds(newHashSet("backend1")).build(),
                         node().withId("service2").havingLinkedToNodeIds(newHashSet("backend2")).build(),
                         node().withId("backend1").havingLinkedFromNodeIds(newHashSet("service1")).build(),
                         node().withId("backend2").havingLinkedFromNodeIds(newHashSet("service2")).build())));
-        Mockito.when(indexesAggregator.fetchIndexesAsObservable())
+        Mockito.when(indexesAggregator.aggregateNodes())
                 .thenReturn(Observable.from(newHashSet(
                         node().withId("svc1rsc1").havingLinkedToNodeIds(newHashSet("service1")).build(),
                         node().withId("svc1rsc2").havingLinkedToNodeIds(newHashSet("service1")).build(),
                         node().withId("svc2rsc1").havingLinkedToNodeIds(newHashSet("service2")).build(),
                         node().withId("service1").withDetail("test", "test").build(),
                         node().withId("service2").build())));
-        Mockito.when(pactsAggregator.fetchPactNodesAsObservable())
+        Mockito.when(pactsAggregator.aggregateNodes())
                 .thenReturn(Observable.from(newHashSet(
                         node().withId("svc1rsc2").build(),
                         node().withId("svc2rsc1").build(),

@@ -3,17 +3,13 @@ package be.ordina.msdashboard.aggregator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
-import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.store.NodeStore;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import rx.Observable;
-import rx.exceptions.CompositeException;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -24,6 +20,9 @@ import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.collect.Maps.newHashMap;
 
+/**
+ * @author Andreas Evers
+ */
 public class ObservablesToGraphConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservablesToGraphConverter.class);
@@ -49,9 +48,9 @@ public class ObservablesToGraphConverter {
 	}
 
 	public Map<String, Object> build() {
-		Observable<Node> microservicesAndBackends = healthIndicatorsAggregator.fetchCombinedDependenciesAsObservable();
-		Observable<Node> resources = indexesAggregator.fetchIndexesAsObservable();
-		Observable<Node> pactComponents = pactsAggregator.fetchPactNodesAsObservable();
+		Observable<Node> microservicesAndBackends = healthIndicatorsAggregator.aggregateNodes();
+		Observable<Node> resources = indexesAggregator.aggregateNodes();
+		Observable<Node> pactComponents = pactsAggregator.aggregateNodes();
 		Observable<Node> virtualNodes = redisService.getAllNodesAsObservable();
 
 		return createGraph(microservicesAndBackends, resources, pactComponents, virtualNodes);
@@ -85,14 +84,11 @@ public class ObservablesToGraphConverter {
 				.subscribe(element -> {
 					graph.put(NODES, element.get(NODES));
 					graph.put(LINKS, element.get(LINKS));
-				}, new Action1<Throwable>() {
-					@Override
-					public void call(Throwable throwable) {
-						//System.out.println("Exceptions: " + ((CompositeException) throwable).getExceptions());
-						System.out.println(throwable);
-						throwable.printStackTrace();
-					}
-				});
+				}, throwable -> {
+                    //System.out.println("Exceptions: " + ((CompositeException) throwable).getExceptions());
+                    System.out.println(throwable);
+                    throwable.printStackTrace();
+                });
 
 		return graph;
 	}

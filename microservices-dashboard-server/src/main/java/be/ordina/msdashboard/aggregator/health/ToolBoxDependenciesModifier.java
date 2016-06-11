@@ -13,6 +13,9 @@ import java.util.HashSet;
 
 import be.ordina.msdashboard.model.Node;
 
+/**
+ * @author Andreas Evers
+ */
 public class ToolBoxDependenciesModifier {
 
 	public Collection<Node> modify(final Collection<Node> source) {

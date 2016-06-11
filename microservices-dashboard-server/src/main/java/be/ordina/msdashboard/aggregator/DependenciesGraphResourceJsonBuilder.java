@@ -17,6 +17,9 @@ import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.collect.Maps.newHashMap;
 
+/**
+ * @author Andreas Evers
+ */
 public class DependenciesGraphResourceJsonBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DependenciesGraphResourceJsonBuilder.class);
@@ -45,9 +48,9 @@ public class DependenciesGraphResourceJsonBuilder {
 	}
 
 	public Map<String, Object> build() {
-		Node healthNode = healthIndicatorsAggregator.fetchCombinedDependencies();
-		Node indexNode = indexesAggregator.fetchIndexes();
-		Node pactNode = pactsAggregator.fetchPactNodes();
+		Node healthNode = /*healthIndicatorsAggregator.fetchCombinedDependencies()*/new Node("");
+		Node indexNode = /*indexesAggregator.fetchIndexes()*/new Node("");
+		Node pactNode = /*pactsAggregator.fetchPactNodes()*/new Node("");
 		Set<Node> microservicesAndBackends = healthNode.getLinkedToNodes();
 		Set<Node> resources = indexNode.getLinkedToNodes();
 		Set<Node> pactComponents = pactNode.getLinkedToNodes();

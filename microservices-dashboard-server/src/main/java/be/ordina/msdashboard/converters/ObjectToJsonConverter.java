@@ -7,6 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 
+/**
+ * @author Andreas Evers
+ */
 public class ObjectToJsonConverter<T> implements Converter<T, String> {
 	private static final Logger LOG = LoggerFactory.getLogger(ObjectToJsonConverter.class);
 	private static final ObjectWriter OBJECT_WRITER = new ObjectMapper().writer();

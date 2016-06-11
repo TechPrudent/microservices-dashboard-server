@@ -44,15 +44,6 @@ public class NodesControllerTest {
     }
 
     @Test
-    public void getDependenciesJson() {
-        doReturn(new Node("testnode")).when(dependenciesResourceService).getDependenciesResourceJson();
-
-        HttpEntity<Node> httpEntity = nodesController.getDependenciesJson();
-
-        assertThat(httpEntity.getBody()).isNotNull();
-    }
-
-    @Test
     public void saveNode() {
         nodesController.saveNode("nodeAsJson");
 

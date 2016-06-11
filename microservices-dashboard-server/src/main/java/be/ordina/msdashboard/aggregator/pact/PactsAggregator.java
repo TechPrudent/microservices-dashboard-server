@@ -1,74 +1,39 @@
 package be.ordina.msdashboard.aggregator.pact;
 
-import be.ordina.msdashboard.aggregator.PactBrokerBasedAggregator;
-import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.aggregator.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
 import com.jayway.jsonpath.JsonPath;
 import io.reactivex.netty.RxNetty;
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
 import rx.Observable;
 
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.concurrent.*;
 
-public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
+/**
+ * @author Andreas Evers
+ */
+public class PactsAggregator implements NodeAggregator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PactsAggregator.class);
 
-	private static final long TIMEOUT = 17000L;
+	@Value("${pact-broker.url:'http://localhost:8089'}")
+	protected String pactBrokerUrl;
+	@Value("${pact-broker.latest-url:'/pacts/latest'}")
+	protected String latestPactsUrl;
+	@Value("${pact-broker.self-href-jsonPath:'test'}")
+	protected String selfHrefJsonPath;
 
-	@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Node fetchPactNodes() {
-		NodeBuilder pactNode = new NodeBuilder();
-		for (FutureTask<Node> task : getFutureTasks()) {
-			String key = null;
-			try {
-				key = ((IdentifiableFutureTask) task).getId();
-				Node value = task.get(TIMEOUT, TimeUnit.MILLISECONDS);
-				LOG.debug("Task {} is done: {}", key, task.isDone());
-				pactNode.withLinkedToNode(value);
-			} catch (InterruptedException | ExecutionException | TimeoutException e) {
-				LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
-			}
-		}
-		LOG.debug("Finished fetching pacts");
-		return pactNode.build();
-	}
-
+	//TODO: Caching
+	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	@Override
-	protected Callable<Node> instantiateAggregatorTask(String pactUrl) {
-		return new SinglePactCollectorTask(pactUrl);
-	}
-
-	// REACTIVE WAY
-
-	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Node fetchPactNodesWithObservable() {
-		NodeBuilder pactNode = new NodeBuilder();
-		fetchPactNodesAsObservable().subscribe(node -> pactNode.withLinkedToNode(node));
-		return pactNode.build();
-	}
-
-	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Observable<Node> fetchPactNodesAsObservable() {
+	public Observable<Node> aggregateNodes() {
 		Observable<String> urls = getPactUrlsFromBroker();
 		return urls.map(url -> getNodesFromPacts(url))
 				.flatMap(el -> el)
-				.doOnNext(el -> LOG.info("Merged pact node! " + el.getId()))
-				/*.doOnNext(el -> {
-					LOG.info("Pact node discovered!");
-					try {
-						LOG.info("Sleeping now for 10 seconds");
-						Thread.sleep(10000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				})*/;
+				.doOnNext(el -> LOG.info("Merged pact node! " + el.getId()));
 	}
 
 	private Observable<String> getPactUrlsFromBroker() {
@@ -109,13 +74,5 @@ public class PactsAggregator extends PactBrokerBasedAggregator<Node> {
 					return pactToNodeConverter.convert(response, url);
 				})
 				.doOnNext(node -> LOG.info("Pact node discovered in url: " + url));
-	}
-
-	@Test
-	public void printWiki() {
-		pactBrokerUrl = "http://echo.jsontest.com/url1/echo.jsontest.com/url2/echo.jsontest.com";
-		latestPactsUrl = "";
-		selfHrefJsonPath = "$..*";
-		getPactUrlsFromBroker().toBlocking().forEach(element -> System.out.println("Element: " + element));
 	}
 }

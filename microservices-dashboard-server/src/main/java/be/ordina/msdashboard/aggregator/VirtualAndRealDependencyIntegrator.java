@@ -9,6 +9,9 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import be.ordina.msdashboard.model.Node;
 
+/**
+ * @author Andreas Evers
+ */
 public class VirtualAndRealDependencyIntegrator {
 
 	public Set<Node> integrateVirtualNodesWithReal(Set<Node> microservicesAndBackends, final Set<Node> indexes, final Collection<Node> virtualNodes) {

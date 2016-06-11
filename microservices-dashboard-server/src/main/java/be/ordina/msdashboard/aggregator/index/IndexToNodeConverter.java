@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * @author Andreas Evers
+ */
 public class IndexToNodeConverter {
 
 	private static final String LINKS = "_links";

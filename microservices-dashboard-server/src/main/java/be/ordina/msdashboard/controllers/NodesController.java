@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import be.ordina.msdashboard.model.Node;
 
+/**
+ * @author Andreas Evers
+ */
 @CrossOrigin(maxAge = 3600)
 @RestController
 @ResponseBody
@@ -35,14 +38,10 @@ public class NodesController {
 
 	private CacheCleaningBean cacheCleaningBean;
 
+	//TODO: Support table response?
 	@RequestMapping(value = "/graph", produces = "application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
 		return ok().body(dependenciesResourceService.getDependenciesGraphResourceJson());
-	}
-
-	@RequestMapping(value = "/table", produces = "application/json")
-	public HttpEntity<Node> getDependenciesJson() {
-		return ok().body(dependenciesResourceService.getDependenciesResourceJson());
 	}
 
 	@RequestMapping(value = "/node", method = POST)

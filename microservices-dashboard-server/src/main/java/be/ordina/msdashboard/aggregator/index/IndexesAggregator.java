@@ -1,10 +1,8 @@
 package be.ordina.msdashboard.aggregator.index;
 
-import be.ordina.msdashboard.aggregator.EurekaBasedAggregator;
-import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.aggregator.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
-import be.ordina.msdashboard.model.Service;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
@@ -14,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
@@ -22,17 +19,17 @@ import rx.apache.http.ObservableHttp;
 import rx.apache.http.ObservableHttpResponse;
 import rx.schedulers.Schedulers;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.*;
 
 /**
  * @author Tim Ysewyn
+ * @author Andreas Evers
  */
-public class IndexesAggregator extends EurekaBasedAggregator<Node> {
+//TODO: Reuse code from HealthIndicatorsAggregator and apply composition
+public class IndexesAggregator implements NodeAggregator {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexesAggregator.class);
 
@@ -49,46 +46,14 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         this.discoveryClient = discoveryClient;
     }
 
-    @Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-    public Node fetchIndexes() {
-        NodeBuilder indexesNode = new NodeBuilder();
-        for (FutureTask<Node> task : getFutureTasks()) {
-            String key = null;
-            try {
-                key = ((IdentifiableFutureTask) task).getId();
-                Node value = task.get(17_000L, TimeUnit.MILLISECONDS);
-                LOG.debug("Task {} is done: {}", key, task.isDone());
-                indexesNode.withLinkedNodes(value.getLinkedToNodes());
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                LOG.warn("Problem getting results for task: {} caused by: {}", key, e.toString());
-            }
-        }
-        LOG.debug("Finished fetching combined indexes");
-        return indexesNode.build();
-    }
-
-    @Override
-    protected Callable<Node> instantiateAggregatorTask(final HttpServletRequest originRequest, final Service service) {
-        return new SingleServiceIndexCollectorTask(service, originRequest);
-    }
-
-    // REACTIVE WAY
-
-    public Observable<Node> fetchIndexesAsObservable() {
+    //TODO: Caching
+    //@Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+    public Observable<Node> aggregateNodes() {
         return Observable.from(discoveryClient.getServices())
                 .subscribeOn(Schedulers.io())
                 .flatMap(this::createObservableHttpRequest)
-                .concatMap(this::parseRequestIntoNode)
-                .doOnNext(el -> LOG.info("Merged index node! " + el.getId()))
-                /*.doOnNext(el -> {
-                    LOG.info("Index node discovered!");
-                    try {
-                        LOG.info("Sleeping now for 10 seconds");
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                })*/;
+                .concatMap(this::parseResponseIntoNode)
+                .doOnNext(el -> LOG.info("Merged index node! " + el.getId()));
     }
 
     private Observable<ImmutableTriple<String, ServiceInstance, JSONObject>> createObservableHttpRequest(String service) {
@@ -98,7 +63,8 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         LOG.info("Discovering services for index");
         ServiceInstance instance = discoveryClient.getInstances(service)
                                                   .get(0);
-
+        //TODO: getUri() on ServiceInstance is not including contextRoot
+        //We should include it when the service has a contextRoot
         String uri = instance.getUri()
                              .toString();
         if (LOG.isDebugEnabled()) {
@@ -107,8 +73,10 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
         LOG.info("Index url discovered: " + uri);
         CloseableHttpAsyncClient client = HttpAsyncClients.createDefault();
         client.start();
+        //TODO: Add hook for headers on GET (e.g. accept = application/hal+json")
         return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
                              .toObservable()
+                            //TODO: exception handling and logging
                              .filter(observableHttpResponse -> observableHttpResponse.getResponse().getStatusLine().getStatusCode() < 400)
                              .flatMap(ObservableHttpResponse::getContent)
                              .map(bytes -> {
@@ -124,7 +92,7 @@ public class IndexesAggregator extends EurekaBasedAggregator<Node> {
                              .filter(Objects::nonNull);
     }
 
-    private Observable<Node> parseRequestIntoNode(ImmutableTriple<String, ServiceInstance, JSONObject> triple) {
+    private Observable<Node> parseResponseIntoNode(ImmutableTriple<String, ServiceInstance, JSONObject> triple) {
         String service = triple.getLeft();
         ServiceInstance serviceInstance = triple.getMiddle();
         JSONObject source = triple.getRight();

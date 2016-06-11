@@ -1,9 +1,11 @@
 package be.ordina.msdashboard.cache;
 
-import be.ordina.msdashboard.store.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Andreas Evers
+ */
 public class CacheCleaningBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CacheCleaningBean.class);
