@@ -1,12 +1,14 @@
 package be.ordina.msdashboard.aggregator.index;
 
 import be.ordina.msdashboard.model.Node;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.nio.client.HttpAsyncClient;
-import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.protocol.http.client.HttpClientResponse;
+import io.reactivex.netty.protocol.http.client.HttpResponseHeaders;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,17 +19,20 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
-import rx.apache.http.ObservableHttp;
-import rx.apache.http.ObservableHttpResponse;
 import rx.observers.TestSubscriber;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({HttpAsyncClients.class, ObservableHttp.class})
+@PrepareForTest({RxNetty.class})
 public class IndexesAggregatorTest {
 
     private DiscoveryClient discoveryClient;
@@ -37,33 +42,26 @@ public class IndexesAggregatorTest {
     public void setup() {
         discoveryClient = Mockito.mock(DiscoveryClient.class);
         indexesAggregator = new IndexesAggregator(discoveryClient);
-        PowerMockito.mockStatic(HttpAsyncClients.class);
-        PowerMockito.mockStatic(ObservableHttp.class);
+
+        PowerMockito.mockStatic(RxNetty.class);
     }
 
     @Test
-    public void shouldReturnThreeNodes() {
-        Mockito.when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
+    @SuppressWarnings("unchecked")
+    public void shouldReturnThreeNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
         ServiceInstance instance = Mockito.mock(ServiceInstance.class);
-        Mockito.when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
+        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
 
-        Mockito.when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
+        when(instance.getServiceId()).thenReturn("service");
+        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
 
-        CloseableHttpAsyncClient client = Mockito.mock(CloseableHttpAsyncClient.class);
-        Mockito.when(HttpAsyncClients.createDefault()).thenReturn(client);
-        ObservableHttp<ObservableHttpResponse> observableHttp = Mockito.mock(ObservableHttp.class);
-        Mockito.when(ObservableHttp.createRequest(Mockito.any(HttpAsyncRequestProducer.class), Mockito.eq(client))).thenReturn(observableHttp);
+        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
 
-        ObservableHttpResponse observableHttpResponse = Mockito.mock(ObservableHttpResponse.class);
-        Mockito.when(observableHttp.toObservable()).thenReturn(Observable.just(observableHttpResponse));
-
-        HttpResponse httpResponse = Mockito.mock(HttpResponse.class);
-        Mockito.when(observableHttpResponse.getResponse()).thenReturn(httpResponse);
-        StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(200);
-
-        String response = "{\n" +
+        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
+        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
+        ByteBufUtil.writeUtf8(byteBuf, "{\n" +
                 "  \"_links\": {\n" +
                 "    \"svc1:svc1rsc1\": {\n" +
                 "      \"href\": \"http://host0015.local:8301/svc1rsc1\",\n" +
@@ -81,8 +79,8 @@ public class IndexesAggregatorTest {
                 "      }\n" +
                 "    ]\n" +
                 "  }\n" +
-                "}";
-        Mockito.when(observableHttpResponse.getContent()).thenReturn(Observable.just(response.getBytes()));
+                "}");
+        when(response.getContent()).thenReturn(Observable.just(byteBuf));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
@@ -98,9 +96,82 @@ public class IndexesAggregatorTest {
 
         checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc1");
         checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc2");
+    }
 
-        PowerMockito.verifyStatic();
-        ObservableHttp.createRequest(Mockito.any(HttpAsyncRequestProducer.class), Mockito.any(HttpAsyncClient.class));
+    @Test
+    public void noServicesShouldReturnZeroNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.emptyList());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).hasSize(0);
+    }
+
+    @Test
+    public void noInstancesShouldReturnZeroNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
+        when(discoveryClient.getInstances("service")).thenReturn(Collections.emptyList());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).hasSize(0);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void failedIndexCallShouldReturnZeroNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
+        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
+        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
+
+        when(instance.getServiceId()).thenReturn("service");
+        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
+
+        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
+
+        when(response.getStatus()).thenReturn(HttpResponseStatus.SERVICE_UNAVAILABLE);
+        when(response.getHeaders()).thenReturn(mock(HttpResponseHeaders.class));
+        when(response.getCookies()).thenReturn(Collections.emptyMap());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).hasSize(0);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void wrongIndexResponseShouldReturnZeroNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
+        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
+        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
+
+        when(instance.getServiceId()).thenReturn("service");
+        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
+
+        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
+
+        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
+        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
+        ByteBufUtil.writeUtf8(byteBuf, "No JSON here");
+        when(response.getContent()).thenReturn(Observable.just(byteBuf));
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        indexesAggregator.fetchIndexesAsObservable().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).hasSize(0);
     }
 
     private void checkResource(Node resource, String id, String url, String docs) {
