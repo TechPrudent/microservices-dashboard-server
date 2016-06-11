@@ -25,16 +25,16 @@
     },
     {
       "details": {
-        "test": "test"
+
       },
-      "id": "service1",
+      "id": "svc1rsc2",
       "lane": 3
     },
     {
       "details": {
-
+        "test":"test"
       },
-      "id": "backend1",
+      "id": "service1",
       "lane": 3
     },
     {
@@ -48,14 +48,14 @@
       "details": {
 
       },
-      "id": "svc1rsc1",
+      "id": "backend1",
       "lane": 3
     },
     {
       "details": {
 
       },
-      "id": "svc1rsc2",
+      "id": "svc1rsc1",
       "lane": 3
     }
   ],
@@ -79,7 +79,19 @@
   ],
   "links": [
     {
-      "source": 2,
+      "source": 0,
+      "target": 2
+    },
+    {
+      "source": 6,
+      "target": 3
+    },
+    {
+      "source": 3,
+      "target": 5
+    },
+    {
+      "source": 3,
       "target": 4
     },
     {
@@ -91,20 +103,8 @@
       "target": 3
     },
     {
-      "source": 0,
-      "target": 6
-    },
-    {
       "source": 4,
       "target": 0
-    },
-    {
-      "source": 6,
-      "target": 2
-    },
-    {
-      "source": 5,
-      "target": 2
     }
   ],
   "multigraph": false,
