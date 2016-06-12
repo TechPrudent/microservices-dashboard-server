@@ -30,20 +30,22 @@ public class ObservablesToGraphConverter {
 	private final List<NodeAggregator> aggregators;
 	private final NodeStore redisService;
 
-	private final Map<String, Object> graph;
-
 	@Autowired
 	public ObservablesToGraphConverter(List<NodeAggregator> aggregators, NodeStore redisService) {
 		this.aggregators = aggregators;
 		this.redisService = redisService;
-
-		graph = new HashMap<>();
-		initGraph(graph);
 	}
 
 	public Map<String, Object> build() {
 		List<Observable<Node>> observables = aggregators.stream().collect(Collectors.mapping(NodeAggregator::aggregateNodes, Collectors.toList()));
 		observables.add(redisService.getAllNodesAsObservable());
+
+		Map<String, Object> graph = new HashMap<>();
+		graph.put(DIRECTED, true);
+		graph.put(MULTIGRAPH, false);
+		graph.put(GRAPH, new String[0]);
+		graph.put(LANES, constructLanes());
+		graph.put(TYPES, constructTypes());
 
 		Observable.mergeDelayError(observables)
 				.observeOn(Schedulers.io())
@@ -53,7 +55,6 @@ public class ObservablesToGraphConverter {
 				.doOnNext(node -> LOG.info("Converting to nodes and links map"))
 				.reduce(new HashMap<>(), toNodesAndLinksMap())
 				.doOnNext(nodesAndLinksMap -> LOG.info("Converted to nodes and links map"))
-				.toBlocking()
 				.subscribe(element -> {
 					graph.put(NODES, element.get(NODES));
 					graph.put(LINKS, element.get(LINKS));
@@ -221,13 +222,5 @@ public class ObservablesToGraphConverter {
 		laneMap.put(LANE, lane);
 		laneMap.put(TYPE, type);
 		return laneMap;
-	}
-
-	private void initGraph(final Map<String, Object> graph) {
-		graph.put(DIRECTED, true);
-		graph.put(MULTIGRAPH, false);
-		graph.put(GRAPH, new String[0]);
-		graph.put(LANES, constructLanes());
-		graph.put(TYPES, constructTypes());
 	}
 }
