@@ -3,7 +3,6 @@ package be.ordina.msdashboard.aggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.store.NodeStore;
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class ObservablesToGraphConverter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ObservablesToGraphConverter.class);
+	private static final Logger logger = LoggerFactory.getLogger(ObservablesToGraphConverter.class);
 
 	private final List<NodeAggregator> aggregators;
 	private final NodeStore redisService;
@@ -47,20 +46,18 @@ public class ObservablesToGraphConverter {
 
 		Observable.mergeDelayError(observables)
 				.observeOn(Schedulers.io())
-				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
+				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
-				.doOnNext(node -> LOG.info("Merged all emitted nodes"))
-				.doOnNext(node -> LOG.info("Converting to nodes and links map"))
+				.doOnNext(node -> logger.info("Merged all emitted nodes"))
+				.doOnNext(node -> logger.info("Converting to nodes and links map"))
 				.reduce(new HashMap<>(), toNodesAndLinksMap())
-				.doOnNext(nodesAndLinksMap -> LOG.info("Converted to nodes and links map"))
+				.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
 				.toBlocking()
 				.subscribe(element -> {
 					graph.put(NODES, element.get(NODES));
 					graph.put(LINKS, element.get(LINKS));
 				}, throwable -> {
-                    //System.out.println("Exceptions: " + ((CompositeException) throwable).getExceptions());
-                    System.out.println(throwable);
-                    throwable.printStackTrace();
+					logger.error("An error occurred: {}", throwable);
                 });
 
 		return graph;
@@ -74,10 +71,10 @@ public class ObservablesToGraphConverter {
 
 			Optional<Integer> nodeIndex = findNodeIndexByNode(mergedNodes, node);
 			if (nodeIndex.isPresent()) {
-				LOG.info("Node previously added, merging");
+				logger.info("Node previously added, merging");
 				mergedNodes.get(nodeIndex.get()).mergeWith(node);
 			} else {
-				LOG.info("Node was not merged before, adding it to the list");
+				logger.info("Node was not merged before, adding it to the list");
 				mergedNodes.add(node);
 			}
 
@@ -130,16 +127,14 @@ public class ObservablesToGraphConverter {
 				.findFirst();
 	}
 
-	@VisibleForTesting
-	Map<String, Integer> createLink(final int source, final int target) {
+	private Map<String, Integer> createLink(final int source, final int target) {
 		Map<String, Integer> link = new HashMap<>();
 		link.put("source", source);
 		link.put("target", target);
 		return link;
 	}
 
-	@VisibleForTesting
-	Integer determineLane(Map<String, Object> details) {
+	private Integer determineLane(Map<String, Object> details) {
 		String type = (String) details.get(TYPE);
 		if (type == null) {
 			return new Integer("3");
@@ -153,7 +148,7 @@ public class ObservablesToGraphConverter {
 	}
 
 	private Map<String, Object> createDisplayableNode(final Node node) {
-		LOG.info("Creating displayable node: " + node.getId());
+		logger.info("Creating displayable node: " + node.getId());
 		Integer lane = determineLane(node.getDetails());
 		return createNode(node.getId(), lane, node.getDetails());
 	}
