@@ -107,6 +107,10 @@ public class Node {
 		this.details = details;
 	}
 
+	public void addDetail(String key, Object value) {
+		details.put(key, value);
+	}
+
 	public void mergeWith(Node node) {
 		if (linkedToNodeIds == null) {
 			linkedToNodeIds = node.getLinkedToNodeIds();

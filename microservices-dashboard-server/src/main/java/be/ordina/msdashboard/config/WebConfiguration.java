@@ -4,6 +4,7 @@ import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
 import be.ordina.msdashboard.aggregator.NodeAggregator;
 import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregator.index.IndexToNodeConverter;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
@@ -90,7 +91,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public IndexesAggregator indexesAggregator() {
-        return new IndexesAggregator(discoveryClient);
+        return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient);
     }
 
     @Bean

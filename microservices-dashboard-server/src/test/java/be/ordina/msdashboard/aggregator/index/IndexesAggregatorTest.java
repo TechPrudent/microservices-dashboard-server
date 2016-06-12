@@ -36,12 +36,15 @@ import static org.mockito.Mockito.when;
 public class IndexesAggregatorTest {
 
     private DiscoveryClient discoveryClient;
+    private IndexToNodeConverter indexToNodeConverter;
     private IndexesAggregator indexesAggregator;
 
     @Before
     public void setup() {
         discoveryClient = Mockito.mock(DiscoveryClient.class);
-        indexesAggregator = new IndexesAggregator(discoveryClient);
+        // TODO mock this
+        indexToNodeConverter = new IndexToNodeConverter();
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient);
 
         PowerMockito.mockStatic(RxNetty.class);
     }
@@ -164,6 +167,32 @@ public class IndexesAggregatorTest {
         when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
         ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
         ByteBufUtil.writeUtf8(byteBuf, "No JSON here");
+        when(response.getContent()).thenReturn(Observable.just(byteBuf));
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).hasSize(0);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void malformedJsonIndexResponseShouldReturnZeroNodes() throws InterruptedException {
+        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
+        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
+        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
+
+        when(instance.getServiceId()).thenReturn("service");
+        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
+
+        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
+
+        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
+        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
+        ByteBufUtil.writeUtf8(byteBuf, "{}");
         when(response.getContent()).thenReturn(Observable.just(byteBuf));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();

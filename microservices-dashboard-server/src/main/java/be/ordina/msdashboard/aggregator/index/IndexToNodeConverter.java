@@ -2,17 +2,29 @@ package be.ordina.msdashboard.aggregator.index;
 
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
-import be.ordina.msdashboard.model.Service;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
+import rx.Observable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * @author Andreas Evers
+ * @author Tim Ysewyn
  */
 public class IndexToNodeConverter {
+
+	private static final Logger logger = LoggerFactory.getLogger(IndexToNodeConverter.class);
 
 	private static final String LINKS = "_links";
 	private static final String CURIES = "curies";
@@ -21,58 +33,79 @@ public class IndexToNodeConverter {
 	private static final String RESOURCE = "RESOURCE";
 	private static final String UP = "UP";
 
-	public Node convert(final Map<String, Object> source, final Service service) {
-		if (source.containsKey(LINKS)) {
-			return convertLinksToNodes((Map<String, Object>) source.get(LINKS), service);
-		} else {
-			throw new IllegalStateException("Index deserialization fails because no HAL _links was found at the root");
+	public Observable<Node> convert(String serviceId, String serviceUri, String source) {
+		try {
+			JSONObject index = new JSONObject(source);
+
+			if (index.has(LINKS)) {
+				return Observable.from(getNodesFromJSON(serviceId, serviceUri, index));
+			} else {
+				logger.error("Index deserialization fails because no HAL _links was found at the root");
+				return Observable.empty();
+			}
+		} catch (JSONException je) {
+			logger.error("Could not parse JSON: {}", je);
+			return Observable.empty();
 		}
 	}
 
-	private Node convertLinksToNodes(final Map<String, Object> links, final Service service) {
-		Node masterNode = new Node("masternode");
-		links.keySet().stream()
-				.filter(linkKey -> !CURIES.equals(linkKey))
-				.forEach(linkKey -> {
-					NodeBuilder node = new NodeBuilder();
-					Map <String, Object> link = (Map<String, Object>) links.get(linkKey);
+	@SuppressWarnings("unchecked")
+	private List<Node> getNodesFromJSON(String serviceId, String serviceUri, JSONObject index) {
+		List<Node> nodes = new ArrayList<>();
 
-					node.withId(linkKey);
-					Node linkNode = NodeBuilder.node().withId(service.getId()).build();
-					node.withLinkedToNode(linkNode);
-					node.withLane(1);
-					Map<String, Object> details = new HashMap<>();
-					details.put("url", (String) link.get(HREF));
-					details.put("docs", resolveDocs((List<Map<String, Object>>) links.get(CURIES), linkKey, service));
-					details.put("type", RESOURCE);
-					details.put("status", UP);
-					node.havingDetails(details);
+		NodeBuilder serviceNode = NodeBuilder.node().withId(serviceId);
 
-					masterNode.getLinkedToNodes().add(node.build());
+		JSONObject links = index.getJSONObject(LINKS);
+		final boolean hasCuries = links.has(CURIES);
 
-				});
-		return masterNode;
+		Set<String> keyset = new HashSet<>(links.keySet());
+
+		keyset.stream()
+			.filter(linkKey -> !CURIES.equals(linkKey))
+			.forEach(linkKey -> {
+				serviceNode.withLinkedFromNodeId(linkKey);
+
+				JSONObject link = links.getJSONObject(linkKey);
+
+				Node linkedNode = convertLinkToNodes(linkKey, link, serviceId);
+				if (hasCuries) {
+					String docs = resolveDocs(linkKey, links.getJSONArray(CURIES), serviceUri);
+
+					if (docs != null) {
+						linkedNode.addDetail("docs", docs);
+					}
+				}
+
+				nodes.add(linkedNode);
+			});
+
+		nodes.add(0, serviceNode.build());
+
+		return nodes;
 	}
 
-	private String resolveDocs(List<Map<String, Object>> curies, String link, Service service) {
-		String namespace = link.substring(0, link.indexOf(":"));
-		String rel = link.substring(link.indexOf(":") + 1);
-		List<String> list = curies.stream()
-				.filter(curie ->
-						((String) curie.get(CURIE_NAME)).equals(namespace))
-				.map(curie -> ((String) curie.get(HREF)).replace("{rel}", rel))
-				.map(docs -> {
-					StringBuilder builder = new StringBuilder("http://");
-					builder.append(service.getHost())
-							.append(":")
-							.append(service.getPort())
-							.append("/")
-							.append(service.getId())
-							.append(docs);
-					return builder.toString();
-				})
-				.collect(Collectors.toList());
-		return list.get(0);
+	private Node convertLinkToNodes(String linkKey, JSONObject link, String linkToServiceId) {
+		return NodeBuilder.node()
+				.withId(linkKey)
+				.withLane(1)
+				.withLinkedToNodeId(linkToServiceId)
+				.withDetail("url", link.getString(HREF))
+				.withDetail("type", RESOURCE)
+				.withDetail("status", UP)
+				.build();
+	}
+
+	private String resolveDocs(String linkKey, JSONArray curies, String serviceUri) {
+		String namespace = linkKey.substring(0, linkKey.indexOf(":"));
+
+		for (int i = 0; i < curies.length(); ) {
+			JSONObject curie = curies.getJSONObject(i);
+
+			if (curie.has(CURIE_NAME) && curie.getString(CURIE_NAME).equals(namespace)) {
+				return serviceUri + curie.getString(HREF).replace("{rel}", linkKey.substring(linkKey.indexOf(":") + 1));
+			}
+		}
+
+		return null;
 	}
 }
-
