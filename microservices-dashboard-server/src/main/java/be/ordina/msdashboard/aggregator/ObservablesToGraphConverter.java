@@ -55,6 +55,7 @@ public class ObservablesToGraphConverter {
 				.doOnNext(node -> LOG.info("Converting to nodes and links map"))
 				.reduce(new HashMap<>(), toNodesAndLinksMap())
 				.doOnNext(nodesAndLinksMap -> LOG.info("Converted to nodes and links map"))
+				.toBlocking()
 				.subscribe(element -> {
 					graph.put(NODES, element.get(NODES));
 					graph.put(LINKS, element.get(LINKS));
