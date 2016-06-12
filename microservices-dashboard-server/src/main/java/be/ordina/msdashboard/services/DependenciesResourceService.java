@@ -53,7 +53,7 @@ public class DependenciesResourceService {
         Map<String, Object> nodesAndLinks = Observable.mergeDelayError(observables)
 				.observeOn(Schedulers.io())
 				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
-				.reduce(new ArrayList<>(), mergeNodes())
+				.reduce(new ArrayList<>(), NodeMerger.merge())
 				.doOnNext(node -> logger.info("Merged all emitted nodes"))
 				.doOnNext(nodes -> logger.info("Converting to nodes and links map"))
                 .map(toNodesAndLinksMap())
@@ -66,26 +66,6 @@ public class DependenciesResourceService {
         graph.put(LINKS, nodesAndLinks.get(LINKS));
 
 		return graph;
-	}
-
-	private Func2<ArrayList<Node>, Node, ArrayList<Node>> mergeNodes() {
-		return (mergedNodes, node) -> {
-
-			// TODO: we should be able to modify nodes in a general way before merging, eg. convert all service names to lowercase
-			// Aggregator specific logic should not come here, eg. removing the Eureka description
-
-			Optional<Integer> nodeIndex = findNodeIndexByNode(mergedNodes, node);
-			if (nodeIndex.isPresent()) {
-				logger.info("Node previously added, merging");
-				mergedNodes.get(nodeIndex.get())
-						.mergeWith(node);
-			} else {
-				logger.info("Node was not merged before, adding it to the list");
-				mergedNodes.add(node);
-			}
-
-			return mergedNodes;
-		};
 	}
 
 	private Func1<ArrayList<Node>, Map<String, Object>> toNodesAndLinksMap() {
@@ -123,10 +103,6 @@ public class DependenciesResourceService {
 
 			return nodesAndLinksMap;
 		};
-	}
-
-	private Optional<Integer> findNodeIndexByNode(List<Node> nodes, Node node) {
-		return findNodeIndexById(nodes, node.getId());
 	}
 
 	private Optional<Integer> findNodeIndexById(List<Node> nodes, String nodeId) {
