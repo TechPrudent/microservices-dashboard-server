@@ -3,8 +3,11 @@ package be.ordina.msdashboard.aggregator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
+import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.store.NodeStore;
+import com.github.tomakehurst.wiremock.common.Json;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +31,6 @@ import static com.google.common.collect.Maps.newHashMap;
 public class ObservablesToGraphConverter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservablesToGraphConverter.class);
-	private final ObservablesIntoNodesAndLinksReducer observablesIntoNodesAndLinksReducer = new ObservablesIntoNodesAndLinksReducer();
 
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 	private IndexesAggregator indexesAggregator;
@@ -76,15 +78,13 @@ public class ObservablesToGraphConverter {
 			return Observable.from(displayableNodes);
 		}).flatMap(el -> el);*/
 
-		Observable<Node> mergedObservable = Observable.mergeDelayError(microservicesWithTheirBackends, resources, pactComponents, virtualNodes)
+		Observable.mergeDelayError(microservicesWithTheirBackends, resources, pactComponents, virtualNodes)
 				.observeOn(Schedulers.io())
 				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
 				.flatMap(Observable::from)
-				.doOnNext(node -> LOG.info("Merged node with id '{}'", node.getId()));
-
-		observablesIntoNodesAndLinksReducer
-				.reduceToNodesAndLinksMap(mergedObservable)
+				.doOnNext(node -> LOG.info("Merged node with id '{}'", node.getId()))
+				.reduce(initNodesAndLinksMap(), toNodesAndLinksMap())
 				.map(mapToDisplayableNode())
 				.toBlocking()
 				.subscribe(element -> {
@@ -101,10 +101,7 @@ public class ObservablesToGraphConverter {
 
 	private Func2<ArrayList<Node>, Node, ArrayList<Node>> mergeNodes() {
 		return (mergedNodes, node) -> {
-			Optional<Integer> nodeIndex = mergedNodes.stream()
-					.filter(n -> n.getId().equals(node.getId()))
-					.map(mergedNodes::indexOf)
-					.findFirst();
+			Optional<Integer> nodeIndex = findNodeIndexByNode(mergedNodes, node);
 			if (nodeIndex.isPresent()) {
 				LOG.info("Node previously added, merging");
 				mergedNodes.get(nodeIndex.get()).mergeWith(node);
@@ -115,6 +112,84 @@ public class ObservablesToGraphConverter {
 
 			return mergedNodes;
 		};
+	}
+
+	private Map<String, Object> initNodesAndLinksMap() {
+		Map<String, Object> nodesAndLinksMap = new HashMap<>();
+		nodesAndLinksMap.put(Constants.NODES, new ArrayList<>());
+		nodesAndLinksMap.put(Constants.LINKS, new HashSet<>());
+		return nodesAndLinksMap;
+	}
+
+	private Func2<Map<String, Object>, Node, Map<String, Object>> toNodesAndLinksMap() {
+		return (nodesAndLinksMap, node) -> {
+			List<Node> mappedNodes = (List<Node>) nodesAndLinksMap.get(Constants.NODES);
+			Optional<Integer> nodeIndex = findNodeIndexByNode(mappedNodes, node);
+			int mappedNodeIndex;
+
+			if (nodeIndex.isPresent()) {
+				mappedNodeIndex = nodeIndex.get();
+				Node mappedNode = mappedNodes.get(mappedNodeIndex);
+				mappedNode.mergeWith(node);
+				mappedNodes.set(mappedNodeIndex, mappedNode);
+			} else {
+				mappedNodes.add(node);
+				mappedNodeIndex = mappedNodes.size() - 1;
+			}
+
+			Set<Map<String, Integer>> links = (Set<Map<String, Integer>>) nodesAndLinksMap.get(Constants.LINKS);
+
+			Set<String> linkedToNodeIds = node.getLinkedToNodeIds();
+			for (String nodeId : linkedToNodeIds) {
+				nodeIndex = findNodeIndexById(mappedNodes, nodeId);
+				int linkedNodeIndex;
+				if (!nodeIndex.isPresent()) {
+					mappedNodes.add(createNodeById(nodeId));
+					linkedNodeIndex = mappedNodes.size() - 1;
+				} else {
+					linkedNodeIndex = nodeIndex.get();
+				}
+				links.add(createLink(mappedNodeIndex, linkedNodeIndex));
+			}
+
+			Set<String> linkedFromNodeIds = node.getLinkedFromNodeIds();
+			for (String nodeId : linkedFromNodeIds) {
+				nodeIndex = findNodeIndexById(mappedNodes, nodeId);
+				int linkedNodeIndex;
+				if (!nodeIndex.isPresent()) {
+					mappedNodes.add(createNodeById(nodeId));
+					linkedNodeIndex = mappedNodes.size() - 1;
+				} else {
+					linkedNodeIndex = nodeIndex.get();
+				}
+				links.add(createLink(linkedNodeIndex, mappedNodeIndex));
+			}
+			
+			return nodesAndLinksMap;
+		};
+	}
+
+	private Optional<Integer> findNodeIndexByNode(List<Node> nodes, Node node) {
+		return findNodeIndexById(nodes, node.getId());
+	}
+
+	private Optional<Integer> findNodeIndexById(List<Node> nodes, String nodeId) {
+		return nodes.stream()
+				.filter(n -> n.getId().equals(nodeId))
+				.map(nodes::indexOf)
+				.findFirst();
+	}
+
+	private Node createNodeById(String nodeId) {
+		return NodeBuilder.node().withId(nodeId).build();
+	}
+
+	@VisibleForTesting
+	Map<String, Integer> createLink(final int source, final int target) {
+		Map<String, Integer> link = new HashMap<>();
+		link.put("source", source);
+		link.put("target", target);
+		return link;
 	}
 
 	private String convertMicroserviceName(String name) {
@@ -152,10 +227,6 @@ public class ObservablesToGraphConverter {
 			map.replace(NODES, displayableNodes);
 			return map;
 		};
-	}
-
-	private Observable<Map<String, Object>> reduceToNodesAndLinksMap(Observable<Node> mergedObservable) {
-		return observablesIntoNodesAndLinksReducer.reduceToNodesAndLinksMap(mergedObservable);
 	}
 
 	@VisibleForTesting
