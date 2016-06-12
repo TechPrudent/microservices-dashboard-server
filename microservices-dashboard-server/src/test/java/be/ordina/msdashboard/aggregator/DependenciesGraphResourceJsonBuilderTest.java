@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import be.ordina.msdashboard.model.Node;
 
-//TODO: Compare with ObservablesToGraphConverterTest
+//TODO: Compare with DependenciesResourceServiceTest
 @Ignore
 @RunWith(MockitoJUnitRunner.class)
 public class DependenciesGraphResourceJsonBuilderTest {
