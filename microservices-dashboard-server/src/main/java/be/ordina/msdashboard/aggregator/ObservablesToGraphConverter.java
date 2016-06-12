@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 import java.util.*;
@@ -78,21 +79,7 @@ public class ObservablesToGraphConverter {
 		Observable<Node> mergedObservable = Observable.mergeDelayError(microservicesWithTheirBackends, resources, pactComponents, virtualNodes)
 				.subscribeOn(Schedulers.io())
 				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
-				.reduce(new ArrayList<Node>(), (mergedNodes, node) -> {
-					Optional<Integer> nodeIndex = mergedNodes.stream()
-															 .filter(n -> n.getId().equals(node.getId()))
-															 .map(mergedNodes::indexOf)
-															 .findFirst();
-					if (nodeIndex.isPresent()) {
-						LOG.info("Node previously added, merging");
-						mergedNodes.get(nodeIndex.get()).mergeWith(node);
-					} else {
-						LOG.info("Node was not merged before, adding it to the list");
-						mergedNodes.add(node);
-					}
-
-					return mergedNodes;
-				})
+				.reduce(new ArrayList<>(), mergeNodes())
 				.flatMap(Observable::from)
 				.doOnNext(node -> LOG.info("Merged node with id '{}'", node.getId()));
 
@@ -110,6 +97,24 @@ public class ObservablesToGraphConverter {
                 });
 
 		return graph;
+	}
+
+	private Func2<ArrayList<Node>, Node, ArrayList<Node>> mergeNodes() {
+		return (mergedNodes, node) -> {
+			Optional<Integer> nodeIndex = mergedNodes.stream()
+					.filter(n -> n.getId().equals(node.getId()))
+					.map(mergedNodes::indexOf)
+					.findFirst();
+			if (nodeIndex.isPresent()) {
+				LOG.info("Node previously added, merging");
+				mergedNodes.get(nodeIndex.get()).mergeWith(node);
+			} else {
+				LOG.info("Node was not merged before, adding it to the list");
+				mergedNodes.add(node);
+			}
+
+			return mergedNodes;
+		};
 	}
 
 	private String convertMicroserviceName(String name) {
