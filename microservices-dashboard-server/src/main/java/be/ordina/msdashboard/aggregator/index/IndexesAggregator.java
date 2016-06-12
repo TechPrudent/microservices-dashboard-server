@@ -3,22 +3,19 @@ package be.ordina.msdashboard.aggregator.index;
 import be.ordina.msdashboard.aggregator.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.nio.client.methods.HttpAsyncMethods;
+import io.reactivex.netty.RxNetty;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
-import rx.apache.http.ObservableHttp;
-import rx.apache.http.ObservableHttpResponse;
+import rx.Observer;
 import rx.schedulers.Schedulers;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +28,7 @@ import java.util.Set;
 //TODO: Reuse code from HealthIndicatorsAggregator and apply composition
 public class IndexesAggregator implements NodeAggregator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IndexesAggregator.class);
+    private static final Logger logger = LoggerFactory.getLogger(IndexesAggregator.class);
 
     private static final String LINKS = "_links";
     private static final String CURIES = "curies";
@@ -50,54 +47,103 @@ public class IndexesAggregator implements NodeAggregator {
     //@Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
     public Observable<Node> aggregateNodes() {
         return Observable.from(discoveryClient.getServices())
-                .subscribeOn(Schedulers.io())
-                .flatMap(this::createObservableHttpRequest)
-                .concatMap(this::parseResponseIntoNode)
-                .doOnNext(el -> LOG.info("Merged index node! " + el.getId()));
+                .observeOn(Schedulers.io())
+                .doOnNext(service -> {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Sending instance retrieval request for service '{}'", service);
+                    }
+                })
+                .map(this::getFirstInstanceForService)
+                .filter(Objects::nonNull)
+                .flatMap(this::getIndexFromServiceInstance)
+                .observeOn(Schedulers.computation())
+                .concatMap(this::parseRequestIntoNode)
+                .doOnEach(new Observer<Node>() {
+
+                    private int totalNodesEmitted = 0;
+
+                    @Override
+                    public void onCompleted() {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Emitted {} nodes", totalNodesEmitted);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Node node) {
+                        ++totalNodesEmitted;
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Emitting node with id '{}'", node.getId());
+                            logger.debug("{}", node);
+                        }
+                    }
+                });
     }
 
-    private Observable<ImmutableTriple<String, ServiceInstance, JSONObject>> createObservableHttpRequest(String service) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Getting instance for service {}", service);
+    private ServiceInstance getFirstInstanceForService(String service) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Getting first instance for service '{}'", service);
         }
-        LOG.info("Discovering services for index");
-        ServiceInstance instance = discoveryClient.getInstances(service)
-                                                  .get(0);
+
+        List<ServiceInstance> instances = discoveryClient.getInstances(service);
+
+        if (instances.size() > 0) {
+            return instances.get(0);
+        } else {
+            logger.warn("No instances found for service '{}'", service);
+            return null;
+        }
+    }
+
+    private Observable<ImmutablePair<ServiceInstance, JSONObject>> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
         //TODO: getUri() on ServiceInstance is not including contextRoot
         //We should include it when the service has a contextRoot
-        String uri = instance.getUri()
-                             .toString();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Calling {}...", uri);
+        String uri = serviceInstance.getUri().toString();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating GET request to '{}'...", uri);
         }
-        LOG.info("Index url discovered: " + uri);
-        CloseableHttpAsyncClient client = HttpAsyncClients.createDefault();
-        client.start();
+
         //TODO: Add hook for headers on GET (e.g. accept = application/hal+json")
-        return ObservableHttp.createRequest(HttpAsyncMethods.createGet(uri), client)
-                             .toObservable()
-                            //TODO: exception handling and logging
-                             .filter(observableHttpResponse -> observableHttpResponse.getResponse().getStatusLine().getStatusCode() < 400)
-                             .flatMap(ObservableHttpResponse::getContent)
-                             .map(bytes -> {
-                                 String response = new String(bytes);
-                                 try {
-                                     return new ImmutableTriple<>(service, instance, new JSONObject(response));
-                                 } catch (JSONException e) {
-                                     LOG.error("An exception occurred: {}", e.getStackTrace());
-                                     LOG.error("Response: {}", response);
-                                     return null;
-                                 }
-                             })
-                             .filter(Objects::nonNull);
+        return RxNetty.createHttpGet(uri)
+                .filter(r -> {
+                    if (r.getStatus().code() < 400) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("'GET {}' returned '{}'", uri, r.getStatus());
+                        }
+                        return true;
+                    } else {
+                        logger.warn("'GET {}' returned '{}'", uri, r.getStatus());
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Headers: {}", r.getHeaders().entries());
+                            logger.debug("Cookies: {}", r.getCookies().entrySet());
+                        }
+                        return false;
+                    }
+                })
+                .flatMap(r -> r.getContent()
+                        .map(bb -> new JSONObject(bb.toString(Charset.defaultCharset()))))
+                .onErrorReturn(throwable -> {
+                    logger.error("Skipping the result of service '{}' because of an error: {}",
+                            serviceInstance.getServiceId(),
+                            throwable.getMessage());
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .map(json -> ImmutablePair.of(serviceInstance, json));
     }
 
-    private Observable<Node> parseResponseIntoNode(ImmutableTriple<String, ServiceInstance, JSONObject> triple) {
-        String service = triple.getLeft();
-        ServiceInstance serviceInstance = triple.getMiddle();
-        JSONObject source = triple.getRight();
+    @SuppressWarnings("unchecked")
+    private Observable<Node> parseRequestIntoNode(ImmutablePair<ServiceInstance, JSONObject> pair) {
+        ServiceInstance serviceInstance = pair.getLeft();
+        JSONObject source = pair.getRight();
 
-        NodeBuilder serviceNode = NodeBuilder.node().withId(service);
+        NodeBuilder serviceNode = NodeBuilder.node().withId(serviceInstance.getServiceId());
 
         List<Node> nodes = new ArrayList<>();
 
@@ -112,12 +158,12 @@ public class IndexesAggregator implements NodeAggregator {
                     serviceNode.withLinkedFromNodeId(linkKey);
 
                     NodeBuilder nodeBuilder = NodeBuilder.node()
-                                                         .withId(linkKey)
-                                                         .withLane(1)
-                                                         .withLinkedToNodeId(service)
-                                                         .withDetail("url", link.getString(HREF))
-                                                         .withDetail("type", RESOURCE)
-                                                         .withDetail("status", UP);
+                            .withId(linkKey)
+                            .withLane(1)
+                            .withLinkedToNodeId(serviceInstance.getServiceId())
+                            .withDetail("url", link.getString(HREF))
+                            .withDetail("type", RESOURCE)
+                            .withDetail("status", UP);
 
                     if (links.has(CURIES)) {
                         String namespace = linkKey.substring(0, linkKey.indexOf(":"));
