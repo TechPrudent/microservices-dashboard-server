@@ -50,7 +50,7 @@ public class DependenciesResourceService {
 		graph.put(LANES, constructLanes());
 		graph.put(TYPES, constructTypes());
 
-		Observable.mergeDelayError(observables)
+        Map<String, Object> nodesAndLinks = Observable.mergeDelayError(observables)
 				.observeOn(Schedulers.io())
 				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
@@ -58,13 +58,12 @@ public class DependenciesResourceService {
 				.doOnNext(nodes -> logger.info("Converting to nodes and links map"))
                 .map(toNodesAndLinksMap())
 				.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
+                .doOnError(throwable -> logger.error("An error occurred: {}", throwable))
 				.toBlocking()
-				.subscribe(element -> {
-					graph.put(NODES, element.get(NODES));
-					graph.put(LINKS, element.get(LINKS));
-				}, throwable -> {
-					logger.error("An error occurred: {}", throwable);
-				});
+                .first();
+
+        graph.put(NODES, nodesAndLinks.get(NODES));
+        graph.put(LINKS, nodesAndLinks.get(LINKS));
 
 		return graph;
 	}
