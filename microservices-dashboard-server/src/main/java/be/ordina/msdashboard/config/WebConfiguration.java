@@ -1,6 +1,7 @@
 package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.aggregator.DependenciesGraphResourceJsonBuilder;
+import be.ordina.msdashboard.aggregator.NodeAggregator;
 import be.ordina.msdashboard.aggregator.ObservablesToGraphConverter;
 import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
@@ -23,6 +24,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Andreas Evers
@@ -78,10 +82,11 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public ObservablesToGraphConverter observablesToGraphConverter() {
-        return new ObservablesToGraphConverter(healthIndicatorsAggregator,
+        List<NodeAggregator> aggregators = Arrays.asList(healthIndicatorsAggregator,
                 indexesAggregator(),
-                pactsAggregator(),
-                nodeStore);
+                pactsAggregator());
+
+        return new ObservablesToGraphConverter(aggregators, nodeStore);
     }
 
     @Bean

@@ -5,9 +5,9 @@ import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
 import be.ordina.msdashboard.converters.ObjectToJsonConverter;
 import be.ordina.msdashboard.store.NodeStore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -16,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
 import rx.Observable;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Map;
 
 import static be.ordina.msdashboard.JsonHelper.load;
@@ -29,7 +30,6 @@ import static com.google.common.collect.Sets.newHashSet;
 @RunWith(MockitoJUnitRunner.class)
 public class ObservablesToGraphConverterTest {
 
-    @InjectMocks
     private ObservablesToGraphConverter observablesToGraphConverter;
 
     @Mock
@@ -40,6 +40,11 @@ public class ObservablesToGraphConverterTest {
     private PactsAggregator pactsAggregator;
     @Mock
     private NodeStore redisService;
+
+    @Before
+    public void setup() {
+        observablesToGraphConverter = new ObservablesToGraphConverter(Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
+    }
 
     @Test
     public void retrieveGraph() throws FileNotFoundException {
