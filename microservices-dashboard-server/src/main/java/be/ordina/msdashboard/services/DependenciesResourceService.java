@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import rx.Observable;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
@@ -54,8 +55,8 @@ public class DependenciesResourceService {
 				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
 				.doOnNext(node -> logger.info("Merged all emitted nodes"))
-				.doOnNext(node -> logger.info("Converting to nodes and links map"))
-				.reduce(new HashMap<>(), toNodesAndLinksMap())
+				.doOnNext(nodes -> logger.info("Converting to nodes and links map"))
+                .map(toNodesAndLinksMap())
 				.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
 				.toBlocking()
 				.subscribe(element -> {
@@ -88,8 +89,8 @@ public class DependenciesResourceService {
 		};
 	}
 
-	private Func2<Map<String, Object>, ArrayList<Node>, Map<String, Object>> toNodesAndLinksMap() {
-		return (nodesAndLinksMap, nodes) -> {
+	private Func1<ArrayList<Node>, Map<String, Object>> toNodesAndLinksMap() {
+		return (nodes) -> {
 			List<Map<String, Object>> displayableNodes = new ArrayList<>();
 			Set<Map<String, Integer>> links = new HashSet<>();
 
@@ -116,6 +117,8 @@ public class DependenciesResourceService {
 						}
 					});
 
+            Map<String, Object> nodesAndLinksMap = new HashMap<>();
+
 			nodesAndLinksMap.put(Constants.NODES, displayableNodes);
 			nodesAndLinksMap.put(Constants.LINKS, links);
 
@@ -129,8 +132,7 @@ public class DependenciesResourceService {
 
 	private Optional<Integer> findNodeIndexById(List<Node> nodes, String nodeId) {
 		return nodes.stream()
-				.filter(n -> n.getId()
-						.equals(nodeId))
+				.filter(n -> n.getId().equals(nodeId))
 				.map(nodes::indexOf)
 				.findFirst();
 	}
