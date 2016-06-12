@@ -18,6 +18,7 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static be.ordina.msdashboard.constants.Constants.*;
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
@@ -82,10 +83,10 @@ public class ObservablesToGraphConverter {
 				.observeOn(Schedulers.io())
 				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
-				.flatMap(Observable::from)
-				.doOnNext(node -> LOG.info("Merged node with id '{}'", node.getId()))
-				.reduce(initNodesAndLinksMap(), toNodesAndLinksMap())
-				.map(mapToDisplayableNode())
+				.doOnNext(node -> LOG.info("Merged all emitted nodes"))
+				.doOnNext(node -> LOG.info("Converting to nodes and links map"))
+				.reduce(new HashMap<>(), toNodesAndLinksMap())
+				.doOnNext(nodesAndLinksMap -> LOG.info("Converted to nodes and links map"))
 				.toBlocking()
 				.subscribe(element -> {
 					graph.put(NODES, element.get(NODES));
@@ -114,57 +115,36 @@ public class ObservablesToGraphConverter {
 		};
 	}
 
-	private Map<String, Object> initNodesAndLinksMap() {
-		Map<String, Object> nodesAndLinksMap = new HashMap<>();
-		nodesAndLinksMap.put(Constants.NODES, new ArrayList<>());
-		nodesAndLinksMap.put(Constants.LINKS, new HashSet<>());
-		return nodesAndLinksMap;
-	}
+	private Func2<Map<String, Object>, ArrayList<Node>, Map<String, Object>> toNodesAndLinksMap() {
+		return (nodesAndLinksMap, nodes) -> {
+			List<Map<String, Object>> displayableNodes = new ArrayList<>();
+			Set<Map<String, Integer>> links = new HashSet<>();
 
-	private Func2<Map<String, Object>, Node, Map<String, Object>> toNodesAndLinksMap() {
-		return (nodesAndLinksMap, node) -> {
-			List<Node> mappedNodes = (List<Node>) nodesAndLinksMap.get(Constants.NODES);
-			Optional<Integer> nodeIndex = findNodeIndexByNode(mappedNodes, node);
-			int mappedNodeIndex;
+			nodes.stream().forEach(node -> {
+				displayableNodes.add(createDisplayableNode(node));
 
-			if (nodeIndex.isPresent()) {
-				mappedNodeIndex = nodeIndex.get();
-				Node mappedNode = mappedNodes.get(mappedNodeIndex);
-				mappedNode.mergeWith(node);
-				mappedNodes.set(mappedNodeIndex, mappedNode);
-			} else {
-				mappedNodes.add(node);
-				mappedNodeIndex = mappedNodes.size() - 1;
-			}
+				int mappedNodeIndex = nodes.indexOf(node);
 
-			Set<Map<String, Integer>> links = (Set<Map<String, Integer>>) nodesAndLinksMap.get(Constants.LINKS);
-
-			Set<String> linkedToNodeIds = node.getLinkedToNodeIds();
-			for (String nodeId : linkedToNodeIds) {
-				nodeIndex = findNodeIndexById(mappedNodes, nodeId);
-				int linkedNodeIndex;
-				if (!nodeIndex.isPresent()) {
-					mappedNodes.add(createNodeById(nodeId));
-					linkedNodeIndex = mappedNodes.size() - 1;
-				} else {
-					linkedNodeIndex = nodeIndex.get();
+				Set<String> linkedToNodeIds = node.getLinkedToNodeIds();
+				for (String nodeId : linkedToNodeIds) {
+					Optional<Integer> nodeIndex = findNodeIndexById(nodes, nodeId);
+					if (nodeIndex.isPresent()) {
+						links.add(createLink(mappedNodeIndex, nodeIndex.get()));
+					}
 				}
-				links.add(createLink(mappedNodeIndex, linkedNodeIndex));
-			}
 
-			Set<String> linkedFromNodeIds = node.getLinkedFromNodeIds();
-			for (String nodeId : linkedFromNodeIds) {
-				nodeIndex = findNodeIndexById(mappedNodes, nodeId);
-				int linkedNodeIndex;
-				if (!nodeIndex.isPresent()) {
-					mappedNodes.add(createNodeById(nodeId));
-					linkedNodeIndex = mappedNodes.size() - 1;
-				} else {
-					linkedNodeIndex = nodeIndex.get();
+				Set<String> linkedFromNodeIds = node.getLinkedFromNodeIds();
+				for (String nodeId : linkedFromNodeIds) {
+					Optional<Integer> nodeIndex = findNodeIndexById(nodes, nodeId);
+					if (nodeIndex.isPresent()) {
+						links.add(createLink(nodeIndex.get(), mappedNodeIndex));
+					}
 				}
-				links.add(createLink(linkedNodeIndex, mappedNodeIndex));
-			}
-			
+			});
+
+			nodesAndLinksMap.put(Constants.NODES, displayableNodes);
+			nodesAndLinksMap.put(Constants.LINKS, links);
+
 			return nodesAndLinksMap;
 		};
 	}
@@ -178,10 +158,6 @@ public class ObservablesToGraphConverter {
 				.filter(n -> n.getId().equals(nodeId))
 				.map(nodes::indexOf)
 				.findFirst();
-	}
-
-	private Node createNodeById(String nodeId) {
-		return NodeBuilder.node().withId(nodeId).build();
 	}
 
 	@VisibleForTesting
@@ -215,18 +191,6 @@ public class ObservablesToGraphConverter {
 				break;
 			}
 		}
-	}
-
-	private Func1<Map<String, Object>, Map<String, Object>> mapToDisplayableNode() {
-		return map -> {
-			List<Node> nodes = (List<Node>) map.get(NODES);
-			List<Map<String, Object>> displayableNodes = new ArrayList<>();
-			for (Node node : nodes) {
-				displayableNodes.add(createDisplayableNode(node));
-			}
-			map.replace(NODES, displayableNodes);
-			return map;
-		};
 	}
 
 	@VisibleForTesting
