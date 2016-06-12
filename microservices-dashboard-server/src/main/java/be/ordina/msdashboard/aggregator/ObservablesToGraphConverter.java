@@ -15,8 +15,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static be.ordina.msdashboard.constants.Constants.*;
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**
@@ -70,6 +68,10 @@ public class ObservablesToGraphConverter {
 
 	private Func2<ArrayList<Node>, Node, ArrayList<Node>> mergeNodes() {
 		return (mergedNodes, node) -> {
+
+			// TODO: we should be able to modify nodes in a general way before merging, eg. convert all service names to lowercase
+			// Aggregator specific logic should not come here, eg. removing the Eureka description
+
 			Optional<Integer> nodeIndex = findNodeIndexByNode(mergedNodes, node);
 			if (nodeIndex.isPresent()) {
 				LOG.info("Node previously added, merging");
@@ -136,31 +138,6 @@ public class ObservablesToGraphConverter {
 		return link;
 	}
 
-	private String convertMicroserviceName(String name) {
-		return LOWER_CAMEL.to(LOWER_HYPHEN, name);
-	}
-
-	@VisibleForTesting
-	Map<String, Object> createMicroserviceNode(final String microServicename, final Node node) {
-		Map<String, Object> details = new HashMap<>();
-		for (Map.Entry<String, Object> detail : node.getDetails().entrySet()) {
-			if (!(detail.getValue() instanceof Node)) {
-				details.put(detail.getKey(), detail.getValue());
-			}
-		}
-		Integer lane = determineLane(details);
-		return createNode(microServicename, lane, details);
-	}
-
-	private void removeEurekaDescription(final Set<Node> dependencyNodes) {
-		for (Node dependencyNode : dependencyNodes) {
-			if (DESCRIPTION.equals(dependencyNode.getId())) {
-				dependencyNodes.remove(dependencyNode);
-				break;
-			}
-		}
-	}
-
 	@VisibleForTesting
 	Integer determineLane(Map<String, Object> details) {
 		String type = (String) details.get(TYPE);
@@ -177,15 +154,6 @@ public class ObservablesToGraphConverter {
 
 	private Map<String, Object> createDisplayableNode(final Node node) {
 		LOG.info("Creating displayable node: " + node.getId());
-		Integer lane = determineLane(node.getDetails());
-		return createNode(node.getId(), lane, node.getDetails());
-	}
-
-	private Map<String, Object> createResourceNode(final Node node) {
-		return createNode(node.getId(), node.getLane(), node.getDetails());
-	}
-
-	private Map<String, Object> createPactComponentNode(final Node node) {
 		Integer lane = determineLane(node.getDetails());
 		return createNode(node.getId(), lane, node.getDetails());
 	}
