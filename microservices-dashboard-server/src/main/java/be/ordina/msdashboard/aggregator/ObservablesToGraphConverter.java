@@ -77,7 +77,7 @@ public class ObservablesToGraphConverter {
 		}).flatMap(el -> el);*/
 
 		Observable<Node> mergedObservable = Observable.mergeDelayError(microservicesWithTheirBackends, resources, pactComponents, virtualNodes)
-				.subscribeOn(Schedulers.io())
+				.observeOn(Schedulers.io())
 				.doOnNext(node -> LOG.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), mergeNodes())
 				.flatMap(Observable::from)
