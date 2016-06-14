@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.functions.Func2;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,7 +15,7 @@ public class NodeMerger {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeMerger.class);
 
-    public static Func2<ArrayList<Node>, Node, ArrayList<Node>> merge() {
+    public static Func2<List<Node>, Node, List<Node>> merge() {
         return (mergedNodes, node) -> {
 
             // TODO: we should be able to modify nodes in a general way before merging, eg. convert all service names to lowercase

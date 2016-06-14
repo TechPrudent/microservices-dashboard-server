@@ -17,7 +17,7 @@ public class GraphMapper {
 
     private static final Logger logger = LoggerFactory.getLogger(GraphMapper.class);
 
-    public static Func1<ArrayList<Node>, Map<String, Object>> toGraph() {
+    public static Func1<List<Node>, Map<String, Object>> toGraph() {
         return (nodes) -> {
             List<Map<String, Object>> displayableNodes = new ArrayList<>();
             Set<Map<String, Integer>> links = new HashSet<>();
