@@ -65,7 +65,7 @@ import java.lang.reflect.Method;
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class RedisConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisConfiguration.class);
 
     @Bean
     public NodeStore nodeStore(final RedisConnectionFactory factory) {

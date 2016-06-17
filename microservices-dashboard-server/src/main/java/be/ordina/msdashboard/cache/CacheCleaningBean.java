@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class CacheCleaningBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CacheCleaningBean.class);
+	private static final Logger logger = LoggerFactory.getLogger(CacheCleaningBean.class);
 
 	private NodeCache nodeCache;
 	private boolean evict;
@@ -34,7 +34,7 @@ public class CacheCleaningBean {
 	}
 
 	public void clean() {
-		LOG.info("Cleaning cache: " + evict);
+		logger.info("Cleaning cache: " + evict);
 		if (evict) {
 			nodeCache.evictHealthsCache();
 			nodeCache.evictIndexesCache();

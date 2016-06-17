@@ -46,7 +46,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Ignore
 public class ObservableTests {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ObservableTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(ObservableTests.class);
 
     @Test
     public void testingCombiningNestedObservables() {
@@ -122,16 +122,16 @@ public class ObservableTests {
         Observable<Observable<String>> observableObservable =
                 Observable.from(new Observable[] { observable1, observable2 });
         Observable<String> mergedObservable = Observable.merge(observableObservable);
-        mergedObservable.toBlocking().subscribe(LOG::info);
+        mergedObservable.toBlocking().subscribe(logger::info);
     }
 
     @Test
     public void testingCombiningNestedObservablesWithBlockingAndLogging() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).doOnEach(aLong -> {
             try {
                 Thread.sleep(2000);
@@ -149,10 +149,10 @@ public class ObservableTests {
     public void testingCombiningNestedObservablesWithLatchAndLogging() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).doOnEach(aLong -> {
             try {
                 Thread.sleep(2000);
@@ -185,67 +185,67 @@ public class ObservableTests {
     @Test
     public void testingCombiningNestedObservablesWithSchedulers() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<Observable<String>> observableObservable =
                 Observable.from(new Observable[] { observable1, observable2 });
         Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable).subscribeOn(Schedulers.io());
-        mergedObservable.toBlocking().subscribe(LOG::info);
+        mergedObservable.toBlocking().subscribe(logger::info);
     }
 
     @Test
     public void testingCombiningNestedObservablesWithoutSchedulers() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         Observable<Observable<String>> observableObservable =
                 Observable.from(new Observable[] { observable1, observable2 });
         Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable);
-        mergedObservable.toBlocking().subscribe(LOG::info);
+        mergedObservable.toBlocking().subscribe(logger::info);
     }
 
     @Test
     public void testingObserveOn() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         observable1.observeOn(Schedulers.computation());
         observable1.toBlocking().subscribe(s -> {
-            LOG.info("Got {}", s);
-        }, e -> LOG.error(e.getMessage(), e), () -> LOG.info("Completed"));
+            logger.info("Got {}", s);
+        }, e -> logger.error(e.getMessage(), e), () -> logger.info("Completed"));
     }
 
     @Test
     public void testingSubscribeOn() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         observable1.subscribeOn(Schedulers.computation());
         observable1.toBlocking().subscribe(s -> {
-            LOG.info("Got {}", s);
-        }, e -> LOG.error(e.getMessage(), e), () -> LOG.info("Completed"));
+            logger.info("Got {}", s);
+        }, e -> logger.error(e.getMessage(), e), () -> logger.info("Completed"));
     }
 
     @Test
     public void testWithoutObserveOnOrSubscribeOn() throws InterruptedException {
         Observable<String> observable = Observable.<String>create(s -> {
-            LOG.info("Start: Executing a Service");
+            logger.info("Start: Executing a Service");
             for (int i = 1; i <= 3; i++) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                LOG.info("Emitting {}", "root " + i);
+                logger.info("Emitting {}", "root " + i);
                 s.onNext("root " + i);
             }
-            LOG.info("End: Executing a Service");
+            logger.info("End: Executing a Service");
             s.onCompleted();
         });
 
@@ -257,8 +257,8 @@ public class ObservableTests {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LOG.info("Got {}", s);
-        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+            logger.info("Got {}", s);
+        }, e -> logger.error(e.getMessage(), e), () -> latch.countDown());
 
         latch.await();
     }
@@ -267,17 +267,17 @@ public class ObservableTests {
     public void testWithSubscribeOn() throws InterruptedException {
         ExecutorService executor1 = Executors.newFixedThreadPool(5, new ThreadFactoryBuilder().setNameFormat("SubscribeOn-%d").build());
         Observable<String> observable = Observable.<String>create(s -> {
-            LOG.info("Start: Executing a Service");
+            logger.info("Start: Executing a Service");
             for (int i = 1; i <= 3; i++) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                LOG.info("Emitting {}", "root " + i);
+                logger.info("Emitting {}", "root " + i);
                 s.onNext("root " + i);
             }
-            LOG.info("End: Executing a Service");
+            logger.info("End: Executing a Service");
             s.onCompleted();
         });
 
@@ -289,8 +289,8 @@ public class ObservableTests {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LOG.info("Got {}", s);
-        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+            logger.info("Got {}", s);
+        }, e -> logger.error(e.getMessage(), e), () -> latch.countDown());
 
         latch.await();
     }
@@ -299,17 +299,17 @@ public class ObservableTests {
     public void testWithObserveOn() throws InterruptedException {
         ExecutorService executor1 = Executors.newFixedThreadPool(5, new ThreadFactoryBuilder().setNameFormat("SubscribeOn-%d").build());
         Observable<String> observable = Observable.<String>create(s -> {
-            LOG.info("Start: Executing a Service");
+            logger.info("Start: Executing a Service");
             for (int i = 1; i <= 3; i++) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                LOG.info("Emitting {}", "root " + i);
+                logger.info("Emitting {}", "root " + i);
                 s.onNext("root " + i);
             }
-            LOG.info("End: Executing a Service");
+            logger.info("End: Executing a Service");
             s.onCompleted();
         });
 
@@ -321,8 +321,8 @@ public class ObservableTests {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LOG.info("Got {}", s);
-        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+            logger.info("Got {}", s);
+        }, e -> logger.error(e.getMessage(), e), () -> latch.countDown());
 
         latch.await();
     }
@@ -331,25 +331,25 @@ public class ObservableTests {
     public void testRxJavaDebug() {
         RxJavaPlugins.getInstance().registerObservableExecutionHook(new DebugHook(new DebugNotificationListener() {
             public Object onNext(DebugNotification n) {
-                LOG.info("onNext on " + n);
+                logger.info("onNext on " + n);
                 return super.onNext(n);
             }
 
             public Object start(DebugNotification n) {
-                LOG.info("start on " + n);
+                logger.info("start on " + n);
                 return super.start(n);
             }
 
             public void complete(Object context) {
-                LOG.info("complete on " + context);
+                logger.info("complete on " + context);
             }
 
             public void error(Object context, Throwable e) {
-                LOG.error("error on " + context);
+                logger.error("error on " + context);
             }
         }));
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            LOG.info(notification.toString());
+            logger.info(notification.toString());
         }).take(10);
         observable1.toBlocking().subscribe(System.out::println);
     }

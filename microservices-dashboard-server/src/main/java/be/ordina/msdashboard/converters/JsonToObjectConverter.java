@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
  */
 public class JsonToObjectConverter<T> implements Converter<String, T> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(JsonToObjectConverter.class);
+	private static final Logger logger = LoggerFactory.getLogger(JsonToObjectConverter.class);
 	private static final ObjectReader OBJECT_READER = new ObjectMapper().reader();
 
 	private Class<T> type;
@@ -48,7 +48,7 @@ public class JsonToObjectConverter<T> implements Converter<String, T> {
 			}
 			return OBJECT_READER.withType(type).readValue(objectAsString);
 		} catch (IOException e) {
-			LOG.error("unable to read value", e);
+			logger.error("unable to read value", e);
 			throw new IllegalArgumentException(objectAsString, e);
 		}
 	}

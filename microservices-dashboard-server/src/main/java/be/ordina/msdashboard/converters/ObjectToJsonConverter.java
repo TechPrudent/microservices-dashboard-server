@@ -26,7 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Andreas Evers
  */
 public class ObjectToJsonConverter<T> implements Converter<T, String> {
-	private static final Logger LOG = LoggerFactory.getLogger(ObjectToJsonConverter.class);
+
+	private static final Logger logger = LoggerFactory.getLogger(ObjectToJsonConverter.class);
 	private static final ObjectWriter OBJECT_WRITER = new ObjectMapper().writer();
 
 	@Override
@@ -37,7 +38,7 @@ public class ObjectToJsonConverter<T> implements Converter<T, String> {
 		try {
 			return OBJECT_WRITER.writeValueAsString(source);
 		} catch (JsonProcessingException e) {
-			LOG.error("unable to create string value", e);
+			logger.error("unable to create string value", e);
 			throw new IllegalArgumentException("", e);
 
 		}

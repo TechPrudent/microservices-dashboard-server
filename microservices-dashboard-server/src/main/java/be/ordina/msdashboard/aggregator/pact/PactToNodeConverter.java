@@ -31,16 +31,17 @@ import java.util.Map;
  */
 public class PactToNodeConverter {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PactToNodeConverter.class);
 	private static final String UP = "UP";
 	private static final String relPath = "rel://";
+
+	private static final Logger logger = LoggerFactory.getLogger(PactToNodeConverter.class);
 
 	public Node convert(final String source, final String pactUrl) {
 		List<String> paths = JsonPath.read(source, "$.interactions[*].request.path");
 		String provider = JsonPath.read(source, "$.provider.name");
 		String consumer = JsonPath.read(source, "$.consumer.name");
 
-		LOG.info("Retrieved UI Component for consumer {} and producer {} with rels {}", consumer, provider, paths);
+		logger.info("Retrieved UI Component for consumer {} and producer {} with rels {}", consumer, provider, paths);
 
 		NodeBuilder node = new NodeBuilder();
 		node.withId(consumer);
@@ -65,7 +66,7 @@ public class PactToNodeConverter {
 		} else {
 			rel = path;
 		}
-		LOG.info("Path '{}' resolved to rel '{}'", path, rel);
+		logger.info("Path '{}' resolved to rel '{}'", path, rel);
 		return rel;
 	}
 }

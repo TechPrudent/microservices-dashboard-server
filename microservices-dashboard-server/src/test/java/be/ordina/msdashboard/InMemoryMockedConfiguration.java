@@ -33,7 +33,7 @@ import java.util.Map;
 @Configuration
 public class InMemoryMockedConfiguration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InMemoryMockedConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(InMemoryMockedConfiguration.class);
 
     @Bean
     protected DiscoveryClient discoveryClient() {

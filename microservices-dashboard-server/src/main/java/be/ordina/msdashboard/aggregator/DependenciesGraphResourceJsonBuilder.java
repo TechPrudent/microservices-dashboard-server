@@ -37,7 +37,7 @@ import static com.google.common.collect.Maps.newHashMap;
  */
 public class DependenciesGraphResourceJsonBuilder {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DependenciesGraphResourceJsonBuilder.class);
+	private static final Logger logger = LoggerFactory.getLogger(DependenciesGraphResourceJsonBuilder.class);
 
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 	private IndexesAggregator indexesAggregator;
@@ -112,7 +112,7 @@ public class DependenciesGraphResourceJsonBuilder {
 			if (linkedMicroserviceNodeId != -1) {
 				links.add(createLink(resourceNodeId, linkedMicroserviceNodeId));
 			} else {
-				LOG.warn("Unable to resolve a link from {} to {} (destination not found)", resource.getId(), linkedMicroservice);
+				logger.warn("Unable to resolve a link from {} to {} (destination not found)", resource.getId(), linkedMicroservice);
 			}
 		}
 		for (Node pactComponent : pactComponents) {
@@ -129,7 +129,7 @@ public class DependenciesGraphResourceJsonBuilder {
 						if (resolvedLinkedNodeId != -1) {
 							links.add(createLink(pactNodeId, resolvedLinkedNodeId));
 						} else {
-							LOG.warn("Unable to resolve a link from {} to {} (destination not found)", pactComponent.getId(), linkedNodeId);
+							logger.warn("Unable to resolve a link from {} to {} (destination not found)", pactComponent.getId(), linkedNodeId);
 						}
 					});
 		}

@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class PactsAggregator implements NodeAggregator {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PactsAggregator.class);
+	private static final Logger logger = LoggerFactory.getLogger(PactsAggregator.class);
 
 	@Value("${pact-broker.url:'http://localhost:8089'}")
 	protected String pactBrokerUrl;
@@ -48,17 +48,17 @@ public class PactsAggregator implements NodeAggregator {
 		Observable<String> urls = getPactUrlsFromBroker();
 		return urls.map(url -> getNodesFromPacts(url))
 				.flatMap(el -> el)
-				.doOnNext(el -> LOG.info("Merged pact node! " + el.getId()));
+				.doOnNext(el -> logger.info("Merged pact node! " + el.getId()));
 	}
 
 	private Observable<String> getPactUrlsFromBroker() {
-		LOG.info("Discovering pact urls");
+		logger.info("Discovering pact urls");
 		return RxNetty.createHttpGet(pactBrokerUrl + latestPactsUrl)
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						LOG.warn("Exception {} for call {} with headers {}", r.getStatus(), pactBrokerUrl + latestPactsUrl, r.getHeaders().entries());
+						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), pactBrokerUrl + latestPactsUrl, r.getHeaders().entries());
 						return false;
 					}
 				})
@@ -68,7 +68,7 @@ public class PactsAggregator implements NodeAggregator {
 				.map(response -> (List<String>) JsonPath.read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> el.map(obj -> (String) obj))
-				.doOnNext(url -> LOG.info("Pact url discovered: " + url));
+				.doOnNext(url -> logger.info("Pact url discovered: " + url));
 	}
 
 	private Observable<Node> getNodesFromPacts(String url) {
@@ -77,7 +77,7 @@ public class PactsAggregator implements NodeAggregator {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						LOG.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
+						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
 						return false;
 					}
 				})
@@ -88,6 +88,6 @@ public class PactsAggregator implements NodeAggregator {
 					PactToNodeConverter pactToNodeConverter = new PactToNodeConverter();
 					return pactToNodeConverter.convert(response, url);
 				})
-				.doOnNext(node -> LOG.info("Pact node discovered in url: " + url));
+				.doOnNext(node -> logger.info("Pact node discovered in url: " + url));
 	}
 }

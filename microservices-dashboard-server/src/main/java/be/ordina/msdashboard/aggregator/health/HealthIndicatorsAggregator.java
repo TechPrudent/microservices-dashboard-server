@@ -37,9 +37,9 @@ import static be.ordina.msdashboard.constants.Constants.*;
  */
 public class HealthIndicatorsAggregator implements NodeAggregator {
 
-	private static final Logger LOG = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
-
 	protected static final String ZUUL_ID = "zuul";
+
+	private static final Logger logger = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private DiscoveryClient discoveryClient;
 
@@ -56,22 +56,22 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				//We should include it when the service has a managementContextPath
 				//Also, if the service has a contextRoot, we should add that as well!
 				.map(id -> new ImmutablePair<String, String>(id, discoveryClient.getInstances(id).get(0).getUri().toString() + "/health"))
-				.doOnNext(pair -> LOG.info("Creating health observable: " + pair))
+				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
 				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
 				/*.flatMap(el -> el, throwable -> {
                     System.out.println("EXCEPTION: " + throwable);
                     return null;
                 }, () -> Observable.just(new Node("endNode")))*/
 				.filter(Objects::nonNull)
-				.doOnNext(el -> LOG.info("Unmerged health observable: " + el))
-				.doOnCompleted(() -> LOG.info("Completed getting all health observables"));
+				.doOnNext(el -> logger.info("Unmerged health observable: " + el))
+				.doOnCompleted(() -> logger.info("Completed getting all health observables"));
 		return Observable.merge(observableObservable)
-				.doOnNext(el -> LOG.info("Merged health node! " + el.getId()))
-				.doOnCompleted(() -> LOG.info("Completed merging all health observables"));
+				.doOnNext(el -> logger.info("Merged health node! " + el.getId()))
+				.doOnCompleted(() -> logger.info("Completed merging all health observables"));
 	}
 
 	private Observable<String> getServiceIdsFromDiscoveryClient() {
-		LOG.info("Discovering services for health");
+		logger.info("Discovering services for health");
 		Observable<String> serviceIds = Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io());
 		serviceIds.filter(id -> !id.equals(ZUUL_ID));
 		return serviceIds;
@@ -84,7 +84,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						LOG.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
+						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
 						return false;
 					}
 				})
@@ -99,8 +99,8 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.filter(node -> !HYSTRIX.equals(node.getId()) && !DISK_SPACE.equals(node.getId())
 						&& !DISCOVERY.equals(node.getId()) && !CONFIGSERVER.equals(node.getId()))
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
-				.doOnNext(el -> LOG.info("Health node discovered in url: " + url))
-				.doOnNext(el -> LOG.info("Node added: " + el.getId()))
-				.doOnCompleted(() -> LOG.info("Completed emission of a health node observable from url: " + url));
+				.doOnNext(el -> logger.info("Health node discovered in url: " + url))
+				.doOnNext(el -> logger.info("Node added: " + el.getId()))
+				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url));
 	}
 }
