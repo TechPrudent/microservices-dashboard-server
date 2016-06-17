@@ -1,6 +1,6 @@
-[![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
+[ ![Codeship Status for ordina-jworks/microservices-dashboard-server](https://codeship.com/projects/29bfd6e0-de37-0133-bed6-5e9acf2db2e6/status?branch=master)](https://codeship.com/projects/144644)
 
-[![coveralls](https://coveralls.io/repos/github/ordina-jworks/microservices-dashboard-server/badge.svg?branch=master)](https://coveralls.io/github/ordina-jworks/microservices-dashboard-server?branch=master)
+[![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
 
 # microservices-dashboard-server
 
