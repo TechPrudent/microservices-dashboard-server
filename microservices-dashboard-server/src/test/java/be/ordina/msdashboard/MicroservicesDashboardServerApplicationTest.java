@@ -2,44 +2,33 @@ package be.ordina.msdashboard;
 
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import rx.Observable;
+import rx.plugins.DebugHook;
+import rx.plugins.DebugNotification;
+import rx.plugins.DebugNotificationListener;
+import rx.plugins.RxJavaPlugins;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 
 import static be.ordina.msdashboard.JsonHelper.load;
 import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.constants.Constants.ID;
-import static be.ordina.msdashboard.constants.Constants.LINKS;
-import static be.ordina.msdashboard.constants.Constants.NODES;
+import static be.ordina.msdashboard.constants.Constants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -125,7 +114,28 @@ public class MicroservicesDashboardServerApplicationTest {
     @EnableMicroservicesDashboardServer
     public static class TestMicroservicesDashboardServerApplication {
 
+        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
+
         public static void main(String[] args) {
+            RxJavaPlugins.getInstance().registerObservableExecutionHook(new DebugHook(new DebugNotificationListener() {
+                public Object onNext(DebugNotification n) {
+                    logger.info("onNext on " + n);
+                    return super.onNext(n);
+                }
+
+                public Object start(DebugNotification n) {
+                    logger.info("start on " + n);
+                    return super.start(n);
+                }
+
+                public void complete(Object context) {
+                    logger.info("complete on " + context);
+                }
+
+                public void error(Object context, Throwable e) {
+                    logger.error("error on " + context);
+                }
+            }));
         }
     }
 }

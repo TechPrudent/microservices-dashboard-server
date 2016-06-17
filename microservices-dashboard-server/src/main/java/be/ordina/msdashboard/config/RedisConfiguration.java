@@ -75,7 +75,7 @@ public class RedisConfiguration {
 
     private class InMemoryRedis {
 
-        @Value("${spring.redis.port}")
+        @Value("${spring.redis.port:6379}")
         private int redisPort;
 
         private RedisServer redisServer;

@@ -1,5 +1,6 @@
 package be.ordina.msdashboard;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.assertj.core.util.Arrays;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,9 +10,15 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
+import rx.plugins.DebugHook;
+import rx.plugins.DebugNotification;
+import rx.plugins.DebugNotificationListener;
+import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -187,4 +194,149 @@ public class ObservableTests {
         Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable);
         mergedObservable.toBlocking().subscribe(LOG::info);
     }
+
+    @Test
+    public void testingObserveOn() throws InterruptedException {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            LOG.info(notification.toString());
+        }).take(10);
+        observable1.observeOn(Schedulers.computation());
+        observable1.toBlocking().subscribe(s -> {
+            LOG.info("Got {}", s);
+        }, e -> LOG.error(e.getMessage(), e), () -> LOG.info("Completed"));
+    }
+
+    @Test
+    public void testingSubscribeOn() throws InterruptedException {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            LOG.info(notification.toString());
+        }).take(10);
+        observable1.subscribeOn(Schedulers.computation());
+        observable1.toBlocking().subscribe(s -> {
+            LOG.info("Got {}", s);
+        }, e -> LOG.error(e.getMessage(), e), () -> LOG.info("Completed"));
+    }
+
+    @Test
+    public void testWithoutObserveOnOrSubscribeOn() throws InterruptedException {
+        Observable<String> observable = Observable.<String>create(s -> {
+            LOG.info("Start: Executing a Service");
+            for (int i = 1; i <= 3; i++) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                LOG.info("Emitting {}", "root " + i);
+                s.onNext("root " + i);
+            }
+            LOG.info("End: Executing a Service");
+            s.onCompleted();
+        });
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        observable.subscribe(s -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            LOG.info("Got {}", s);
+        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+
+        latch.await();
+    }
+
+    @Test
+    public void testWithSubscribeOn() throws InterruptedException {
+        ExecutorService executor1 = Executors.newFixedThreadPool(5, new ThreadFactoryBuilder().setNameFormat("SubscribeOn-%d").build());
+        Observable<String> observable = Observable.<String>create(s -> {
+            LOG.info("Start: Executing a Service");
+            for (int i = 1; i <= 3; i++) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                LOG.info("Emitting {}", "root " + i);
+                s.onNext("root " + i);
+            }
+            LOG.info("End: Executing a Service");
+            s.onCompleted();
+        });
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        observable.subscribeOn(Schedulers.from(executor1)).subscribe(s -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            LOG.info("Got {}", s);
+        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+
+        latch.await();
+    }
+
+    @Test
+    public void testWithObserveOn() throws InterruptedException {
+        ExecutorService executor1 = Executors.newFixedThreadPool(5, new ThreadFactoryBuilder().setNameFormat("SubscribeOn-%d").build());
+        Observable<String> observable = Observable.<String>create(s -> {
+            LOG.info("Start: Executing a Service");
+            for (int i = 1; i <= 3; i++) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                LOG.info("Emitting {}", "root " + i);
+                s.onNext("root " + i);
+            }
+            LOG.info("End: Executing a Service");
+            s.onCompleted();
+        });
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        observable.observeOn(Schedulers.from(executor1)).subscribe(s -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            LOG.info("Got {}", s);
+        }, e -> LOG.error(e.getMessage(), e), () -> latch.countDown());
+
+        latch.await();
+    }
+
+    @Test
+    public void testRxJavaDebug() {
+        RxJavaPlugins.getInstance().registerObservableExecutionHook(new DebugHook(new DebugNotificationListener() {
+            public Object onNext(DebugNotification n) {
+                LOG.info("onNext on " + n);
+                return super.onNext(n);
+            }
+
+            public Object start(DebugNotification n) {
+                LOG.info("start on " + n);
+                return super.start(n);
+            }
+
+            public void complete(Object context) {
+                LOG.info("complete on " + context);
+            }
+
+            public void error(Object context, Throwable e) {
+                LOG.error("error on " + context);
+            }
+        }));
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            LOG.info(notification.toString());
+        }).take(10);
+        observable1.toBlocking().subscribe(System.out::println);
+    }
+
 }
