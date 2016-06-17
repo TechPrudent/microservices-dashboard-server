@@ -16,6 +16,7 @@ import be.ordina.msdashboard.store.SimpleStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,8 +49,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
     @Autowired
     private CacheCleaningBean cacheCleaningBean;
 
-    @Autowired
-    private HealthIndicatorsAggregator healthIndicatorsAggregator;
+    @Autowired(required = false)
+    private List<NodeAggregator> aggregators = new ArrayList<>();
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -68,33 +70,23 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
 
     @Bean
     public DependenciesResourceService dependenciesResourceService() {
-        List<NodeAggregator> aggregators = Arrays.asList(healthIndicatorsAggregator,
-                indexesAggregator(),
-                pactsAggregator());
-
         return new DependenciesResourceService(aggregators, nodeStore);
     }
 
     @Bean
-    public DependenciesGraphResourceJsonBuilder dependenciesGraphResourceJsonBuilder() {
-        return new DependenciesGraphResourceJsonBuilder(healthIndicatorsAggregator,
-                indexesAggregator(),
-                pactsAggregator(),
-                nodeStore,
-                virtualAndRealDependencyIntegrator());
-    }
-
-    @Bean
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
     public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
         return new HealthIndicatorsAggregator(discoveryClient);
     }
 
     @Bean
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
     public IndexesAggregator indexesAggregator() {
         return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient);
     }
 
     @Bean
+    @ConditionalOnProperty("pact-broker.url")
     public PactsAggregator pactsAggregator() {
         return new PactsAggregator();
     }
@@ -103,7 +95,6 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
     public VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator() {
         return new VirtualAndRealDependencyIntegrator();
     }
-
 
     @Bean
     @ConditionalOnMissingBean

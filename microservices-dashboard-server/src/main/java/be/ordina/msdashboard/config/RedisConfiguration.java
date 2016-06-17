@@ -7,6 +7,7 @@ import be.ordina.msdashboard.converters.NodeSerializer;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.store.NodeStore;
 import be.ordina.msdashboard.store.RedisStore;
+import be.ordina.msdashboard.config.RedisConfiguration.RedisOrMockCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -21,6 +23,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
 import org.springframework.data.redis.cache.RedisCacheManager;
@@ -41,6 +44,7 @@ import java.lang.reflect.Method;
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CachingProperties.class)
+@Conditional(RedisOrMockCondition.class)
 @AutoConfigureBefore(WebConfiguration.class)
 @AutoConfigureAfter(RedisAutoConfiguration.class)
 @SuppressWarnings("SpringJavaAutowiringInspection")
@@ -68,7 +72,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "redis.mock", matchIfMissing = false)
+    @ConditionalOnProperty("redis.mock")
     public InMemoryRedis inMemoryRedis() {
         return new InMemoryRedis();
     }
@@ -125,5 +129,19 @@ public class RedisConfiguration {
                 return sb.toString();
             }
         };
+    }
+
+    static class RedisOrMockCondition extends AnyNestedCondition {
+
+        RedisOrMockCondition() {
+            super(ConfigurationPhase.PARSE_CONFIGURATION);
+        }
+
+        @ConditionalOnProperty("spring.redis.host")
+        static class SpringRedisCondition {}
+
+        @ConditionalOnProperty("redis.mock")
+        static class MockRedisCondition {}
+
     }
 }
