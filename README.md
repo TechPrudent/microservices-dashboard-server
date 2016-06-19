@@ -1,8 +1,10 @@
-[ ![Codeship Status for ordina-jworks/microservices-dashboard-server](https://codeship.com/projects/29bfd6e0-de37-0133-bed6-5e9acf2db2e6/status?branch=master)](https://codeship.com/projects/144644)
-
-[![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
-
 # microservices-dashboard-server
+[ ![Codeship Status for ordina-jworks/microservices-dashboard-server](https://codeship.com/projects/29bfd6e0-de37-0133-bed6-5e9acf2db2e6/status?branch=master)](https://codeship.com/projects/144644)
+[![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
+[![][license img]][license]
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/ordina-jworks/microservices-dashboard-server.svg)](http://isitmaintained.com/project/ordina-jworks/microservices-dashboard-server "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/ordina-jworks/microservices-dashboard-server.svg)](http://isitmaintained.com/project/ordina-jworks/microservices-dashboard-server "Percentage of issues still open")
+[ ![Download](https://api.bintray.com/packages/ordina-jworks/microservices-dashboard-server/microservices-dashboard-server/images/download.svg) ](https://bintray.com/ordina-jworks/microservices-dashboard-server/microservices-dashboard-server/_latestVersion)
 
 ## Overview
 
@@ -29,6 +31,21 @@ Build the microservices-dashboard-server project from source (see below), and ad
 	<artifactId>microservices-dashboard-server</artifactId>
 	<version>x.y.z</version>
 </dependency>
+```
+
+In case you use a `SNAPSHOT` version, add the JFrog OSS Artifactory repository:
+
+```xml
+<repositories>
+	<repository>
+		<id>oss-snapshots</id>
+		<name>JFrog OSS Snapshots</name>
+		<url>https://oss.jfrog.org/simple/oss-snapshot-local/</url>
+		<snapshots>
+			<enabled>true</enabled>
+		</snapshots>
+	</repository>
+</repositories>
 ```
 
 Pull in the Microservices Dashboard Server configuration via adding `@EnableMicroservicesDashboardServer` to your configuration:
@@ -95,3 +112,6 @@ java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 
 To enable Spring debug logging, add ```--debug``` to the command.
 
 Make sure to use actuator endpoints such as ```/autoconfig``` and ```/beans``` for validating the right beans have been loaded.
+
+[license]:LICENSE-2.0.txt
+[license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
