@@ -115,6 +115,8 @@ public class IndexToNodeConverter {
 			if (curie.has(CURIE_NAME) && curie.getString(CURIE_NAME).equals(namespace)) {
 				return serviceUri + curie.getString(HREF).replace("{rel}", linkKey.substring(linkKey.indexOf(":") + 1));
 			}
+
+			++i;
 		}
 
 		return null;

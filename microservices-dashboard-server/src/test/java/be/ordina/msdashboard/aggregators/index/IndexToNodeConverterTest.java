@@ -70,7 +70,6 @@ public class IndexToNodeConverterTest {
 
         checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1");
         checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2");
-
     }
 
     @Test
@@ -99,6 +98,38 @@ public class IndexToNodeConverterTest {
         checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1");
         checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2");
 
+    }
+
+    @Test
+    public void linksWithCuriesWithMissingNamespaceShouldReturnThreeSimpleNodes() throws InterruptedException {
+        List<Node> nodes = convertSource("{" +
+                "  \"_links\": {\n" +
+                "    \"svc1:svc1rsc1\": {\n" +
+                "      \"href\": \"http://host0015.local:8301/svc1rsc1\",\n" +
+                "      \"templated\": true\n" +
+                "    },\n" +
+                "    \"svc1:svc1rsc2\": {\n" +
+                "      \"href\": \"http://host0015.local:8301/svc1rsc2\",\n" +
+                "      \"templated\": true\n" +
+                "    },\n" +
+                "    \"curies\": [\n" +
+                "      {\n" +
+                "        \"href\": \"/generated-docs/api-guide.html#resources-{rel}\",\n" +
+                "        \"name\": \"svc2\",\n" +
+                "        \"templated\": true\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}");
+        assertThat(nodes).hasSize(3);
+
+        Iterator<Node> iterator = nodes.iterator();
+        Node serviceNode = iterator.next();
+        assertThat(serviceNode.getId()).isEqualTo("service");
+        assertThat(serviceNode.getLinkedFromNodeIds()).contains("svc1:svc1rsc1", "svc1:svc1rsc2");
+
+        checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1");
+        checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2");
     }
 
     @Test
