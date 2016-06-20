@@ -79,6 +79,7 @@ public class MicroservicesDashboardServerApplicationTest {
 
         ObjectMapper m = new ObjectMapper();
         Map<String, List> r = m.readValue(body, Map.class);
+        // printLinks(r);
         assertLinkBetweenIds(r, "svc1:svc1rsc1", "service1");
         assertLinkBetweenIds(r, "svc1:svc1rsc2", "service1");
         assertLinkBetweenIds(r, "svc1:svc1rsc3", "service1");
@@ -104,6 +105,18 @@ public class MicroservicesDashboardServerApplicationTest {
         assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(22);
         assertThat(totalTime).isLessThan(10000);
         // assertThat(totalTime).isLessThan(4500); // should be the case after reactive improvements
+    }
+
+    private void printLinks(Map<String, List> r) {
+        List<Object> nodes = (List<Object>) r.get(NODES);
+        List<Map<String, Integer>> links = (List<Map<String, Integer>>) r.get(LINKS);
+        for (Map<String, Integer> link : links) {
+            int sourceIndex = link.get("source");
+            int targetIndex = link.get("target");
+            String sourceNodeId = (String) ((Map) nodes.get(sourceIndex)).get(ID);
+            String targetNodeId = (String) ((Map) nodes.get(targetIndex)).get(ID);
+            System.out.println("Graph contains links between: " + sourceNodeId + " and " + targetNodeId);
+        }
     }
 
     private static void assertLinkBetweenIds(Map<String, List> r, String source, String target) throws IOException {

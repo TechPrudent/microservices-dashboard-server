@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.aggregators;
 
-import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.store.NodeStore;
+import be.ordina.msdashboard.stores.NodeStore;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

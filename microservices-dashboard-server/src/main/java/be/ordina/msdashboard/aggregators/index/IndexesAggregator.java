@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.index;
+package be.ordina.msdashboard.aggregators.index;
 
-import be.ordina.msdashboard.aggregator.NodeAggregator;
+import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.reactivex.netty.RxNetty;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
@@ -42,10 +42,13 @@ public class IndexesAggregator implements NodeAggregator {
 
     private final DiscoveryClient discoveryClient;
     private final IndexToNodeConverter indexToNodeConverter;
+    private UriResolver uriResolver;
 
-    public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient) {
+    public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient,
+                             UriResolver uriResolver) {
         this.indexToNodeConverter = indexToNodeConverter;
         this.discoveryClient = discoveryClient;
+        this.uriResolver = uriResolver;
     }
 
     //TODO: Caching
@@ -103,9 +106,7 @@ public class IndexesAggregator implements NodeAggregator {
     }
 
     private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
-        //TODO: getUri() on ServiceInstance is not including contextRoot
-        //We should include it when the service has a contextRoot
-        final String uri = serviceInstance.getUri().toString();
+        final String uri = uriResolver.resolveHomePageUrl(serviceInstance);
         if (logger.isDebugEnabled()) {
             logger.debug("Creating GET request to '{}'...", uri);
         }
@@ -129,6 +130,6 @@ public class IndexesAggregator implements NodeAggregator {
                 })
                 .flatMap(r -> r.getContent().map(bb -> bb.toString(Charset.defaultCharset())))
                 .observeOn(Schedulers.computation())
-                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId(), uri, source));
+                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), uri, source));
     }
 }

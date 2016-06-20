@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.health;
+package be.ordina.msdashboard.aggregators.health;
 
 import static be.ordina.msdashboard.constants.Constants.CONFIGSERVER;
 import static be.ordina.msdashboard.constants.Constants.DISCOVERY;
@@ -22,7 +22,6 @@ import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
 import static be.ordina.msdashboard.constants.Constants.TOOLBOX;
 import static be.ordina.msdashboard.constants.Constants.TYPE;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 

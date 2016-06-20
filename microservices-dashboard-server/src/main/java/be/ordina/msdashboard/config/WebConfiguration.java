@@ -15,20 +15,25 @@
  */
 package be.ordina.msdashboard.config;
 
-import be.ordina.msdashboard.aggregator.NodeAggregator;
-import be.ordina.msdashboard.aggregator.VirtualAndRealDependencyIntegrator;
-import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregator.index.IndexToNodeConverter;
-import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
+import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.aggregators.VirtualAndRealDependencyIntegrator;
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexToNodeConverter;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.controllers.NodesController;
 import be.ordina.msdashboard.properties.Labels;
 import be.ordina.msdashboard.services.DependenciesResourceService;
-import be.ordina.msdashboard.store.NodeStore;
-import be.ordina.msdashboard.store.SimpleStore;
+import be.ordina.msdashboard.stores.NodeStore;
+import be.ordina.msdashboard.stores.SimpleStore;
+import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
+import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
+import be.ordina.msdashboard.uriresolvers.UriResolver;
+import com.netflix.discovery.EurekaClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,6 +42,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -49,26 +55,7 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties
 @AutoConfigureAfter({ RedisConfiguration.class })
-public class WebConfiguration extends WebMvcConfigurerAdapter implements ApplicationContextAware {
-
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private DiscoveryClient discoveryClient;
-
-    @Autowired
-    private NodeStore nodeStore;
-
-    @Autowired
-    private CacheCleaningBean cacheCleaningBean;
-
-    @Autowired(required = false)
-    private List<NodeAggregator> aggregators = new ArrayList<>();
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+public class WebConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     @ConditionalOnMissingBean
@@ -76,32 +63,63 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
         return new Labels();
     }
 
-    @Bean
-    public NodesController nodesController() {
-        return new NodesController(dependenciesResourceService(), nodeStore, cacheCleaningBean);
+    @Configuration
+    @AutoConfigureAfter({ EurekaConfiguration.class, AggregatorsConfiguration.class })
+    public static class DependenciesResourceConfiguration {
+
+        @Autowired
+        private NodeStore nodeStore;
+
+        @Autowired
+        private CacheCleaningBean cacheCleaningBean;
+
+        @Autowired(required = false)
+        private List<NodeAggregator> aggregators = new ArrayList<>();
+
+        @Bean
+        public DependenciesResourceService dependenciesResourceService() {
+            return new DependenciesResourceService(aggregators, nodeStore);
+        }
+
+        @Bean
+        public NodesController nodesController() {
+            return new NodesController(dependenciesResourceService(), nodeStore, cacheCleaningBean);
+        }
+
     }
 
-    @Bean
-    public DependenciesResourceService dependenciesResourceService() {
-        return new DependenciesResourceService(aggregators, nodeStore);
-    }
-
-    @Bean
+    @Configuration
     @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
-    public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
-        return new HealthIndicatorsAggregator(discoveryClient);
+    public static class EurekaConfiguration {
+
+        @Autowired
+        private DiscoveryClient discoveryClient;
+
+        @Bean
+        public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver());
+        }
+
+        @Bean
+        public IndexesAggregator indexesAggregator() {
+            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver());
+        }
+
+        @Bean
+        public UriResolver uriResolver() {
+            return new EurekaUriResolver();
+        }
+
     }
 
-    @Bean
-    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
-    public IndexesAggregator indexesAggregator() {
-        return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient);
-    }
+    @Configuration
+    public static class AggregatorsConfiguration {
 
-    @Bean
-    @ConditionalOnProperty("pact-broker.url")
-    public PactsAggregator pactsAggregator() {
-        return new PactsAggregator();
+        @Bean
+        @ConditionalOnProperty("pact-broker.url")
+        public PactsAggregator pactsAggregator() {
+            return new PactsAggregator();
+        }
     }
 
     @Bean
@@ -119,5 +137,11 @@ public class WebConfiguration extends WebMvcConfigurerAdapter implements Applica
     @ConditionalOnMissingBean
     public CacheCleaningBean cacheCleaningBean() {
         return null;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UriResolver uriResolver() {
+        return new DefaultUriResolver();
     }
 }

@@ -15,11 +15,11 @@
  */
 package be.ordina.msdashboard.services;
 
-import be.ordina.msdashboard.aggregator.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregator.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregator.pact.PactsAggregator;
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.converters.ObjectToJsonConverter;
-import be.ordina.msdashboard.store.NodeStore;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.health;
+package be.ordina.msdashboard.aggregators.health;
 
-import be.ordina.msdashboard.aggregator.NodeAggregator;
+import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -42,9 +43,11 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private static final Logger logger = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private DiscoveryClient discoveryClient;
+	private UriResolver uriResolver;
 
-	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient) {
+	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver) {
 		this.discoveryClient = discoveryClient;
+		this.uriResolver = uriResolver;
 	}
 
 	//TODO: Caching
@@ -52,10 +55,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	@Override
 	public Observable<Node> aggregateNodes() {
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
-				//TODO: getUri() on ServiceInstance is not including managementContextPath or contextRoot
-				//We should include it when the service has a managementContextPath
-				//Also, if the service has a contextRoot, we should add that as well!
-				.map(id -> new ImmutablePair<String, String>(id, discoveryClient.getInstances(id).get(0).getUri().toString() + "/health"))
+				.map(id -> new ImmutablePair<String, String>(id, uriResolver.resolveHealthCheckUrl(discoveryClient.getInstances(id).get(0))))
 				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
 				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
 				/*.flatMap(el -> el, throwable -> {
@@ -73,7 +73,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
 		Observable<String> serviceIds = Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io());
-		serviceIds.filter(id -> !id.equals(ZUUL_ID));
+		serviceIds.map(id -> id.toLowerCase()).filter(id -> !id.equals(ZUUL_ID));
 		return serviceIds;
 	}
 

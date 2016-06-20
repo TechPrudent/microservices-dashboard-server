@@ -37,7 +37,7 @@ public class NodeMerger {
             // Aggregator specific logic should not come here, eg. removing the Eureka description
 
             Optional<Integer> nodeIndex = mergedNodes.stream()
-                    .filter(n -> n.getId().equals(node.getId()))
+                    .filter(n -> n.getId().equalsIgnoreCase(node.getId()))
                     .map(mergedNodes::indexOf)
                     .findFirst();
 

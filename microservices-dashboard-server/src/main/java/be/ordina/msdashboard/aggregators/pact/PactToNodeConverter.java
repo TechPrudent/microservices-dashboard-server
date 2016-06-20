@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.pact;
+package be.ordina.msdashboard.aggregators.pact;
 
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;

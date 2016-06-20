@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.index;
+package be.ordina.msdashboard.aggregators.index;
 
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
+import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
+import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientResponse;
@@ -53,13 +55,15 @@ public class IndexesAggregatorTest {
     private DiscoveryClient discoveryClient;
     private IndexToNodeConverter indexToNodeConverter;
     private IndexesAggregator indexesAggregator;
+    private UriResolver uriResolver;
 
     @Before
     public void setup() {
         discoveryClient = Mockito.mock(DiscoveryClient.class);
         // TODO mock this
         indexToNodeConverter = new IndexToNodeConverter();
-        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient);
+        uriResolver = new DefaultUriResolver();
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver);
 
         PowerMockito.mockStatic(RxNetty.class);
     }

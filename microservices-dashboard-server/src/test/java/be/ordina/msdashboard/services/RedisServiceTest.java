@@ -16,7 +16,7 @@
 package be.ordina.msdashboard.services;
 
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.store.RedisStore;
+import be.ordina.msdashboard.stores.RedisStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -29,7 +29,6 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;

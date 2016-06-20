@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.store;
+package be.ordina.msdashboard.stores;
 
 import java.util.ArrayList;
 import java.util.Collection;

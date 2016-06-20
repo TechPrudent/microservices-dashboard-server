@@ -21,12 +21,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.services.DependenciesResourceService;
-import be.ordina.msdashboard.store.NodeStore;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
 

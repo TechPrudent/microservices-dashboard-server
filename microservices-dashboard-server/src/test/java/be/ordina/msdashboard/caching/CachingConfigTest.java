@@ -19,7 +19,7 @@ import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CachingProperties;
 import be.ordina.msdashboard.config.RedisConfiguration;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.store.RedisStore;
+import be.ordina.msdashboard.stores.RedisStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

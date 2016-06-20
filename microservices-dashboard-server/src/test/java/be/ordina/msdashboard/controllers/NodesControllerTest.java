@@ -18,7 +18,7 @@ package be.ordina.msdashboard.controllers;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.services.DependenciesResourceService;
-import be.ordina.msdashboard.store.NodeStore;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

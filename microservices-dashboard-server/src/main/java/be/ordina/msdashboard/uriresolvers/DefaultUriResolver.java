@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator;
+package be.ordina.msdashboard.uriresolvers;
 
-import be.ordina.msdashboard.model.Node;
-import rx.Observable;
+import org.springframework.cloud.client.ServiceInstance;
 
 /**
  * @author Andreas Evers
  */
-public interface NodeAggregator {
+public class DefaultUriResolver implements UriResolver {
 
-    Observable<Node> aggregateNodes();
+    @Override
+    public String resolveHomePageUrl(ServiceInstance instance) {
+        return instance.getUri().toString();
+    }
+
+    @Override
+    public String resolveHealthCheckUrl(ServiceInstance instance) {
+        return instance.getUri() + "/health";
+    }
 }

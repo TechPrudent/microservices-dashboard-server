@@ -13,30 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.store;
+package be.ordina.msdashboard.uriresolvers;
 
-import be.ordina.msdashboard.model.Node;
-import rx.Observable;
-
-import java.util.Collection;
+import org.springframework.cloud.client.ServiceInstance;
 
 /**
  * @author Andreas Evers
  */
-public interface NodeStore {
+public interface UriResolver {
 
-    String KEY_PREFIX = "virtual:";
-    String VIRTUAL_FLAG = "virtual";
+    String resolveHomePageUrl(ServiceInstance instance);
 
-    Collection<Node> getAllNodes();
+    String resolveHealthCheckUrl(ServiceInstance instance);
 
-    Observable<Node> getAllNodesAsObservable();
-
-    void saveNode(String nodeData);
-
-    void deleteNode(String nodeId);
-
-    void deleteAllNodes();
-
-    void flushDB();
 }

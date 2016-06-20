@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.health;
+package be.ordina.msdashboard.aggregators.health;
 
 import static be.ordina.msdashboard.constants.Constants.*;
 import static be.ordina.msdashboard.constants.Constants.HYSTRIX;
@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import rx.Observable;
 

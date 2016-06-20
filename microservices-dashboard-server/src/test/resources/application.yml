@@ -25,9 +25,9 @@ admin:
 
 eureka:
   client:
-    enabled: false
+    enabled: true
     serviceUrl:
-      defaultZone: http://localhost:7878/eureka/
+      defaultZone: http://localhost:8089/eureka/
 
 pact-broker:
   url: http://localhost:8089

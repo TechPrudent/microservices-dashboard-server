@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.aggregator.pact;
+package be.ordina.msdashboard.aggregators.pact;
 
-import be.ordina.msdashboard.aggregator.NodeAggregator;
+import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
 import com.jayway.jsonpath.JsonPath;
 import io.reactivex.netty.RxNetty;

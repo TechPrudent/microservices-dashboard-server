@@ -15,16 +15,12 @@
  */
 package be.ordina.msdashboard.services;
 
-import be.ordina.msdashboard.aggregator.NodeAggregator;
-import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.store.NodeStore;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 import java.util.*;
