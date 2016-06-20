@@ -16,6 +16,7 @@
 package be.ordina.msdashboard.aggregators.index;
 
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
@@ -39,10 +40,7 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -60,8 +58,7 @@ public class IndexesAggregatorTest {
     @Before
     public void setup() {
         discoveryClient = Mockito.mock(DiscoveryClient.class);
-        // TODO mock this
-        indexToNodeConverter = new IndexToNodeConverter();
+        indexToNodeConverter = Mockito.mock(IndexToNodeConverter.class);
         uriResolver = new DefaultUriResolver();
         indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver);
 
@@ -83,41 +80,21 @@ public class IndexesAggregatorTest {
 
         when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
         ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
-        ByteBufUtil.writeUtf8(byteBuf, "{\n" +
-                "  \"_links\": {\n" +
-                "    \"svc1:svc1rsc1\": {\n" +
-                "      \"href\": \"http://host0015.local:8301/svc1rsc1\",\n" +
-                "      \"templated\": true\n" +
-                "    },\n" +
-                "    \"svc1:svc1rsc2\": {\n" +
-                "      \"href\": \"http://host0015.local:8301/svc1rsc2\",\n" +
-                "      \"templated\": true\n" +
-                "    },\n" +
-                "    \"curies\": [\n" +
-                "      {\n" +
-                "        \"href\": \"/generated-docs/api-guide.html#resources-{rel}\",\n" +
-                "        \"name\": \"svc1\",\n" +
-                "        \"templated\": true\n" +
-                "      }\n" +
-                "    ]\n" +
-                "  }\n" +
-                "}");
+        ByteBufUtil.writeUtf8(byteBuf, "source");
         when(response.getContent()).thenReturn(Observable.just(byteBuf));
+
+        Node node = new NodeBuilder().withId("service").build();
+
+        when(indexToNodeConverter.convert("service", "http://localhost:8089/service", "source")).thenReturn(Observable.just(node));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
         testSubscriber.assertNoErrors();
 
         List<Node> nodes = testSubscriber.getOnNextEvents();
-        assertThat(nodes).hasSize(3);
+        assertThat(nodes).hasSize(1);
 
-        Iterator<Node> iterator = nodes.iterator();
-        Node serviceNode = iterator.next();
-        assertThat(serviceNode.getId()).isEqualTo("service");
-        assertThat(serviceNode.getLinkedFromNodeIds()).contains("svc1:svc1rsc1", "svc1:svc1rsc2");
-
-        checkResource(iterator.next(), "svc1:svc1rsc1", "http://host0015.local:8301/svc1rsc1", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc1");
-        checkResource(iterator.next(), "svc1:svc1rsc2", "http://host0015.local:8301/svc1rsc2", "http://localhost:8089/service/generated-docs/api-guide.html#resources-svc1rsc2");
+        assertThat(nodes.get(0).getId()).isEqualTo("service");
     }
 
     @Test
@@ -168,71 +145,6 @@ public class IndexesAggregatorTest {
 
         List<Node> nodes = testSubscriber.getOnNextEvents();
         assertThat(nodes).hasSize(0);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void wrongIndexResponseShouldReturnZeroNodes() throws InterruptedException {
-        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
-        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
-        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
-
-        when(instance.getServiceId()).thenReturn("service");
-        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
-
-        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
-        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
-
-        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
-        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
-        ByteBufUtil.writeUtf8(byteBuf, "No JSON here");
-        when(response.getContent()).thenReturn(Observable.just(byteBuf));
-
-        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
-        testSubscriber.assertNoErrors();
-
-        List<Node> nodes = testSubscriber.getOnNextEvents();
-        assertThat(nodes).hasSize(0);
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void malformedJsonIndexResponseShouldReturnZeroNodes() throws InterruptedException {
-        when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
-        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
-        when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
-
-        when(instance.getServiceId()).thenReturn("service");
-        when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
-
-        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
-        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
-
-        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
-        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
-        ByteBufUtil.writeUtf8(byteBuf, "{}");
-        when(response.getContent()).thenReturn(Observable.just(byteBuf));
-
-        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
-        testSubscriber.assertNoErrors();
-
-        List<Node> nodes = testSubscriber.getOnNextEvents();
-        assertThat(nodes).hasSize(0);
-    }
-
-    private void checkResource(Node resource, String id, String url, String docs) {
-        assertThat(resource.getId()).isEqualTo(id);
-        assertThat(resource.getLinkedToNodeIds()).contains("service");
-        assertThat(resource.getLane()).isEqualTo(1);
-        assertThat(resource.getDetails()).isNotEmpty();
-
-        Map<String, Object> details = resource.getDetails();
-        assertThat(details.get("status")).isEqualTo("UP");
-        assertThat(details.get("type")).isEqualTo("RESOURCE");
-        assertThat(details.get("url")).isEqualTo(url);
-        assertThat(details.get("docs")).isEqualTo(docs);
     }
 
 }
