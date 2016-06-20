@@ -34,8 +34,8 @@ public class GraphMapperTest {
     public void shouldReturnGraphMap() {
         Node uiComponentNode = new NodeBuilder().withId("ui").withDetail(TYPE, UI_COMPONENT).withLinkedToNodeId("resource").build();
         Node resourceNode = new NodeBuilder().withId("resource").withDetail(TYPE, RESOURCE).withLinkedToNodeId("microservice").build();
-        Node microserviceNode = new NodeBuilder().withId("microservice").withDetail(TYPE, MICROSERVICE).withLinkedToNodeId("backend").build();
-        Node backendNode = new NodeBuilder().withId("backend").withDetail(TYPE, BACKEND).build();
+        Node microserviceNode = new NodeBuilder().withId("microservice").withDetail(TYPE, MICROSERVICE).withLinkedToNodeId("unknown node").withLinkedToNodeId("backend").build();
+        Node backendNode = new NodeBuilder().withId("backend").withDetail(TYPE, BACKEND).withLinkedFromNodeId("unknown node").build();
         Node unknownNode = new NodeBuilder().withId("virtual node").withLinkedFromNodeId("microservice").build();
 
         Map<String, Object> graph = GraphMapper.toGraph().call(Arrays.asList(uiComponentNode, resourceNode, microserviceNode, backendNode, unknownNode));
