@@ -65,14 +65,13 @@ public class DependenciesResourceService {
 				.observeOn(Schedulers.io())
 				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), NodeMerger.merge())
-				.doOnNext(node -> logger.info("Merged all emitted nodes"))
-				.doOnNext(nodes -> logger.info("Converting to nodes and links map"))
+				.doOnNext(nodes -> logger.info("Merged all emitted nodes, converting to map"))
                 .map(GraphMapper.toGraph())
 				.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
-                .doOnError(throwable -> logger.error("An error occurred: {}", throwable))
+                .doOnError(throwable -> logger.error("An error occurred:", throwable))
 				.toBlocking()
                 .first();
-
+		logger.info("Graph retrieved: {}", nodesAndLinks);
         graph.put(NODES, nodesAndLinks.get(NODES));
         graph.put(LINKS, nodesAndLinks.get(LINKS));
 
