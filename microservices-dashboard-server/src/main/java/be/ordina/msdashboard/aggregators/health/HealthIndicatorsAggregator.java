@@ -16,10 +16,13 @@
 package be.ordina.msdashboard.aggregators.health;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.config.WebConfiguration;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
+import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,8 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import static be.ordina.msdashboard.constants.Constants.*;
@@ -44,10 +49,12 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 
 	private DiscoveryClient discoveryClient;
 	private UriResolver uriResolver;
+	private WebConfiguration.EurekaConfiguration.HeaderProperties headers;
 
-	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver) {
+	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver, WebConfiguration.EurekaConfiguration.HeaderProperties headers) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
+		this.headers = headers;
 	}
 
 	//TODO: Caching
@@ -79,7 +86,11 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 
 	//TODO: Add hook for headers on GET (e.g. globalId)
 	private Observable<Node> getHealthNodesFromService(String serviceId, String url) {
-		return RxNetty.createHttpGet(url)
+		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		for (Entry<String, String> header : headers.getHeaders().entrySet()) {
+			request.withHeader(header.getKey(), header.getValue());
+		}
+		return RxNetty.createHttpRequest(request)
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;

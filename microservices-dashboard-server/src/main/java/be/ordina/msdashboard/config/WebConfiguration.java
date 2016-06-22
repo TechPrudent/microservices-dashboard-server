@@ -31,9 +31,11 @@ import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +44,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Andreas Evers
@@ -91,8 +95,23 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private DiscoveryClient discoveryClient;
 
         @Bean
+        @ConfigurationProperties("msdashboard.requests")
+        public HeaderProperties headers() {
+            return new HeaderProperties();
+        }
+
+        public static class HeaderProperties {
+
+            private Map<String, String> headers = new HashMap<>();
+
+            public Map<String, String> getHeaders() {
+                return this.headers;
+            }
+        }
+
+        @Bean
         public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
-            return new HealthIndicatorsAggregator(discoveryClient, uriResolver());
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), headers());
         }
 
         @Bean
