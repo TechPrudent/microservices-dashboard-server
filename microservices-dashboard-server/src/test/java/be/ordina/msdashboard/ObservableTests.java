@@ -25,16 +25,14 @@ import rx.Notification;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
+import rx.functions.Func2;
 import rx.plugins.DebugHook;
 import rx.plugins.DebugNotification;
 import rx.plugins.DebugNotificationListener;
 import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -352,6 +350,67 @@ public class ObservableTests {
             logger.info(notification.toString());
         }).take(10);
         observable1.toBlocking().subscribe(System.out::println);
+    }
+
+    @Test
+    public void testReduceWithoutError() {
+        Observable<String> observable = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10);
+
+        observable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test
+    public void testMergeAndReduceWithoutError() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10);
+        Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10);
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable);
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test
+    public void testMergeAndReduceWithErrorReturned() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10);
+        Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10).map(i -> throwException(i));
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()));
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info, e -> logger.error("" + e));
+    }
+
+    @Test
+    public void testMergeAndReduceWithErrorIgnored() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10);
+        Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(notification -> {
+            logger.info(notification.toString());
+        }).take(10).map(i -> throwException(i));
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()))
+                .onErrorResumeNext(Observable.empty());
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    private String throwException(String i) {
+        if (i.equals("b4")) {
+            throw new RuntimeException("Error");
+        }
+        return i;
     }
 
 }
