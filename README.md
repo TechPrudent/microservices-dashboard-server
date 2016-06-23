@@ -98,7 +98,9 @@ From there on, you can visit actuator endpoints to validate the server's status 
 
 The graph exposing nodes and links is located under the following URL:
 
-```http://localhost:8383/graph```
+```
+http://localhost:8383/graph
+```
 
 ## Troubleshooting
 
