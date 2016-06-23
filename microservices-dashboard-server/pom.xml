@@ -58,6 +58,11 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <dependency>
+			<groupId>be.ordina</groupId>
+			<artifactId>microservices-dashboard-ui</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
