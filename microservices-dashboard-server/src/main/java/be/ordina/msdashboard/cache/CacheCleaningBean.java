@@ -36,6 +36,7 @@ public class CacheCleaningBean {
 	public void clean() {
 		logger.info("Cleaning cache: " + evict);
 		if (evict) {
+			nodeCache.evictGraphCache();
 			nodeCache.evictHealthsCache();
 			nodeCache.evictIndexesCache();
 			nodeCache.evictPactsCache();

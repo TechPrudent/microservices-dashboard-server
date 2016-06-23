@@ -19,15 +19,22 @@ import be.ordina.msdashboard.model.Node;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
+import java.util.HashMap;
+
 /**
  * @author Andreas Evers
  */
-public class NodeSerializer implements RedisSerializer<Node> {
+public class NodeSerializer implements RedisSerializer<Object> {
 
 	@Override
-	public byte[] serialize(Node node) throws SerializationException {
-		ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
-		return converter.convert(node).getBytes();
+	public byte[] serialize(Object node) throws SerializationException {
+		if (node instanceof Node) {
+			ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
+			return converter.convert((Node) node).getBytes();
+		} else {
+			ObjectToJsonConverter<HashMap> converter = new ObjectToJsonConverter<>();
+			return converter.convert((HashMap) node).getBytes();
+		}
 	}
 
 	@Override

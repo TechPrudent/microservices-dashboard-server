@@ -45,6 +45,7 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.embedded.RedisServer;
 
@@ -78,11 +79,11 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisTemplate<String,Node> redisTemplate(final RedisConnectionFactory factory){
-        RedisTemplate<String, Node> virtualNodeTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate(final RedisConnectionFactory factory){
+        RedisTemplate<String, Object> virtualNodeTemplate = new RedisTemplate<>();
         virtualNodeTemplate.setConnectionFactory(factory);
         virtualNodeTemplate.setKeySerializer(new StringRedisSerializer());
-        virtualNodeTemplate.setValueSerializer(new NodeSerializer());
+        virtualNodeTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return virtualNodeTemplate;
     }
 
@@ -121,7 +122,7 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisCacheManager cacheManager(RedisTemplate<String, Node> redisTemplate) {
+    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
         cacheManager.setDefaultExpiration(cachingProperties.getDefaultExpiration());
         RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();

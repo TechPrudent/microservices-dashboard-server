@@ -16,10 +16,12 @@
 package be.ordina.msdashboard.services;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -47,8 +49,7 @@ public class DependenciesResourceService {
 		this.redisService = redisService;
 	}
 
-    // TODO: Caching
-    //@Cacheable
+	@Cacheable(value = Constants.GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Map<String, Object> getDependenciesGraphResourceJson() {
 		List<Observable<Node>> observables = aggregators.stream()
 				.collect(Collectors.mapping(NodeAggregator::aggregateNodes, Collectors.toList()));

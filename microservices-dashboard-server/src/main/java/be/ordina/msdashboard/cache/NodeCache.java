@@ -22,6 +22,10 @@ import org.springframework.cache.annotation.CacheEvict;
  * @author Andreas Evers
  */
 public interface NodeCache {
+
+    @CacheEvict(value = Constants.GRAPH_CACHE_NAME, allEntries = true)
+    void evictGraphCache();
+
     @CacheEvict(value = Constants.HEALTH_CACHE_NAME, allEntries = true)
     void evictHealthsCache();
 

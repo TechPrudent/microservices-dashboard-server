@@ -34,12 +34,12 @@ import rx.Observable;
 
 public class RedisStore implements NodeCache, NodeStore {
 
-	private RedisTemplate<String, Node> redisTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	private RedisConnectionFactory redisConnectionFactory;
 
 	@Autowired
-	public RedisStore(final RedisTemplate<String, Node> redisTemplate,
+	public RedisStore(final RedisTemplate<String, Object> redisTemplate,
 					  final RedisConnectionFactory redisConnectionFactory) {
 		this.redisTemplate = redisTemplate;
 		((JedisConnectionFactory) redisConnectionFactory).setTimeout(10000);
@@ -51,7 +51,7 @@ public class RedisStore implements NodeCache, NodeStore {
 		List<Node> results = new ArrayList<>();
 		Set<String> keys = redisTemplate.keys(KEY_PREFIX + "*");
 		for (String key : keys) {
-			Node node = redisTemplate.opsForValue().get(key);
+			Node node = (Node) redisTemplate.opsForValue().get(key);
 			results.add(node);
 		}
 		return results;
@@ -68,16 +68,19 @@ public class RedisStore implements NodeCache, NodeStore {
 		String nodeId = node.getId();
 		node.getDetails().put(VIRTUAL_FLAG, true);
 		redisTemplate.opsForValue().set(KEY_PREFIX + nodeId, node);
+		evictGraphCache();
 	}
 
 	@Override
 	public void deleteNode(final String nodeId) {
 		redisTemplate.delete(nodeId);
+		evictGraphCache();
 	}
 
 	@Override
 	public void deleteAllNodes() {
 		redisTemplate.delete(redisTemplate.keys("*"));
+		evictGraphCache();
 	}
 
 	private Node getNode(String nodeData) {
@@ -88,6 +91,11 @@ public class RedisStore implements NodeCache, NodeStore {
 	@Override
 	public void flushDB() {
 		redisConnectionFactory.getConnection().flushDb();
+	}
+
+	@Override
+	@CacheEvict(value = Constants.GRAPH_CACHE_NAME, allEntries = true)
+	public void evictGraphCache() {
 	}
 
 	@Override

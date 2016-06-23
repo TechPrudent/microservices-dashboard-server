@@ -43,7 +43,7 @@ public class CachingConfigTest {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldReturnARedisCacheManager() {
-        RedisTemplate<String, Node> redisTemplate = mock(RedisTemplate.class);
+        RedisTemplate<String, Object> redisTemplate = mock(RedisTemplate.class);
 
         when(cachingProperties.getDefaultExpiration()).thenReturn(30L);
         when(cachingProperties.getRedisCachePrefix()).thenReturn("prefix");
