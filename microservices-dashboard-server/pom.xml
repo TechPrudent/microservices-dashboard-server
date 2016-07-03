@@ -242,6 +242,14 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
+        <repository>
+            <id>oss-snapshots</id>
+            <name>JFrog OSS Snapshots</name>
+            <url>https://oss.jfrog.org/simple/oss-snapshot-local/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <build>
