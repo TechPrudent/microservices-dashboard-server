@@ -1,4 +1,5 @@
 # microservices-dashboard-server
+[![Gitter](https://badges.gitter.im/ordina-jworks/microservices-dashboard.svg)](https://gitter.im/ordina-jworks/microservices-dashboard?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [ ![Codeship Status for ordina-jworks/microservices-dashboard-server](https://codeship.com/projects/29bfd6e0-de37-0133-bed6-5e9acf2db2e6/status?branch=master)](https://codeship.com/projects/144644)
 [![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
 [![][license img]][license]
@@ -21,7 +22,7 @@ Either by creating a new Spring Boot application and enhancing it with our depen
 
 ### Using a vanilla Spring Boot application
 
-First you need to setup your server. To do this just setup a simple boot project (using [start.spring.io](start.spring.io) for example).
+First you need to setup your server. To do this just setup a simple boot project (using [start.spring.io](http://start.spring.io) for example).
 
 Build the microservices-dashboard-server project from source (see below), and add the artefact as a dependency to your new Spring Boot's dependencies:
 
