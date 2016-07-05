@@ -62,23 +62,15 @@ public class MicroservicesDashboardServerApplication {
 }
 ```
 
-### Using a sample
-
-See the sample documentation located here: https://github.com/ordina-jworks/microservices-dashboard-server/tree/master/samples
-
-## Building from source
-
-Microservices-dashboard-server requires Java 8 or later and is built using maven:
-
-```bash
-mvn install
-```
-
 If successful, you should see the following output in the log:
 
 > o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8080 (http)
 
 From there on, you can visit actuator endpoints to validate the server's status such as ```http://localhost:8080/env``` (to see the environment variables), and ```http://localhost:8080/mappings``` (for all the available mappings).
+
+### Using a sample
+
+See the sample documentation located here: https://github.com/ordina-jworks/microservices-dashboard-server/tree/master/samples
 
 ## Available endpoints
 
@@ -112,6 +104,14 @@ You can enable debug logging of the dashboard as well, by adding a ```logback.xm
 
 Make sure to use actuator endpoints such as ```/autoconfig``` and ```/beans``` for validating the right beans have been loaded.
 More information on actuator endpoints can be found here: http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready
+
+## Building from source
+
+Microservices-dashboard-server requires Java 8 or later and is built using maven:
+
+```bash
+mvn install
+```
 
 [license]:LICENSE-2.0.txt
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
