@@ -64,7 +64,7 @@ public class IndexToNodeConverter {
 	private List<Node> getNodesFromJSON(String serviceId, String serviceUri, JSONObject index) {
 		List<Node> nodes = new ArrayList<>();
 
-		NodeBuilder serviceNode = NodeBuilder.node().withId(serviceId);
+		NodeBuilder serviceNode = NodeBuilder.node().withId(serviceId).withLane(2);
 
 		JSONObject links = index.getJSONObject(LINKS);
 		final boolean hasCuries = links.has(CURIES);
