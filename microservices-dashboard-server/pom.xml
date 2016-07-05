@@ -221,6 +221,7 @@
             <artifactId>embedded-redis</artifactId>
             <version>0.6</version>
         </dependency>
+        <!-- TODO: Wiremock test scoped? Wiremock latest version? -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
