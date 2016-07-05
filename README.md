@@ -113,5 +113,23 @@ Microservices-dashboard-server requires Java 8 or later and is built using maven
 mvn install
 ```
 
+## Contributing
+
+Contributors to this project agree to uphold its [code of conduct][1].
+
+There are several that you can contribute to Spring REST Docs:
+
+ - Open a [pull request][2]. Please see the [contributor guidelines][3] for details.
+ - Chat with fellow users [on Gitter][4].
+
+## Licence
+
+Spring REST Docs is open source software released under the [Apache 2.0 license][5].
+
 [license]:LICENSE-2.0.txt
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
+[1]: CODE_OF_CONDUCT.md
+[2]: https://help.github.com/articles/using-pull-requests/
+[3]: CONTRIBUTING.md
+[4]: https://gitter.im/ordina-jworks/microservices-dashboard
+[5]: http://www.apache.org/licenses/LICENSE-2.0.html
