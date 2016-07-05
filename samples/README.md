@@ -1,30 +1,50 @@
-## Building the sample from source
+# Samples
+
+Currently two working samples are available: simple and simple-mocks.
+
+## Sample 1: microservices-dashboard-simple
+The simple sample is a great way to get up and running quickly without any mocks.
+You can use this as a base for your own version of the microservices-dashboard.
+
+## Sample 2: microservices-dashboard-simple-mocks
+This sample builds on top of the simple sample, with mocks enabled.
+
+## Setup
+
+The first step is to clone the Git repository:
 
 ```bash
-cd ./microservices-dashboard-sample
-mvn install
+git clone https://github.com/ordina-jworks/microservices-dashboard-server
 ```
 
-## Running the sample locally
-
-To run the sample application locally, build it from source and run the following command:
+Once the clone is complete, you’re ready to get the service up and running:
 
 ```bash
-java -jar target/microservices-dashboard-server-sample-1.0.0-SNAPSHOT.jar --spring.config.location=./microservices-dashboard-server-configuration/microservices-dashboard-server.yml
+cd samples/microservices-dashboard-simple (or -simple-mocks)
+./mvnw install
+java -jar target/*.jar
 ```
 
 If successful, you should see the following output in the log:
 
-> o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8383 (http)
+> o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8080 (http)
 
-From there on, you can visit actuator endpoints to validate the server's status such as ```http://localhost:8383/env``` (to see the environment variables), and ```http://localhost:8383/mappings``` (for all the available mappings).
+From there on, you can visit actuator endpoints to validate the server's status such as ```http://localhost:8080/env``` (to see the environment variables), and ```http://localhost:8080/mappings``` (for all the available mappings).
+
+## Loading the UI
+
+The UI is located under the root of the webserver:
+
+```
+http://localhost:8080/
+```
 
 ## Available endpoints
 
 The graph exposing nodes and links is located under the following URL:
 
 ```
-http://localhost:8383/graph
+http://localhost:8080/graph
 ```
 
 ## Troubleshooting
@@ -32,7 +52,7 @@ http://localhost:8383/graph
 For remote debugging, run the following command:
 
 ```bash
-java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
+java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/*.jar
 ```
 
 To enable Spring debug logging, add ```--debug``` to the command.
