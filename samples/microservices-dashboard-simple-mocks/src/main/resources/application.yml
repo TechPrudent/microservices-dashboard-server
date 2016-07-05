@@ -1,0 +1,33 @@
+services:
+  mock: true
+redis:
+  mock: true
+
+spring:
+  jackson:
+    mapper:
+      DEFAULT_VIEW_INCLUSION: true
+    serialization:
+      WRITE_NULL_MAP_VALUES: false
+  aop:
+    proxyTargetClass: true
+  redis:
+      host: localhost
+      port: 6379
+      pool:
+        max-wait: 10000
+  cache:
+      default-expiration: 30
+      redis-cache-prefix: graph
+      evict: true
+
+eureka:
+  client:
+    enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8089/eureka/
+
+pact-broker:
+  url: http://localhost:8089
+  latest-url: /pacts/latest
+  self-href-jsonPath: $.pacts[*]._links.self[0].href

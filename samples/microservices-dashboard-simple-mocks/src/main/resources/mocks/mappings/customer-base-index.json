@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/customer-base"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "customer-base-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

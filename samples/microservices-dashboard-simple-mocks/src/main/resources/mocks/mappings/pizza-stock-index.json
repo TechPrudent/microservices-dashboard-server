@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pizza-stock"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pizza-stock-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

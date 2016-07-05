@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/awards/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "awards.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

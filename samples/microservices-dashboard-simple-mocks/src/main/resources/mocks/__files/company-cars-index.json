@@ -1,0 +1,19 @@
+{
+  "_links": {
+    "car:cars": {
+      "href": "http://host0014.local:8381/company-cars/cars",
+      "templated": true
+    },
+    "car:customer": {
+      "href": "http://host0014.local:8381/company-cars/customer/info?requestCharacteristics={requestCharacteristics}",
+      "templated": true
+    },
+    "curies": [
+      {
+        "href": "/company-cars/generated-docs/api-guide.html#resources-{rel}",
+        "name": "car",
+        "templated": true
+      }
+    ]
+  }
+}

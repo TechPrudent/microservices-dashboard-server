@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/ordering-pets/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ordering-pets.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

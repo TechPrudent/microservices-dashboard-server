@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pizza-stock/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pizza-stock.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

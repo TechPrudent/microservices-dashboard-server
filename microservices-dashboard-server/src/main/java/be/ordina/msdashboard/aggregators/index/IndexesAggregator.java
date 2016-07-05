@@ -56,6 +56,8 @@ public class IndexesAggregator implements NodeAggregator {
     public Observable<Node> aggregateNodes() {
         return Observable.from(discoveryClient.getServices())
                 .observeOn(Schedulers.io())
+                .doOnError(e -> logger.error("Error retrieving services: " + e.getMessage()))
+                .onErrorResumeNext(Observable.empty())
                 .doOnNext(service -> {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Sending instance retrieval request for service '{}'", service);
@@ -113,6 +115,8 @@ public class IndexesAggregator implements NodeAggregator {
 
         //TODO: Add hook for headers on GET (e.g. accept = application/hal+json")
         return RxNetty.createHttpGet(uri)
+                .doOnError(e -> logger.error("Error retrieving indexes for uri {}: {}", uri, e.getMessage()))
+                .onErrorResumeNext(Observable.empty())
                 .filter(r -> {
                     if (r.getStatus().code() < 400) {
                         if (logger.isDebugEnabled()) {

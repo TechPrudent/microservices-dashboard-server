@@ -7,3 +7,5 @@ microservices-dashboard-server-sample/target/
 .idea/
 .ssh/
 microservices-dashboard-server/.factorypath
+samples/microservices-dashboard-simple/target
+samples/microservices-dashboard-simple-mocks/target

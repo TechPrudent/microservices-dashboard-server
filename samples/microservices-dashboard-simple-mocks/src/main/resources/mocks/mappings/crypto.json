@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/crypto/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "crypto.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

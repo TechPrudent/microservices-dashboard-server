@@ -18,6 +18,7 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.aggregators.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
 import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
@@ -95,23 +96,14 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private DiscoveryClient discoveryClient;
 
         @Bean
-        @ConfigurationProperties("msdashboard.requests")
-        public HeaderProperties headers() {
-            return new HeaderProperties();
-        }
-
-        public static class HeaderProperties {
-
-            private Map<String, String> headers = new HashMap<>();
-
-            public Map<String, String> getHeaders() {
-                return this.headers;
-            }
-        }
-
-        @Bean
         public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
-            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), headers());
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties());
+        }
+
+        @ConfigurationProperties("msdashboard.health")
+        @Bean
+        public HealthProperties healthProperties() {
+            return new HealthProperties();
         }
 
         @Bean

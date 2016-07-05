@@ -16,7 +16,6 @@
 package be.ordina.msdashboard.aggregators.health;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
-import be.ordina.msdashboard.config.WebConfiguration;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
@@ -29,10 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
@@ -49,12 +48,12 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 
 	private DiscoveryClient discoveryClient;
 	private UriResolver uriResolver;
-	private WebConfiguration.EurekaConfiguration.HeaderProperties headers;
+	private HealthProperties properties;
 
-	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver, WebConfiguration.EurekaConfiguration.HeaderProperties headers) {
+	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver, HealthProperties properties) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
-		this.headers = headers;
+		this.properties = properties;
 	}
 
 	//TODO: Caching
@@ -70,32 +69,38 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
                     return null;
                 }, () -> Observable.just(new Node("endNode")))*/
 				.filter(Objects::nonNull)
-				.doOnNext(el -> logger.info("Unmerged health observable: " + el))
+				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
 				.doOnCompleted(() -> logger.info("Completed getting all health observables"));
 		return Observable.merge(observableObservable)
-				.doOnNext(el -> logger.info("Merged health node! " + el.getId()))
+				.doOnNext(el -> logger.debug("Merged health node: " + el.getId()))
 				.doOnCompleted(() -> logger.info("Completed merging all health observables"));
 	}
 
 	private Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
-		Observable<String> serviceIds = Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io());
-		serviceIds.map(id -> id.toLowerCase()).filter(id -> !id.equals(ZUUL_ID));
-		return serviceIds;
+		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io())
+				.doOnError(e -> logger.error("Error retrieving services: " + e.getMessage()))
+				.onErrorResumeNext(Observable.empty())
+				.doOnNext(s -> logger.debug("Service discovered: " + s))
+				.map(id -> id.toLowerCase())
+				.filter(id -> !id.equals(ZUUL_ID));
 	}
 
-	//TODO: Add hook for headers on GET (e.g. globalId)
+	//TODO: Add hook for properties on GET (e.g. globalId)
 	private Observable<Node> getHealthNodesFromService(String serviceId, String url) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
-		for (Entry<String, String> header : headers.getHeaders().entrySet()) {
+		for (Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 		return RxNetty.createHttpRequest(request)
+				.doOnError(el -> logger.error("Error retrieving healthnodes in url {} with headers {}: ",
+						request.getUri(), request.getHeaders().entries(), el))
+				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
+						logger.warn("Exception {} for call {} with properties {}", r.getStatus(), url, r.getHeaders().entries());
 						return false;
 					}
 				})
@@ -110,8 +115,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.filter(node -> !HYSTRIX.equals(node.getId()) && !DISK_SPACE.equals(node.getId())
 						&& !DISCOVERY.equals(node.getId()) && !CONFIGSERVER.equals(node.getId()))
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
-				.doOnNext(el -> logger.info("Health node discovered in url: " + url))
-				.doOnNext(el -> logger.info("Node added: " + el.getId()))
+				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
 				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url));
 	}
 }

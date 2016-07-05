@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/shop-management"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "shop-management-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

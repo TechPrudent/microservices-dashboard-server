@@ -1,0 +1,1894 @@
+{
+  "applications": {
+    "versions__delta": "1",
+    "apps__hashcode": "UP_3_",
+    "application":[
+      {
+        "name": "FAT-JAR-TEST",
+        "instance": [
+          {
+            "instanceId": "localhost:fat-jar-test:8089",
+            "hostName": "localhost",
+            "app": "FAT-JAR-TEST",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "FAT-JAR-TEST",
+            "homePageUrl": "http://localhost:8089/fat-jar-test",
+            "statusPageUrl": "http://localhost:8089/fat-jar-test/info",
+            "healthCheckUrl": "http://localhost:8089/fat-jar-test/health",
+            "vipAddress": "fat-jar-test",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-GROUP",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-group:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-GROUP",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-GROUP",
+            "homePageUrl": "http://localhost:8089/customer-group",
+            "statusPageUrl": "http://localhost:8089/customer-group/info",
+            "healthCheckUrl": "http://localhost:8089/customer-group/health",
+            "vipAddress": "customer-group",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-BASE",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-base:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-BASE",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-BASE",
+            "homePageUrl": "http://localhost:8089/customer-base",
+            "statusPageUrl": "http://localhost:8089/customer-base/info",
+            "healthCheckUrl": "http://localhost:8089/customer-base/health",
+            "vipAddress": "customer-base",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ADMIN",
+        "instance": [
+          {
+            "instanceId": "localhost:admin:8089",
+            "hostName": "localhost",
+            "app": "ADMIN",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ADMIN",
+            "homePageUrl": "http://localhost:8089/admin",
+            "statusPageUrl": "http://localhost:8089/admin/info",
+            "healthCheckUrl": "http://localhost:8089/admin/health",
+            "vipAddress": "admin",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "USER-PREFERENCES",
+        "instance": [
+          {
+            "instanceId": "localhost:user-preferences:8089",
+            "hostName": "localhost",
+            "app": "USER-PREFERENCES",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "USER-PREFERENCES",
+            "homePageUrl": "http://localhost:8089/user-preferences",
+            "statusPageUrl": "http://localhost:8089/user-preferences/info",
+            "healthCheckUrl": "http://localhost:8089/user-preferences/health",
+            "vipAddress": "user-preferences",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-ADDRESSES",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-addresses:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-ADDRESSES",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-ADDRESSES",
+            "homePageUrl": "http://localhost:8089/customer-addresses",
+            "statusPageUrl": "http://localhost:8089/customer-addresses/info",
+            "healthCheckUrl": "http://localhost:8089/customer-addresses/health",
+            "vipAddress": "customer-addresses",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "LOYALTY-PROGRAM",
+        "instance": [
+          {
+            "instanceId": "localhost:loyalty-program:8089",
+            "hostName": "localhost",
+            "app": "LOYALTY-PROGRAM",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "LOYALTY-PROGRAM",
+            "homePageUrl": "http://localhost:8089/loyalty-program",
+            "statusPageUrl": "http://localhost:8089/loyalty-program/info",
+            "healthCheckUrl": "http://localhost:8089/loyalty-program/health",
+            "vipAddress": "loyalty-program",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "PIZZA-STOCK",
+        "instance": [
+          {
+            "instanceId": "localhost:pizza-stock:8089",
+            "hostName": "localhost",
+            "app": "PIZZA-STOCK",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "PIZZA-STOCK",
+            "homePageUrl": "http://localhost:8089/pizza-stock",
+            "statusPageUrl": "http://localhost:8089/pizza-stock/info",
+            "healthCheckUrl": "http://localhost:8089/pizza-stock/health",
+            "vipAddress": "pizza-stock",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ZUUL",
+        "instance": [
+          {
+            "instanceId": "localhost:zuul:8089",
+            "hostName": "localhost",
+            "app": "ZUUL",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ZUUL",
+            "homePageUrl": "http://localhost:8089/zuul",
+            "statusPageUrl": "http://localhost:8089/zuul/info",
+            "healthCheckUrl": "http://localhost:8089/zuul/health",
+            "vipAddress": "zuul",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "BILLING-PAYMENTS",
+        "instance": [
+          {
+            "instanceId": "localhost:billing-payments:8089",
+            "hostName": "localhost",
+            "app": "BILLING-PAYMENTS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "BILLING-PAYMENTS",
+            "homePageUrl": "http://localhost:8089/billing-payments",
+            "statusPageUrl": "http://localhost:8089/billing-payments/info",
+            "healthCheckUrl": "http://localhost:8089/billing-payments/health",
+            "vipAddress": "billing-payments",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ENCRYPTION",
+        "instance": [
+          {
+            "instanceId": "localhost:encryption:8089",
+            "hostName": "localhost",
+            "app": "ENCRYPTION",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ENCRYPTION",
+            "homePageUrl": "http://localhost:8089/encryption",
+            "statusPageUrl": "http://localhost:8089/encryption/info",
+            "healthCheckUrl": "http://localhost:8089/encryption/health",
+            "vipAddress": "encryption",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ORDER-PROCESSOR",
+        "instance": [
+          {
+            "instanceId": "localhost:order-processor:8089",
+            "hostName": "localhost",
+            "app": "ORDER-PROCESSOR",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ORDER-PROCESSOR",
+            "homePageUrl": "http://localhost:8089/order-processor",
+            "statusPageUrl": "http://localhost:8089/order-processor/info",
+            "healthCheckUrl": "http://localhost:8089/order-processor/health",
+            "vipAddress": "order-processor",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-MANAGEMENT",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-management:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-MANAGEMENT",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-MANAGEMENT",
+            "homePageUrl": "http://localhost:8089/customer-management",
+            "statusPageUrl": "http://localhost:8089/customer-management/info",
+            "healthCheckUrl": "http://localhost:8089/customer-management/health",
+            "vipAddress": "customer-management",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "USER",
+        "instance": [
+          {
+            "instanceId": "localhost:user:8089",
+            "hostName": "localhost",
+            "app": "USER",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "USER",
+            "homePageUrl": "http://localhost:8089/user",
+            "statusPageUrl": "http://localhost:8089/user/info",
+            "healthCheckUrl": "http://localhost:8089/user/health",
+            "vipAddress": "user",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "USER-AVATAR",
+        "instance": [
+          {
+            "instanceId": "localhost:user-avatar:8089",
+            "hostName": "localhost",
+            "app": "USER-AVATAR",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "USER-AVATAR",
+            "homePageUrl": "http://localhost:8089/user-avatar",
+            "statusPageUrl": "http://localhost:8089/user-avatar/info",
+            "healthCheckUrl": "http://localhost:8089/user-avatar/health",
+            "vipAddress": "user-avatar",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "AGENDA",
+        "instance": [
+          {
+            "instanceId": "localhost:agenda:8089",
+            "hostName": "localhost",
+            "app": "AGENDA",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "AGENDA",
+            "homePageUrl": "http://localhost:8089/agenda",
+            "statusPageUrl": "http://localhost:8089/agenda/info",
+            "healthCheckUrl": "http://localhost:8089/agenda/health",
+            "vipAddress": "agenda",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "TARIFF-CHARGES",
+        "instance": [
+          {
+            "instanceId": "localhost:tariff-charges:8089",
+            "hostName": "localhost",
+            "app": "TARIFF-CHARGES",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "TARIFF-CHARGES",
+            "homePageUrl": "http://localhost:8089/tariff-charges",
+            "statusPageUrl": "http://localhost:8089/tariff-charges/info",
+            "healthCheckUrl": "http://localhost:8089/tariff-charges/health",
+            "vipAddress": "tariff-charges",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "PIZZA-TRANSACTIONS",
+        "instance": [
+          {
+            "instanceId": "localhost:pizza-transactions:8089",
+            "hostName": "localhost",
+            "app": "PIZZA-TRANSACTIONS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "PIZZA-TRANSACTIONS",
+            "homePageUrl": "http://localhost:8089/pizza-transactions",
+            "statusPageUrl": "http://localhost:8089/pizza-transactions/info",
+            "healthCheckUrl": "http://localhost:8089/pizza-transactions/health",
+            "vipAddress": "pizza-transactions",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-ADMINISTRATORS",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-administrators:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-ADMINISTRATORS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-ADMINISTRATORS",
+            "homePageUrl": "http://localhost:8089/customer-administrators",
+            "statusPageUrl": "http://localhost:8089/customer-administrators/info",
+            "healthCheckUrl": "http://localhost:8089/customer-administrators/health",
+            "vipAddress": "customer-administrators",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "USER-BILLING-STRUCTURE",
+        "instance": [
+          {
+            "instanceId": "localhost:user-billing-structure:8089",
+            "hostName": "localhost",
+            "app": "USER-BILLING-STRUCTURE",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "USER-BILLING-STRUCTURE",
+            "homePageUrl": "http://localhost:8089/user-billing-structure",
+            "statusPageUrl": "http://localhost:8089/user-billing-structure/info",
+            "healthCheckUrl": "http://localhost:8089/user-billing-structure/health",
+            "vipAddress": "user-billing-structure",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "BILLING-ACCOUNTS",
+        "instance": [
+          {
+            "instanceId": "localhost:billing-accounts:8089",
+            "hostName": "localhost",
+            "app": "BILLING-ACCOUNTS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "BILLING-ACCOUNTS",
+            "homePageUrl": "http://localhost:8089/billing-accounts",
+            "statusPageUrl": "http://localhost:8089/billing-accounts/info",
+            "healthCheckUrl": "http://localhost:8089/billing-accounts/health",
+            "vipAddress": "billing-accounts",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "SHOP-MANAGEMENT",
+        "instance": [
+          {
+            "instanceId": "localhost:shop-management:8089",
+            "hostName": "localhost",
+            "app": "SHOP-MANAGEMENT",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "SHOP-MANAGEMENT",
+            "homePageUrl": "http://localhost:8089/shop-management",
+            "statusPageUrl": "http://localhost:8089/shop-management/info",
+            "healthCheckUrl": "http://localhost:8089/shop-management/health",
+            "vipAddress": "shop-management",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-TRANSFORMER",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-transformer:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-TRANSFORMER",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-TRANSFORMER",
+            "homePageUrl": "http://localhost:8089/customer-transformer",
+            "statusPageUrl": "http://localhost:8089/customer-transformer/info",
+            "healthCheckUrl": "http://localhost:8089/customer-transformer/health",
+            "vipAddress": "customer-transformer",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "TURBINE",
+        "instance": [
+          {
+            "instanceId": "localhost:turbine:8089",
+            "hostName": "localhost",
+            "app": "TURBINE",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "TURBINE",
+            "homePageUrl": "http://localhost:8089/turbine",
+            "statusPageUrl": "http://localhost:8089/turbine/info",
+            "healthCheckUrl": "http://localhost:8089/turbine/health",
+            "vipAddress": "turbine",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "HYSTRIX",
+        "instance": [
+          {
+            "instanceId": "localhost:hystrix:8089",
+            "hostName": "localhost",
+            "app": "HYSTRIX",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "HYSTRIX",
+            "homePageUrl": "http://localhost:8089/hystrix",
+            "statusPageUrl": "http://localhost:8089/hystrix/info",
+            "healthCheckUrl": "http://localhost:8089/hystrix/health",
+            "vipAddress": "hystrix",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "AWARDS",
+        "instance": [
+          {
+            "instanceId": "localhost:awards:8089",
+            "hostName": "localhost",
+            "app": "AWARDS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "AWARDS",
+            "homePageUrl": "http://localhost:8089/awards",
+            "statusPageUrl": "http://localhost:8089/awards/info",
+            "healthCheckUrl": "http://localhost:8089/awards/health",
+            "vipAddress": "awards",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "BILLING-REPLICATOR",
+        "instance": [
+          {
+            "instanceId": "localhost:billing-replicator:8089",
+            "hostName": "localhost",
+            "app": "BILLING-REPLICATOR",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "BILLING-REPLICATOR",
+            "homePageUrl": "http://localhost:8089/billing-replicator",
+            "statusPageUrl": "http://localhost:8089/billing-replicator/info",
+            "healthCheckUrl": "http://localhost:8089/billing-replicator/health",
+            "vipAddress": "billing-replicator",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "WEB-FEEDBACK",
+        "instance": [
+          {
+            "instanceId": "localhost:web-feedback:8089",
+            "hostName": "localhost",
+            "app": "WEB-FEEDBACK",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "WEB-FEEDBACK",
+            "homePageUrl": "http://localhost:8089/web-feedback",
+            "statusPageUrl": "http://localhost:8089/web-feedback/info",
+            "healthCheckUrl": "http://localhost:8089/web-feedback/health",
+            "vipAddress": "web-feedback",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "PIZZA-FEEDBACK",
+        "instance": [
+          {
+            "instanceId": "localhost:pizza-feedback:8089",
+            "hostName": "localhost",
+            "app": "PIZZA-FEEDBACK",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "PIZZA-FEEDBACK",
+            "homePageUrl": "http://localhost:8089/pizza-feedback",
+            "statusPageUrl": "http://localhost:8089/pizza-feedback/info",
+            "healthCheckUrl": "http://localhost:8089/pizza-feedback/health",
+            "vipAddress": "pizza-feedback",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-ACCESS",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-access:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-ACCESS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-ACCESS",
+            "homePageUrl": "http://localhost:8089/customer-access",
+            "statusPageUrl": "http://localhost:8089/customer-access/info",
+            "healthCheckUrl": "http://localhost:8089/customer-access/health",
+            "vipAddress": "customer-access",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "BILLING-COMPLAINTS",
+        "instance": [
+          {
+            "instanceId": "localhost:billing-complaints:8089",
+            "hostName": "localhost",
+            "app": "BILLING-COMPLAINTS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "BILLING-COMPLAINTS",
+            "homePageUrl": "http://localhost:8089/billing-complaints",
+            "statusPageUrl": "http://localhost:8089/billing-complaints/info",
+            "healthCheckUrl": "http://localhost:8089/billing-complaints/health",
+            "vipAddress": "billing-complaints",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "HISTORICAL-USAGE-PREPAID",
+        "instance": [
+          {
+            "instanceId": "localhost:historical-usage-prepaid:8089",
+            "hostName": "localhost",
+            "app": "HISTORICAL-USAGE-PREPAID",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "HISTORICAL-USAGE-PREPAID",
+            "homePageUrl": "http://localhost:8089/historical-usage-prepaid",
+            "statusPageUrl": "http://localhost:8089/historical-usage-prepaid/info",
+            "healthCheckUrl": "http://localhost:8089/historical-usage-prepaid/health",
+            "vipAddress": "historical-usage-prepaid",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "OFFERS",
+        "instance": [
+          {
+            "instanceId": "localhost:offers:8089",
+            "hostName": "localhost",
+            "app": "OFFERS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "OFFERS",
+            "homePageUrl": "http://localhost:8089/offers",
+            "statusPageUrl": "http://localhost:8089/offers/info",
+            "healthCheckUrl": "http://localhost:8089/offers/health",
+            "vipAddress": "offers",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "CUSTOMER-ACCESS-NUMBERS",
+        "instance": [
+          {
+            "instanceId": "localhost:customer-access-numbers:8089",
+            "hostName": "localhost",
+            "app": "CUSTOMER-ACCESS-NUMBERS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "CUSTOMER-ACCESS-NUMBERS",
+            "homePageUrl": "http://localhost:8089/customer-access-numbers",
+            "statusPageUrl": "http://localhost:8089/customer-access-numbers/info",
+            "healthCheckUrl": "http://localhost:8089/customer-access-numbers/health",
+            "vipAddress": "customer-access-numbers",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "TRANSPORT",
+        "instance": [
+          {
+            "instanceId": "localhost:transport:8089",
+            "hostName": "localhost",
+            "app": "TRANSPORT",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "TRANSPORT",
+            "homePageUrl": "http://localhost:8089/transport",
+            "statusPageUrl": "http://localhost:8089/transport/info",
+            "healthCheckUrl": "http://localhost:8089/transport/health",
+            "vipAddress": "transport",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "USAGE",
+        "instance": [
+          {
+            "instanceId": "localhost:usage:8089",
+            "hostName": "localhost",
+            "app": "USAGE",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "USAGE",
+            "homePageUrl": "http://localhost:8089/usage",
+            "statusPageUrl": "http://localhost:8089/usage/info",
+            "healthCheckUrl": "http://localhost:8089/usage/health",
+            "vipAddress": "usage",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ORDERING-LOYALTY",
+        "instance": [
+          {
+            "instanceId": "localhost:ordering-loyalty:8089",
+            "hostName": "localhost",
+            "app": "ORDERING-LOYALTY",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ORDERING-LOYALTY",
+            "homePageUrl": "http://localhost:8089/ordering-loyalty",
+            "statusPageUrl": "http://localhost:8089/ordering-loyalty/info",
+            "healthCheckUrl": "http://localhost:8089/ordering-loyalty/health",
+            "vipAddress": "ordering-loyalty",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "ORDERING-PETS",
+        "instance": [
+          {
+            "instanceId": "localhost:ordering-pets:8089",
+            "hostName": "localhost",
+            "app": "ORDERING-PETS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "ORDERING-PETS",
+            "homePageUrl": "http://localhost:8089/ordering-pets",
+            "statusPageUrl": "http://localhost:8089/ordering-pets/info",
+            "healthCheckUrl": "http://localhost:8089/ordering-pets/health",
+            "vipAddress": "ordering-pets",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "MARKETING",
+        "instance": [
+          {
+            "instanceId": "localhost:marketing:8089",
+            "hostName": "localhost",
+            "app": "MARKETING",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "MARKETING",
+            "homePageUrl": "http://localhost:8089/marketing",
+            "statusPageUrl": "http://localhost:8089/marketing/info",
+            "healthCheckUrl": "http://localhost:8089/marketing/health",
+            "vipAddress": "marketing",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "COMPANY-CARS",
+        "instance": [
+          {
+            "instanceId": "localhost:company-cars:8089",
+            "hostName": "localhost",
+            "app": "COMPANY-CARS",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "COMPANY-CARS",
+            "homePageUrl": "http://localhost:8089/company-cars",
+            "statusPageUrl": "http://localhost:8089/company-cars/info",
+            "healthCheckUrl": "http://localhost:8089/company-cars/health",
+            "vipAddress": "company-cars",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      },
+      {
+        "name": "MESSENGER",
+        "instance": [
+          {
+            "instanceId": "localhost:messenger:8089",
+            "hostName": "localhost",
+            "app": "MESSENGER",
+            "ipAddr": "127.0.0.1",
+            "status": "UP",
+            "overriddenstatus": "UNKNOWN",
+            "port": {
+              "$": 8089,
+              "@enabled": "true"
+            },
+            "securePort": {
+              "$": 443,
+              "@enabled": "false"
+            },
+            "countryId": 1,
+            "dataCenterInfo": {
+              "@class": "com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo",
+              "name": "MyOwn"
+            },
+            "leaseInfo": {
+              "renewalIntervalInSecs": 30,
+              "durationInSecs": 90,
+              "registrationTimestamp": 1466173255014,
+              "lastRenewalTimestamp": 1466414104546,
+              "evictionTimestamp": 0,
+              "serviceUpTimestamp": 1466173255014
+            },
+            "metadata": {
+              "@class": "java.util.Collections$EmptyMap"
+            },
+            "appGroupName": "MESSENGER",
+            "homePageUrl": "http://localhost:8089/messenger",
+            "statusPageUrl": "http://localhost:8089/messenger/info",
+            "healthCheckUrl": "http://localhost:8089/messenger/health",
+            "vipAddress": "messenger",
+            "isCoordinatingDiscoveryServer": "false",
+            "lastUpdatedTimestamp": "1466173255014",
+            "lastDirtyTimestamp": "1466173254946",
+            "actionType": "ADDED"
+          }
+        ]
+      }
+    ]
+  }
+}

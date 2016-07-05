@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/italian-food"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "italian-food-index.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

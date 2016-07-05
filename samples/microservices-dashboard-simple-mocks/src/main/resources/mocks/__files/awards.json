@@ -1,0 +1,175 @@
+{
+  "status": "UP",
+  "engpAwardsEligibility": {
+    "status": "UP",
+    "version": "",
+    "type": "SOAP",
+    "group": "ENGP"
+  },
+  "pttAwards": {
+    "status": "UNKNOWN",
+    "type": "REST",
+    "group": "PTT"
+  },
+  "pttAwardsDetails": {
+    "status": "UNKNOWN",
+    "type": "REST",
+    "group": "PTT"
+  },
+  "loyalty-program": {
+    "status": "UP",
+    "type": "MICROSERVICE",
+    "group": "FUNCTIONAL",
+    "minVersion": "2.1.3",
+    "version": "3.0.1"
+  },
+  "discoveryComposite": {
+    "description": "Spring Cloud Eureka Discovery Client",
+    "status": "UP",
+    "discoveryClient": {
+      "description": "Spring Cloud Eureka Discovery Client",
+      "status": "UP",
+      "services": [
+        "webshop-catalogue",
+        "customer-group",
+        "customer-base",
+        "customer-access",
+        "ordering-pets",
+        "user-avatar",
+        "tariff-charges",
+        "admin",
+        "pizza-feedback",
+        "pizza-transactions",
+        "user-preferences",
+        "customer-addresses",
+        "shop-management",
+        "products",
+        "address",
+        "zuul",
+        "customer-finance",
+        "encryption",
+        "transport",
+        "loyalty-program",
+        "web-feedback",
+        "shopping-basket",
+        "payment-gateway",
+        "installbase",
+        "billing-complaints",
+        "hystrix",
+        "italian-food",
+        "pizza-stock",
+        "offers",
+        "billing-replicator",
+        "usage",
+        "customer-gear",
+        "prices",
+        "billing-payments",
+        "user",
+        "customer-access-numbers",
+        "customer-administrators",
+        "pizza-management",
+        "billing-accounts",
+        "marketing",
+        "agenda",
+        "customer-management",
+        "company-cars",
+        "awards",
+        "order-processor",
+        "webshop-accounts",
+        "ordering-cakes",
+        "bill-downloader"
+      ]
+    },
+    "eureka": {
+      "description": "Remote status from Eureka server",
+      "status": "UP",
+      "applications": {
+        "WEBSHOP-CATALOGUE": 1,
+        "CUSTOMER-GROUP": 1,
+        "CUSTOMER-BASE": 1,
+        "CUSTOMER-ACCESS": 1,
+        "ORDERING-PETS": 1,
+        "USER-AVATAR": 1,
+        "RENUNCIATION": 0,
+        "TARIFF-CHARGES": 2,
+        "ADMIN": 1,
+        "PIZZA-FEEDBACK": 1,
+        "BILL-DOWNLOADER": 1,
+        "PIZZA-TRANSACTIONS": 1,
+        "USER-PREFERENCES": 1,
+        "CUSTOMER-ADDRESSES": 1,
+        "ORDERING-CAKES": 1,
+        "SHOP-MANAGEMENT": 1,
+        "PRODUCTS": 1,
+        "ADDRESS": 1,
+        "ZUUL": 1,
+        "CUSTOMER-FINANCE": 1,
+        "ENCRYPTION": 1,
+        "TRANSPORT": 1,
+        "WEBSHOP-ACCOUNTS": 1,
+        "LOYALTY-PROGRAM": 2,
+        "WEB-FEEDBACK": 1,
+        "SHOPPING-BASKET": 1,
+        "PAYMENT-GATEWAY": 1,
+        "INSTALLBASE": 1,
+        "BILLING-COMPLAINTS": 1,
+        "HYSTRIX": 1,
+        "ITALIAN-FOOD": 1,
+        "PIZZA-STOCK": 1,
+        "OFFERS": 1,
+        "PREPAID-IDENTIFICATION": 0,
+        "BILLING-REPLICATOR": 1,
+        "USAGE": 1,
+        "CUSTOMER-GEAR": 1,
+        "ORDER-PROCESSOR": 1,
+        "PRICES": 1,
+        "AWARDS": 1,
+        "BILLING-PAYMENTS": 1,
+        "EUREKA": 0,
+        "USER": 1,
+        "CUSTOMER-ACCESS-NUMBERS": 1,
+        "ORDERING-LOYALTY": 0,
+        "CUSTOMER-ADMINISTRATORS": 1,
+        "PIZZA-MANAGEMENT": 1,
+        "BILLING-ACCOUNTS": 1,
+        "MARKETING": 1,
+        "AGENDA": 1,
+        "CUSTOMER-MANAGEMENT": 1,
+        "COMPANY-CARS": 1
+      }
+    }
+  },
+  "diskSpace": {
+    "status": "UP",
+    "total": 2046640128,
+    "free": 1567690752,
+    "threshold": 10485760
+  },
+  "db": {
+    "status": "UP",
+    "sapcacheDataSource": {
+      "status": "UP",
+      "database": "Microsoft SQL Server",
+      "hello": "Hello"
+    },
+    "pttDataSource": {
+      "status": "UP",
+      "database": "HSQLDB",
+      "hello": 1
+    },
+    "esrvDataSource": {
+      "status": "UP",
+      "database": "Oracle",
+      "hello": 1
+    }
+  },
+  "configServer": {
+    "status": "UP",
+    "propertySources": [
+      "overrides"
+    ]
+  },
+  "hystrix": {
+    "status": "UP"
+  }
+}

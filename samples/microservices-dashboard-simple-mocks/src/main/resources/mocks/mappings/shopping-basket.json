@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/shopping-basket/health"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "shopping-basket.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
