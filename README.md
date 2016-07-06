@@ -13,7 +13,7 @@ The primary goal of this project is to provide a server implementation for the m
 This implementation is for now only supporting Spring Boot microservices.
 It will query other Spring Boot applications for their actuator endpoints (such as ```/health```) to get information on their status and their dependencies.
 After gathering these details from all available applications, it will aggregate these into a single response.
-This response can be queried by the microservices-dashboard GUI application.
+This response can be queried by the microservices-dashboard UI application.
 
 ## Setting up the server
 
@@ -22,9 +22,10 @@ Either by creating a new Spring Boot application and enhancing it with our depen
 
 ### Using a vanilla Spring Boot application
 
-First you need to setup your server. To do this just setup a simple boot project (using [start.spring.io](http://start.spring.io) for example).
+First you need to setup a simple Spring Boot project (using [start.spring.io](http://start.spring.io) for example).
+Microservices-dashboard-server requires Java 8 or later.
 
-Build the microservices-dashboard-server project from source (see below), and add the artefact as a dependency to your new Spring Boot's dependencies:
+Add the microservices-dashboard-server as a dependency to your new Spring Boot's dependencies:
 
 ```xml
 <dependency>
@@ -61,9 +62,48 @@ public class MicroservicesDashboardServerApplication {
 }
 ```
 
-### Using the microservices-dashboard-server-sample project
+If successful, you should see the following output in the log:
 
-Simply build the sample project from source (see below) and run it (also see below).
+> o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8080 (http)
+
+From there on, you can visit actuator endpoints to validate the server's status such as ```http://localhost:8080/env``` (to see the environment variables), and ```http://localhost:8080/mappings``` (for all the available mappings).
+
+### Using a sample
+
+See the sample documentation located here: https://github.com/ordina-jworks/microservices-dashboard-server/tree/master/samples
+
+## Available endpoints
+
+The graph exposing nodes and links is located under the following URL:
+
+```
+http://localhost:8080/graph
+```
+
+## Troubleshooting
+
+For remote debugging, run the following command:
+
+```bash
+java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/*.jar
+```
+
+To enable Spring debug logging, add ```--debug``` to the command.
+
+You can enable debug logging of the dashboard as well, by adding a ```logback.xml``` file under ```src/main/resources``` with the following contents:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="be.ordina.msdashboard" level="DEBUG"/>
+    <logger name="org.springframework.cloud.netflix" level="DEBUG"/>
+    
+</configuration>
+```
+
+Make sure to use actuator endpoints such as ```/autoconfig``` and ```/beans``` for validating the right beans have been loaded.
+More information on actuator endpoints can be found here: http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready
 
 ## Building from source
 
@@ -73,46 +113,23 @@ Microservices-dashboard-server requires Java 8 or later and is built using maven
 mvn install
 ```
 
-## Building the sample from source
+## Contributing
 
-```bash
-cd ./microservices-dashboard-sample
-mvn install
-```
+Contributors to this project agree to uphold its [code of conduct][1].
 
-## Running the sample locally
+There are several that you can contribute to microservices-dashboard-server:
 
-To run the sample application locally, build it from source and run the following command:
+ - Open a [pull request][2]. Please see the [contributor guidelines][3] for details.
+ - Chat with fellow users [on Gitter][4].
 
-```bash
-java -jar target/microservices-dashboard-server-sample-1.0.0-SNAPSHOT.jar --spring.config.location=./microservices-dashboard-server-configuration/microservices-dashboard-server.yml
-```
+## Licence
 
-If successful, you should see the following output in the log:
-
-> o.s.b.c.e.t.TomcatEmbeddedServletContainer Tomcat started on port(s): 8383 (http)
-
-From there on, you can visit actuator endpoints to validate the server's status such as ```http://localhost:8383/env``` (to see the environment variables), and ```http://localhost:8383/mappings``` (for all the available mappings).
-
-## Available endpoints
-
-The graph exposing nodes and links is located under the following URL:
-
-```
-http://localhost:8383/graph
-```
-
-## Troubleshooting
-
-For remote debugging, run the following command:
-
-```bash
-java -jar -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 target/microservices-dashboard-server-0.1.0-SNAPSHOT.jar --spring.config.location=../microservices-dashboard-server-configuration/microservices-dashboard-server.yml
-```
-
-To enable Spring debug logging, add ```--debug``` to the command.
-
-Make sure to use actuator endpoints such as ```/autoconfig``` and ```/beans``` for validating the right beans have been loaded.
+Spring REST Docs is open source software released under the [Apache 2.0 license][5].
 
 [license]:LICENSE-2.0.txt
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
+[1]: CODE_OF_CONDUCT.md
+[2]: https://help.github.com/articles/using-pull-requests/
+[3]: CONTRIBUTING.md
+[4]: https://gitter.im/ordina-jworks/microservices-dashboard
+[5]: http://www.apache.org/licenses/LICENSE-2.0.html
