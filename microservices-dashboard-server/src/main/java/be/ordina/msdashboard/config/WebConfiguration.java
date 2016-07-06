@@ -25,35 +25,26 @@ import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.controllers.NodesController;
 import be.ordina.msdashboard.properties.Labels;
-import be.ordina.msdashboard.services.DependenciesResourceService;
+import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.stores.NodeStore;
 import be.ordina.msdashboard.stores.SimpleStore;
 import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
-import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ConfigurationCondition;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.springframework.context.annotation.ConfigurationCondition.ConfigurationPhase.*;
 
 /**
  * @author Andreas Evers
@@ -83,8 +74,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private List<NodeAggregator> aggregators = new ArrayList<>();
 
         @Bean
-        public DependenciesResourceService dependenciesResourceService() {
-            return new DependenciesResourceService(aggregators, nodeStore);
+        public GraphRetriever dependenciesResourceService() {
+            return new GraphRetriever(aggregators, nodeStore);
         }
 
         @Bean

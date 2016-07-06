@@ -17,7 +17,7 @@ package be.ordina.msdashboard.controllers;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.services.DependenciesResourceService;
+import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +41,7 @@ public class NodesControllerTest {
     private NodesController nodesController;
 
     @Mock
-    private DependenciesResourceService dependenciesResourceService;
+    private GraphRetriever graphRetriever;
 
     @Mock
     private NodeStore redisService;
@@ -51,7 +51,7 @@ public class NodesControllerTest {
 
     @Test
     public void getDependenciesGraphJson() {
-        doReturn(Collections.emptyMap()).when(dependenciesResourceService).getDependenciesGraphResourceJson();
+        doReturn(Collections.emptyMap()).when(graphRetriever).retrieve();
 
         HttpEntity<Map<String, Object>> httpEntity = nodesController.getDependenciesGraphJson();
 

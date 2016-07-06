@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.services;
+package be.ordina.msdashboard.graph;
 
 import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
@@ -44,9 +44,9 @@ import static com.google.common.collect.Sets.newHashSet;
  * @author Tim Ysewyn
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DependenciesResourceServiceTest {
+public class GraphRetrieverTest {
 
-	private DependenciesResourceService dependenciesResourceService;
+	private GraphRetriever graphRetriever;
 
 	@Mock
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
@@ -59,7 +59,7 @@ public class DependenciesResourceServiceTest {
 
 	@Before
 	public void setup() {
-		dependenciesResourceService = new DependenciesResourceService(Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
+		graphRetriever = new GraphRetriever(Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
 	}
 
 	@Test
@@ -87,13 +87,13 @@ public class DependenciesResourceServiceTest {
 				.thenReturn(newHashSet());
 
 		long startTime = System.currentTimeMillis();
-		Map<String, Object> graph = dependenciesResourceService.getDependenciesGraphResourceJson();
+		Map<String, Object> graph = graphRetriever.retrieve();
 		long totalTime = System.currentTimeMillis() - startTime;
 
 		System.out.println("Time spent waiting for processing: " + totalTime);
 		ObjectToJsonConverter<Map<String, Object>> converter = new ObjectToJsonConverter<>();
 		String nodeAsJson = converter.convert(graph);
-		JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/DependenciesResourceServiceTest.json")),
+		JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/GraphRetrieverTest.json")),
 				removeBlankNodes(nodeAsJson), JSONCompareMode.LENIENT);
 	}
 }

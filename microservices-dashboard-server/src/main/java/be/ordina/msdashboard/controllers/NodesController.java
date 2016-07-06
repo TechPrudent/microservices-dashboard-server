@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.services.DependenciesResourceService;
+import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +39,14 @@ import be.ordina.msdashboard.model.Node;
 @ResponseBody
 public class NodesController {
 
-	public NodesController(DependenciesResourceService dependenciesResourceService, NodeStore nodeStore,
+	public NodesController(GraphRetriever graphRetriever, NodeStore nodeStore,
 						   CacheCleaningBean cacheCleaningBean) {
-		this.dependenciesResourceService = dependenciesResourceService;
+		this.graphRetriever = graphRetriever;
 		this.redisService = nodeStore;
 		this.cacheCleaningBean = cacheCleaningBean;
 	}
 
-	private DependenciesResourceService dependenciesResourceService;
+	private GraphRetriever graphRetriever;
 
 	private NodeStore redisService;
 
@@ -55,7 +55,7 @@ public class NodesController {
 	//TODO: Support table response?
 	@RequestMapping(value = "/graph", produces = "application/json")
 	public HttpEntity<Map<String, Object>> getDependenciesGraphJson() {
-		return ok().body(dependenciesResourceService.getDependenciesGraphResourceJson());
+		return ok().body(graphRetriever.retrieve());
 	}
 
 	@RequestMapping(value = "/node", method = POST)

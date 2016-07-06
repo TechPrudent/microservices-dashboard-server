@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.services;
+package be.ordina.msdashboard.graph;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.constants.Constants;
@@ -37,20 +37,20 @@ import static com.google.common.collect.Maps.newHashMap;
  * @author Andreas Evers
  * @author Tim Ysewyn
  */
-public class DependenciesResourceService {
+public class GraphRetriever {
 
-	private static final Logger logger = LoggerFactory.getLogger(DependenciesResourceService.class);
+	private static final Logger logger = LoggerFactory.getLogger(GraphRetriever.class);
 
 	private final List<NodeAggregator> aggregators;
 	private final NodeStore redisService;
 
-	public DependenciesResourceService(List<NodeAggregator> aggregators, NodeStore redisService) {
+	public GraphRetriever(List<NodeAggregator> aggregators, NodeStore redisService) {
 		this.aggregators = aggregators;
 		this.redisService = redisService;
 	}
 
 	@Cacheable(value = Constants.GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
-	public Map<String, Object> getDependenciesGraphResourceJson() {
+	public Map<String, Object> retrieve() {
 		List<Observable<Node>> observables = aggregators.stream()
 				.collect(Collectors.mapping(NodeAggregator::aggregateNodes, Collectors.toList()));
 		observables.add(redisService.getAllNodesAsObservable());
