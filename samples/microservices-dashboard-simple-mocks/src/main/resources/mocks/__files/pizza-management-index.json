@@ -10,7 +10,7 @@
     },
     "curies": [
       {
-        "href": "/pizza-management/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "piz",
         "templated": true
       }

@@ -4,5 +4,6 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="be.ordina.msdashboard" level="DEBUG"/>
     <logger name="org.springframework.cloud.netflix" level="DEBUG"/>
+    <logger name="WireMock" level="OFF"/>
     
 </configuration>

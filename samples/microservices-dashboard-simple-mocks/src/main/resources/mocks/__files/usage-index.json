@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/usage/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "usa",
         "templated": true
       }

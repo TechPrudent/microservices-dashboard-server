@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/customer-finance/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cufi",
         "templated": true
       }

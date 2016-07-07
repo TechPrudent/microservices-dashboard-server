@@ -10,7 +10,7 @@
     },
     "curies": [
       {
-        "href": "/company-cars/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "car",
         "templated": true
       }

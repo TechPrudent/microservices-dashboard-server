@@ -37,7 +37,7 @@
     },
     "curies": [
       {
-        "href": "/address/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "add",
         "templated": true
       }

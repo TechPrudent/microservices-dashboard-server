@@ -22,6 +22,8 @@ import java.util.Set;
 
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.converters.JsonToObjectConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -33,6 +35,8 @@ import be.ordina.msdashboard.model.Node;
 import rx.Observable;
 
 public class RedisStore implements NodeCache, NodeStore {
+
+	private static final Logger logger = LoggerFactory.getLogger(RedisStore.class);
 
 	private RedisTemplate<String, Object> redisTemplate;
 
@@ -64,6 +68,7 @@ public class RedisStore implements NodeCache, NodeStore {
 
 	@Override
 	public void saveNode(final String nodeData) {
+		logger.info("Saving node: " + nodeData);
 		Node node = getNode(nodeData);
 		String nodeId = node.getId();
 		node.getDetails().put(VIRTUAL_FLAG, true);

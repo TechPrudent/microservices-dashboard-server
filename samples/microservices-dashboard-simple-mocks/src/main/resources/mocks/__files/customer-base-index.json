@@ -34,7 +34,7 @@
     },
     "curies": [
       {
-        "href": "/customer-base/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cuba",
         "templated": true
       }

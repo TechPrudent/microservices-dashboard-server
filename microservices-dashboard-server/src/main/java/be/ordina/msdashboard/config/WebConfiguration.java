@@ -93,7 +93,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private DiscoveryClient discoveryClient;
 
         @Bean
-        public HealthIndicatorsAggregator healthIndicatorsAggregator(Environment environment) {
+        public HealthIndicatorsAggregator healthIndicatorsAggregator() {
             return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties());
         }
 

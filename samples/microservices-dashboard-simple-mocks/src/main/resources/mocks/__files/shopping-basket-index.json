@@ -168,7 +168,7 @@
     },
     "curies": [
       {
-        "href": "/shopping-basket/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "bas",
         "templated": true
       }

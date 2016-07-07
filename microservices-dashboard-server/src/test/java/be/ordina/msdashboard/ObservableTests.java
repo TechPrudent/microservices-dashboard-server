@@ -23,8 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Notification;
 import rx.Observable;
+import rx.Observable.Transformer;
 import rx.Subscriber;
+import rx.exceptions.Exceptions;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.plugins.DebugHook;
 import rx.plugins.DebugNotification;
@@ -32,7 +36,11 @@ import rx.plugins.DebugNotificationListener;
 import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
+import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -413,4 +421,294 @@ public class ObservableTests {
         return i;
     }
 
+    @Test
+    public void testUncheckedExceptionHandling() {
+        Observable.just("Hello!")
+                .map(input -> { throw new RuntimeException(); })
+                .subscribe(
+                        System.out::println,
+                        error -> System.out.println("Error!")
+                );
+    }
+
+    @Test
+    public void testUncheckedFatalExceptionHandling() {
+        Observable.just("Hello!")
+                .map(input -> { throw new StackOverflowError(); })
+                .subscribe(
+                        System.out::println,
+                        error -> System.out.println("Error!")
+                );
+    }
+
+    private String transform(String input) throws IOException {
+        throw new IOException();
+    }
+
+    @Test
+    public void testCheckedExceptionHandling() {
+        Observable.just("Hello!")
+                .map(input -> {
+                    try {
+                        return transform(input);
+                    } catch (Throwable t) {
+                        throw Exceptions.propagate(t);
+                    }
+                })
+                .subscribe(
+                        System.out::println,
+                        error -> System.out.println("Error!")
+                );
+    }
+
+    @Test
+    public void testCheckedExceptionHandlingWithoutSubscription() {
+        Observable.just("Hello!")
+                .map(input -> {
+                    try {
+                        return transform(input);
+                    } catch (Throwable t) {
+                        throw Exceptions.propagate(t);
+                    }
+                }).subscribe();
+    }
+
+    @Test
+    public void testCheckedExceptionHandlingWithObservableError() {
+        Observable.just("Hello!")
+                .flatMap(input -> {
+                    try {
+                        return Observable.just(transform(input));
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                }).subscribe(
+                        System.out::println,
+                        error -> System.out.println("Error!")
+                );
+    }
+
+    @Test
+    public void testMergedExceptionHandling() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).take(10);
+        Observable<String> observable2 = Observable.just("Hello!")
+                .flatMap(input -> {
+                    try {
+                        return Observable.just(transform(input));
+                    } catch (Throwable t) {
+                        return Observable.error(t);
+                    }
+                });
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable);
+        mergedObservable.toBlocking().subscribe(
+                    s -> System.out.println(s),
+                    error -> System.out.println("Error!")
+                );
+    }
+
+    @Test
+    public void testExceptionHandlingWithMultipleLevels1() {
+        Observable<String> observable = Observable.interval(1L, SECONDS).map(el -> {
+            if (el == 8L) throw new RuntimeException();
+            return "a" + el;
+        }).take(10);
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testExceptionHandlingWithMultipleLevels2() {
+        Observable<String> observable = Observable.interval(1L, SECONDS).map(el -> {
+            if (el == 8L) throw new RuntimeException("Error");
+            return "a" + el;
+        }).take(10)
+                .doOnError(e -> logger.error("Error caught: " + e.getMessage()))
+                .onErrorResumeNext(Observable.empty());
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testExceptionHandlingWithMultipleLevels3() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .map(el -> {
+                    if (el == 8L) throw new RuntimeException("Error1");
+                    return "a" + el;
+                })
+                .take(10)
+                .map(el -> {
+                    if (el.equals("a9")) throw new RuntimeException("Error2");
+                    return "b" + el;
+                })
+                .doOnError(e -> logger.error("Error caught: " + e.getMessage()))
+                .onErrorResumeNext(Observable.empty());
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testExceptionHandlingWithMultipleLevels4() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .map(el -> {
+                    if (el == 5L) throw new RuntimeException("Error1");
+                    return "a" + el;
+                })
+                .take(10);
+        observable.onExceptionResumeNext(observable)
+                .doOnError(e -> logger.error("Error caught: " + e.getMessage()))
+                .onErrorResumeNext(Observable.empty());
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinueWithCustomOperator() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .map(el -> {
+                    if (el == 5L) throw new RuntimeException("Error1");
+                    return "a" + el;
+                })
+                .take(10)
+                .lift(new OperatorSuppressError(el -> System.out.println("Error lifted!")));
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    final class OperatorSuppressError<T> implements Observable.Operator<T, T> {
+        final Action1<Throwable> onError;
+
+        public OperatorSuppressError(Action1<Throwable> onError) {
+            this.onError = onError;
+        }
+
+        @Override
+        public Subscriber<? super T> call(final Subscriber<? super T> t1) {
+            return new Subscriber<T>(t1) {
+
+                @Override
+                public void onNext(T t) {
+                    t1.onNext(t);
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    onError.call(e);
+                }
+
+                @Override
+                public void onCompleted() {
+                    t1.onCompleted();
+                }
+
+            };
+        }
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .map(el -> {
+                    try {
+                        if (el == 5L) throw new RuntimeException("Error1");
+                    } catch (RuntimeException e) {
+                        System.out.println(e);
+                        return null;
+                    }
+                    return "a" + el;
+                })
+                .filter(Objects::nonNull)
+                .take(10)
+                .lift(new OperatorSuppressError(el -> System.out.println("Error lifted!")));
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue2() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .concatMap(el -> {
+                    try {
+                        if (el == 5L) throw new RuntimeException("Error1");
+                    } catch (RuntimeException e) {
+                        System.out.println(e);
+                        return Observable.empty();
+                    }
+                    return Observable.just("a" + el);
+                })
+                .onErrorResumeNext(Observable.empty())
+                .take(10);
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue3() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .concatMap(el -> {
+                    return Observable.defer(() ->  {
+                        if (el == 5L) throw new RuntimeException("Error1");
+                        return Observable.just("a" + el);
+                    }).onErrorResumeNext(Observable.empty());
+                }).take(10);
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    /*@Test
+    public void testSuppressExceptionAndContinue4() {
+        Observable<String> observable = Observable.interval(1L, SECONDS)
+                .compose(failSafeMap(new Function<Long, Long>() {
+                    @Override
+                    public Long apply(Long t) {
+                        return 1L;
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+
+                    }
+                }))
+                .take(10);
+        observable.toBlocking().subscribe(
+                s -> System.out.println(s),
+                error -> System.out.println("Error!")
+        );
+    }
+
+    public static <T, R> Transformer<Observable<T>, Observable<R>> failSafeMap(Function<T, R> mapper, Consumer<Throwable> onError) {
+        return new Transformer<Observable<T>, Observable<R>>() {
+            @Override
+            public Observable<Observable<R>> call(Observable<Observable<T>> observableObservable) {
+                return obs.concatMap(new Func1<T, Observable<? extends R>>() {
+                    @Override
+                    public Observable<? extends R> call(T t) {
+                        return Observable.defer(new Func0<Observable<R>>() {
+                            @Override
+                            public Observable<R> call() {
+                                return (Observable<R>) mapper.apply(t);
+                            }
+                        }).onErrorResumeNext(Observable.empty());
+                    }
+                });
+            }
+        };
+    }*/
 }

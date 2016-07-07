@@ -63,18 +63,18 @@ public class GraphRetriever {
 		graph.put(TYPES, constructTypes());
 
         Map<String, Object> nodesAndLinks = Observable.mergeDelayError(observables)
-				.doOnError(throwable -> logger.error("An error occurred during merging:", throwable))
-				.onErrorResumeNext(Observable.empty())
+					.doOnError(throwable -> logger.error("An error occurred during merging aggregators:", throwable))
+					.onErrorResumeNext(Observable.empty())
 				.observeOn(Schedulers.io())
-				.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
+					.doOnNext(node -> logger.info("Merging node with id '{}'", node.getId()))
 				.reduce(new ArrayList<>(), NodeMerger.merge())
-				.doOnError(throwable -> logger.error("An error occurred during reducing:", throwable))
-				.onErrorResumeNext(Observable.empty())
-				.doOnNext(nodes -> logger.info("Merged all emitted nodes, converting to map"))
+					.doOnError(throwable -> logger.error("An error occurred during reducing:", throwable))
+					.onErrorResumeNext(Observable.empty())
+					.doOnNext(nodes -> logger.info("Merged all emitted nodes, converting to map"))
                 .map(GraphMapper.toGraph())
-				.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
-                .doOnError(throwable -> logger.error("An error occurred during mapping:", throwable))
-				.onErrorResumeNext(Observable.empty())
+					.doOnNext(nodesAndLinksMap -> logger.info("Converted to nodes and links map"))
+                	.doOnError(throwable -> logger.error("An error occurred during mapping:", throwable))
+					.onErrorResumeNext(Observable.empty())
 				.toBlocking()
                 .first();
 		logger.info("Graph retrieved: {}", nodesAndLinks);

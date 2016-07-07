@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/webshop-catalogue/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cat",
         "templated": true
       }

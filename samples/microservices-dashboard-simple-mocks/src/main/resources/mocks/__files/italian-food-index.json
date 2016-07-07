@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/italian-food/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "ita",
         "templated": true
       }

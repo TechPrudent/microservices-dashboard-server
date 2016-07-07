@@ -25,7 +25,7 @@
     },
     "curies": [
       {
-        "href": "/loyalty-program/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "lp",
         "templated": true
       }

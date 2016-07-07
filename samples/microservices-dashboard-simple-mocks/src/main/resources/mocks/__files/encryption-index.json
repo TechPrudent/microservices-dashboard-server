@@ -15,7 +15,7 @@
     },
     "curies": [
       {
-        "href": "/encryption/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cry",
         "templated": true
       }

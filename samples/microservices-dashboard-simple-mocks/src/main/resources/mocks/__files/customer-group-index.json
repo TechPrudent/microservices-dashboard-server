@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/customer-group/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cugr",
         "templated": true
       }

@@ -10,7 +10,7 @@
     },
     "curies": [
       {
-        "href": "/web-feedback/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "web",
         "templated": true
       }

@@ -8,7 +8,7 @@
     },
     "curies": [
       {
-        "href": "/pizza-feedback/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "uat",
         "templated": true
       }

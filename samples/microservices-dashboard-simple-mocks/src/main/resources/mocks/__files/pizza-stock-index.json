@@ -19,7 +19,7 @@
       "href": "http://host0018.local:8201/pizza-stock/pizza/{pizzaId}/pizza-stock/changes",
       "templated": true
     },
-    "sto:pizza-stock-changes": {
+    "sto:pizza-stocks-changes": {
       "href": "http://host0018.local:8201/pizza-stock/pizza-stocks/changes"
     },
     "sto:pizza-stocks-availability": {
@@ -39,7 +39,7 @@
     },
     "curies": [
       {
-        "href": "/pizza-stock/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "sto",
         "templated": true
       }

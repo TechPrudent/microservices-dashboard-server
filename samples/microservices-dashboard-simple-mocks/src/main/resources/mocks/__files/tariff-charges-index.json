@@ -6,7 +6,7 @@
     },
     "curies": [
       {
-        "href": "/tariff-charges/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "tc",
         "templated": true
       }

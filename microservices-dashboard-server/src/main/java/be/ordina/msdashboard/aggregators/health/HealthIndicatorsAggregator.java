@@ -64,11 +64,6 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.map(id -> new ImmutablePair<String, String>(id, uriResolver.resolveHealthCheckUrl(discoveryClient.getInstances(id).get(0))))
 				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
 				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
-				/*.flatMap(el -> el, throwable -> {
-                    System.out.println("EXCEPTION: " + throwable);
-                    return null;
-                }, () -> Observable.just(new Node("endNode")))*/
-				.filter(Objects::nonNull)
 				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
 				.doOnCompleted(() -> logger.info("Completed getting all health observables"));
 		return Observable.merge(observableObservable)

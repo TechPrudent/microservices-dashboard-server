@@ -20,6 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Andreas Evers
  */
+// TODO: fix this class and externalize properties better
 @ConfigurationProperties("msdashboard.labels")
 public class Labels {
 	private String toolbox = "TOOLBOX";

@@ -14,7 +14,7 @@
     },
     "curies": [
       {
-        "href": "/installbase/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "inst",
         "templated": true
       }

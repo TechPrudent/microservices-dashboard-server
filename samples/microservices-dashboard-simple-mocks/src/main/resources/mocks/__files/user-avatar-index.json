@@ -9,7 +9,7 @@
     },
     "curies": [
       {
-        "href": "/user-avatar/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "ava",
         "templated": true
       }

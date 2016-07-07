@@ -65,7 +65,7 @@
     },
     "curies": [
       {
-        "href": "/webshop-accounts/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "wbre",
         "templated": true
       }

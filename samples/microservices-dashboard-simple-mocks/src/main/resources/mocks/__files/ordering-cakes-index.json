@@ -30,7 +30,7 @@
     },
     "curies": [
       {
-        "href": "/ordering-cakes/generated-docs/api-guide.html#resources-{rel}",
+        "href": "/generated-docs/api-guide.html#resources-{rel}",
         "name": "cake",
         "templated": true
       }
