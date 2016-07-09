@@ -19,11 +19,15 @@ import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.aggregators.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.aggregators.health.HealthProperties;
+import be.ordina.msdashboard.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.controllers.EventsController;
 import be.ordina.msdashboard.controllers.NodesController;
+import be.ordina.msdashboard.events.EventListener;
 import be.ordina.msdashboard.properties.Labels;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.stores.NodeStore;
@@ -38,9 +42,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.ArrayList;
@@ -62,7 +66,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
     @Configuration
     @AutoConfigureAfter({ EurekaConfiguration.class, AggregatorsConfiguration.class })
-    public static class DependenciesResourceConfiguration {
+    public static class GraphConfiguration {
 
         @Autowired
         private NodeStore nodeStore;
@@ -74,15 +78,33 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private List<NodeAggregator> aggregators = new ArrayList<>();
 
         @Bean
-        public GraphRetriever dependenciesResourceService() {
+        @ConditionalOnMissingBean
+        public GraphRetriever graphRetriever() {
             return new GraphRetriever(aggregators, nodeStore);
         }
 
         @Bean
+        @ConditionalOnMissingBean
         public NodesController nodesController() {
-            return new NodesController(dependenciesResourceService(), nodeStore, cacheCleaningBean);
+            return new NodesController(graphRetriever(), nodeStore, cacheCleaningBean);
         }
 
+    }
+
+    @Configuration
+    public static class EventsConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        public EventsController eventsController() {
+            return new EventsController(eventListener());
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public EventListener eventListener() {
+            return new EventListener();
+        }
     }
 
     @Configuration
@@ -93,8 +115,9 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         private DiscoveryClient discoveryClient;
 
         @Bean
-        public HealthIndicatorsAggregator healthIndicatorsAggregator() {
-            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties());
+        @ConditionalOnMissingBean
+        public HealthIndicatorsAggregator healthIndicatorsAggregator(ApplicationEventPublisher publisher) {
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), publisher);
         }
 
         @ConfigurationProperties("msdashboard.health")
@@ -103,9 +126,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
             return new HealthProperties();
         }
 
+        @ConfigurationProperties("msdashboard.index")
         @Bean
-        public IndexesAggregator indexesAggregator() {
-            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver());
+        public IndexProperties indexProperties() {
+            return new IndexProperties();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public IndexesAggregator indexesAggregator(ApplicationEventPublisher publisher) {
+            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver(), indexProperties(), publisher);
         }
 
         @Bean
@@ -119,14 +149,22 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     @Configuration
     public static class AggregatorsConfiguration {
 
+        @ConfigurationProperties("msdashboard.pact")
+        @Bean
+        public PactProperties pactProperties() {
+            return new PactProperties();
+        }
+
         @Bean
         @ConditionalOnProperty("pact-broker.url")
-        public PactsAggregator pactsAggregator() {
-            return new PactsAggregator();
+        @ConditionalOnMissingBean
+        public PactsAggregator pactsAggregator(ApplicationEventPublisher publisher) {
+            return new PactsAggregator(pactProperties(), publisher);
         }
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator() {
         return new VirtualAndRealDependencyIntegrator();
     }

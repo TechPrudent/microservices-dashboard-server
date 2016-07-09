@@ -16,16 +16,24 @@
 package be.ordina.msdashboard.aggregators.pact;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.events.NodeEvent;
+import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import com.jayway.jsonpath.JsonPath;
+import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;
 
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Andreas Evers
@@ -34,12 +42,20 @@ public class PactsAggregator implements NodeAggregator {
 
 	private static final Logger logger = LoggerFactory.getLogger(PactsAggregator.class);
 
+	private final PactProperties properties;
+	private final ApplicationEventPublisher publisher;
+
 	@Value("${pact-broker.url:'http://localhost:8089'}")
 	protected String pactBrokerUrl;
 	@Value("${pact-broker.latest-url:'/pacts/latest'}")
 	protected String latestPactsUrl;
 	@Value("${pact-broker.self-href-jsonPath:'test'}")
 	protected String selfHrefJsonPath;
+
+	public PactsAggregator(final PactProperties properties, final ApplicationEventPublisher publisher) {
+		this.properties = properties;
+		this.publisher = publisher;
+	}
 
 	//TODO: Caching
 	//@Cacheable(value = Constants.PACTS_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
@@ -53,12 +69,26 @@ public class PactsAggregator implements NodeAggregator {
 
 	private Observable<String> getPactUrlsFromBroker() {
 		logger.info("Discovering pact urls");
-		return RxNetty.createHttpGet(pactBrokerUrl + latestPactsUrl)
+		final String url = pactBrokerUrl + latestPactsUrl;
+		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
+			request.withHeader(header.getKey(), header.getValue());
+		}
+
+		return RxNetty.createHttpRequest(request)
+				.doOnError(el -> {
+					String error = MessageFormat.format("Error retrieving pacts in url {} with headers {}: {}",
+							request.getUri(), request.getHeaders().entries(), el);
+					logger.error(error);
+					publisher.publishEvent(new SystemEvent(error, el));
+				})
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), pactBrokerUrl + latestPactsUrl, r.getHeaders().entries());
+						String warning = "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries();
+						logger.warn(warning);
+						publisher.publishEvent(new SystemEvent(warning));
 						return false;
 					}
 				})
@@ -68,16 +98,29 @@ public class PactsAggregator implements NodeAggregator {
 				.map(response -> (List<String>) JsonPath.read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> el.map(obj -> (String) obj))
-				.doOnNext(url -> logger.info("Pact url discovered: " + url));
+				.doOnNext(pactUrl -> logger.info("Pact url discovered: " + pactUrl));
 	}
 
-	private Observable<Node> getNodesFromPacts(String url) {
-		return RxNetty.createHttpGet(url)
+	private Observable<Node> getNodesFromPacts(final String url) {logger.info("Discovering pact urls");
+		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
+			request.withHeader(header.getKey(), header.getValue());
+		}
+
+		return RxNetty.createHttpRequest(request)
+				.doOnError(el -> {
+					String error = MessageFormat.format("Error retrieving pacts in url {} with headers {}: {}",
+							request.getUri(), request.getHeaders().entries(), el);
+					logger.error(error);
+					publisher.publishEvent(new SystemEvent(error, el));
+				})
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						logger.warn("Exception {} for call {} with headers {}", r.getStatus(), url, r.getHeaders().entries());
+						String warning = "Exception " + r.getStatus() + " for call " + url + " with properties " + r.getHeaders().entries();
+						logger.warn(warning);
+						publisher.publishEvent(new SystemEvent(warning));
 						return false;
 					}
 				})

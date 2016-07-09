@@ -16,6 +16,8 @@
 package be.ordina.msdashboard.aggregators.health;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.events.NodeEvent;
+import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
@@ -27,11 +29,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.Map.Entry;
 import java.util.Objects;
 
@@ -49,11 +53,14 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private DiscoveryClient discoveryClient;
 	private UriResolver uriResolver;
 	private HealthProperties properties;
+	private ApplicationEventPublisher publisher;
 
-	public HealthIndicatorsAggregator(DiscoveryClient discoveryClient, UriResolver uriResolver, HealthProperties properties) {
+	public HealthIndicatorsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
+									  final HealthProperties properties, final ApplicationEventPublisher publisher) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
+		this.publisher = publisher;
 	}
 
 	//TODO: Caching
@@ -74,7 +81,11 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
 		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io())
-				.doOnError(e -> logger.error("Error retrieving services: " + e.getMessage()))
+				.doOnError(e -> {
+					String error = "Error retrieving services: " + e.getMessage();
+					logger.error(error);
+					publisher.publishEvent(new SystemEvent(error, e));
+				})
 				.onErrorResumeNext(Observable.empty())
 				.doOnNext(s -> logger.debug("Service discovered: " + s))
 				.map(id -> id.toLowerCase())
@@ -88,14 +99,20 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 		return RxNetty.createHttpRequest(request)
-				.doOnError(el -> logger.error("Error retrieving healthnodes in url {} with headers {}: ",
-						request.getUri(), request.getHeaders().entries(), el))
+				.doOnError(el -> {
+					String error = MessageFormat.format("Error retrieving healthnodes in url {} with headers {}: {}",
+							request.getUri(), request.getHeaders().entries(), el);
+					logger.error(error);
+					publisher.publishEvent(new NodeEvent(serviceId, error));
+				})
 				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						logger.warn("Exception {} for call {} with properties {}", r.getStatus(), url, r.getHeaders().entries());
+						String warning = "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries();
+						logger.warn(warning);
+						publisher.publishEvent(new NodeEvent(serviceId, warning));
 						return false;
 					}
 				})

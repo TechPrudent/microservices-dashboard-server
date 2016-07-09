@@ -13,16 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard;
+package be.ordina.msdashboard.events;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
-@Configuration
-public class InMemoryMockedConfiguration {
+/**
+ * @author Andreas Evers
+ */
+public class EventListener {
 
-    @Bean
-    protected InMemoryWireMock inMemoryWireMock() {
-        return new InMemoryWireMock();
+    private ConcurrentLinkedDeque events = new ConcurrentLinkedDeque();
+
+    @org.springframework.context.event.EventListener
+    public void handleContextRefresh(SystemEvent event) {
+        events.add(event);
+    }
+
+    public ConcurrentLinkedDeque getEvents() {
+        return events;
+    }
+
+    public void deleteEvents() {
+        events.clear();
     }
 }

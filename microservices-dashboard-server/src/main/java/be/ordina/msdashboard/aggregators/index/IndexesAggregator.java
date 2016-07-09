@@ -16,19 +16,26 @@
 package be.ordina.msdashboard.aggregators.index;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
+import be.ordina.msdashboard.events.NodeEvent;
+import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
+import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -42,13 +49,18 @@ public class IndexesAggregator implements NodeAggregator {
 
     private final DiscoveryClient discoveryClient;
     private final IndexToNodeConverter indexToNodeConverter;
+    private final ApplicationEventPublisher publisher;
+    private final IndexProperties properties;
     private UriResolver uriResolver;
 
     public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient,
-                             UriResolver uriResolver) {
+                             UriResolver uriResolver, final IndexProperties properties,
+                             final ApplicationEventPublisher publisher) {
         this.indexToNodeConverter = indexToNodeConverter;
         this.discoveryClient = discoveryClient;
         this.uriResolver = uriResolver;
+        this.properties = properties;
+        this.publisher = publisher;
     }
 
     //TODO: Caching
@@ -56,11 +68,15 @@ public class IndexesAggregator implements NodeAggregator {
     public Observable<Node> aggregateNodes() {
         return Observable.from(discoveryClient.getServices())
                 .observeOn(Schedulers.io())
-                .doOnError(e -> logger.error("Error retrieving services: " + e.getMessage()))
+                .doOnError(e -> {
+                    String error = "Error retrieving services: " + e.getMessage();
+                    logger.error(error);
+                    publisher.publishEvent(new SystemEvent(error, e));
+                })
                 .onErrorResumeNext(Observable.empty())
                 .doOnNext(service -> {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Sending instance retrieval request for service '{}'", service);
+                        logger.debug("Sending instance retrieval request for serviceId '{}'", service);
                     }
                 })
                 .map(this::getFirstInstanceForService)
@@ -78,7 +94,11 @@ public class IndexesAggregator implements NodeAggregator {
                     }
 
                     @Override
-                    public void onError(Throwable e) {}
+                    public void onError(Throwable e) {
+                        String error = "Error retrieving a node: " + e.getMessage();
+                        logger.error(error);
+                        publisher.publishEvent(new SystemEvent(error, e));
+                    }
 
                     @Override
                     public void onNext(Node node) {
@@ -92,48 +112,55 @@ public class IndexesAggregator implements NodeAggregator {
                 });
     }
 
-    private ServiceInstance getFirstInstanceForService(String service) {
+    private ServiceInstance getFirstInstanceForService(String serviceId) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Getting first instance for service '{}'", service);
+            logger.debug("Getting first instance for serviceId '{}'", serviceId);
         }
 
-        List<ServiceInstance> instances = discoveryClient.getInstances(service);
+        List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
 
         if (instances.size() > 0) {
             return instances.get(0);
         } else {
-            logger.warn("No instances found for service '{}'", service);
+            String warning = "No instances found for serviceId " + serviceId;
+            logger.warn(warning);
+            publisher.publishEvent(new NodeEvent(serviceId, warning));
             return null;
         }
     }
 
     private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
-        final String uri = uriResolver.resolveHomePageUrl(serviceInstance);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Creating GET request to '{}'...", uri);
+        final String url = uriResolver.resolveHomePageUrl(serviceInstance);
+        final String serviceId = serviceInstance.getServiceId().toLowerCase();
+        HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+        for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
+            request.withHeader(header.getKey(), header.getValue());
         }
 
         //TODO: Add hook for headers on GET (e.g. accept = application/hal+json")
-        return RxNetty.createHttpGet(uri)
-                .doOnError(e -> logger.error("Error retrieving indexes for uri {}: {}", uri, e.getMessage()))
+        return RxNetty.createHttpRequest(request)
+                .doOnError(el -> {
+                    String error = MessageFormat.format("Error retrieving healthnodes in url {} with headers {}: {}",
+                                    request.getUri(), request.getHeaders().entries(), el);
+                    logger.error(error);
+                    publisher.publishEvent(new NodeEvent(serviceId, error));
+                })
                 .onErrorResumeNext(Observable.empty())
                 .filter(r -> {
                     if (r.getStatus().code() < 400) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug("'GET {}' returned '{}'", uri, r.getStatus());
+                            logger.debug("'GET {}' returned '{}'", url, r.getStatus());
                         }
                         return true;
                     } else {
-                        logger.warn("'GET {}' returned '{}'", uri, r.getStatus());
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Headers: {}", r.getHeaders().entries());
-                            logger.debug("Cookies: {}", r.getCookies().entrySet());
-                        }
+                        String warning = "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries();
+                        logger.warn(warning);
+                        publisher.publishEvent(new NodeEvent(serviceId, warning));
                         return false;
                     }
                 })
                 .flatMap(r -> r.getContent().map(bb -> bb.toString(Charset.defaultCharset())))
                 .observeOn(Schedulers.computation())
-                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), uri, source));
+                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, source));
     }
 }

@@ -1,0 +1,9 @@
+[ {
+  "message" : "Exception 404 Not Found for call http://localhost:8089/service2 with headers [Content-Type=text/html; charset=iso-8859-1, Cache-Control=must-revalidate,no-cache,no-store, Content-Length=1381, Server=Jetty(6.1.26)]",
+  "throwable" : null,
+  "nodeId" : "service2"
+}, {
+  "message" : "Exception 500 Internal Server Error for call http://localhost:8089/service2/health with headers [Content-Type=application/vnd.error+json;charset=UTF-8, Content-Length=2370, Server=Jetty(6.1.26)]",
+  "throwable" : null,
+  "nodeId" : "service2"
+} ]

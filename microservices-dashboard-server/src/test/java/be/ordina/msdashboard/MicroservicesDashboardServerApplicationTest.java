@@ -66,15 +66,15 @@ public class MicroservicesDashboardServerApplicationTest {
     public void exposesGraph() throws IOException, InterruptedException {
         long startTime = System.currentTimeMillis();
         @SuppressWarnings("rawtypes")
-        ResponseEntity<String> entity = new TestRestTemplate()
+        ResponseEntity<String> graph = new TestRestTemplate()
                 .getForEntity("http://localhost:" + port + "/graph", String.class);
         long totalTime = System.currentTimeMillis() - startTime;
-        assertThat(HttpStatus.OK).isEqualTo(entity.getStatusCode());
-        String body = removeBlankNodes(entity.getBody());
+        assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
+        String body = removeBlankNodes(graph.getBody());
         // System.out.println("BODY: " + body);
         System.out.println("Time spent waiting for /graph: " + totalTime);
 
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestResponse.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
@@ -103,8 +103,15 @@ public class MicroservicesDashboardServerApplicationTest {
         assertLinkBetweenIds(r, "service4", "backend9");
         assertLinkBetweenIds(r, "service4", "db");
         assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(22);
-        // assertThat(totalTime).isLessThan(10000);
-        // assertThat(totalTime).isLessThan(4500); // should be the case after reactive improvements
+
+        ResponseEntity<String> errors = new TestRestTemplate()
+                .getForEntity("http://localhost:" + port + "/events", String.class);
+
+        assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
+        body = errors.getBody();
+        // System.out.println("BODY: " + body);
+        JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
+                body, JSONCompareMode.LENIENT);
     }
 
     private void printLinks(Map<String, List> r) {

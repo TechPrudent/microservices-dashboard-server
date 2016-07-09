@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2016 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package be.ordina.msdashboard.events;
 
 import java.io.Serializable;
@@ -7,15 +22,18 @@ import java.io.Serializable;
  *
  * @author Andreas Evers
  */
-public class NodeEvent implements Serializable {
+public class NodeEvent extends SystemEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final String nodeId;
-    private String message;
-    private Throwable throwable;
 
     public NodeEvent(final String nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public NodeEvent(String nodeId, String message) {
+        super(message);
         this.nodeId = nodeId;
     }
 
@@ -23,40 +41,22 @@ public class NodeEvent implements Serializable {
         return nodeId;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
-    public void setThrowable(Throwable throwable) {
-        this.throwable = throwable;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         NodeEvent nodeEvent = (NodeEvent) o;
 
-        if (nodeId != null ? !nodeId.equals(nodeEvent.nodeId) : nodeEvent.nodeId != null) return false;
-        if (message != null ? !message.equals(nodeEvent.message) : nodeEvent.message != null) return false;
-        return throwable != null ? throwable.equals(nodeEvent.throwable) : nodeEvent.throwable == null;
+        return nodeId != null ? nodeId.equals(nodeEvent.nodeId) : nodeEvent.nodeId == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = nodeId != null ? nodeId.hashCode() : 0;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        result = 31 * result + (throwable != null ? throwable.hashCode() : 0);
+        int result = super.hashCode();
+        result = 31 * result + (nodeId != null ? nodeId.hashCode() : 0);
         return result;
     }
 }
