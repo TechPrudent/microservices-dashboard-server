@@ -20,8 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.constants.Constants.STATUS;
+import static be.ordina.msdashboard.constants.Constants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)

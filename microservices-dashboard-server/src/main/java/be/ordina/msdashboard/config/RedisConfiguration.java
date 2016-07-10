@@ -66,6 +66,9 @@ public class RedisConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisConfiguration.class);
 
+    @Autowired
+    private CachingProperties cachingProperties;
+
     @Bean
     public NodeStore nodeStore(final RedisConnectionFactory factory) {
         return new RedisStore(redisTemplate(factory), factory);
@@ -109,9 +112,6 @@ public class RedisConfiguration {
             redisServer.stop();
         }
     }
-
-    @Autowired
-    private CachingProperties cachingProperties;
 
     @Bean
     @ConditionalOnMissingBean

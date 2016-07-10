@@ -62,8 +62,8 @@ public class GraphMapper {
 
             Map<String, Object> nodesAndLinksMap = new HashMap<>();
 
-            nodesAndLinksMap.put(Constants.NODES, displayableNodes);
-            nodesAndLinksMap.put(Constants.LINKS, links);
+            nodesAndLinksMap.put(NODES, displayableNodes);
+            nodesAndLinksMap.put(LINKS, links);
 
             return nodesAndLinksMap;
         };

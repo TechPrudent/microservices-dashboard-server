@@ -36,18 +36,16 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @ResponseBody
 public class NodesController {
 
+	private GraphRetriever graphRetriever;
+	private NodeStore redisService;
+	private CacheCleaningBean cacheCleaningBean;
+
 	public NodesController(GraphRetriever graphRetriever, NodeStore nodeStore,
 						   CacheCleaningBean cacheCleaningBean) {
 		this.graphRetriever = graphRetriever;
 		this.redisService = nodeStore;
 		this.cacheCleaningBean = cacheCleaningBean;
 	}
-
-	private GraphRetriever graphRetriever;
-
-	private NodeStore redisService;
-
-	private CacheCleaningBean cacheCleaningBean;
 
 	//TODO: Support table response?
 	@RequestMapping(value = "/graph", produces = "application/json")

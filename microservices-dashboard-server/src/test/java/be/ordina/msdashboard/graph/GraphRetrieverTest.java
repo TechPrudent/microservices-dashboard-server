@@ -34,8 +34,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Map;
 
-import static be.ordina.msdashboard.JsonHelper.load;
-import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
+import static be.ordina.msdashboard.JsonHelper.*;
 import static be.ordina.msdashboard.model.NodeBuilder.node;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -58,7 +57,7 @@ public class GraphRetrieverTest {
 	private NodeStore redisService;
 
 	@Before
-	public void setup() {
+	public void setUp() {
 		graphRetriever = new GraphRetriever(Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
 	}
 

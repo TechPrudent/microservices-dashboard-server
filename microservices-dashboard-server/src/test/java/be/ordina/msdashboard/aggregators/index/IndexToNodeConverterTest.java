@@ -31,7 +31,7 @@ public class IndexToNodeConverterTest {
     private IndexToNodeConverter indexToNodeConverter;
 
     @Before
-    public void setup() {
+    public void setUp() {
         indexToNodeConverter = new IndexToNodeConverter();
     }
 

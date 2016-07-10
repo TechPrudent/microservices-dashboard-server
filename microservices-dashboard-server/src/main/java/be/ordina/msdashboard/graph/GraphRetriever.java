@@ -50,7 +50,7 @@ public class GraphRetriever {
 		this.redisService = redisService;
 	}
 
-	@Cacheable(value = Constants.GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	public Map<String, Object> retrieve() {
 		List<Observable<Node>> observables = aggregators.stream()
 				.collect(Collectors.mapping(NodeAggregator::aggregateNodes, Collectors.toList()));

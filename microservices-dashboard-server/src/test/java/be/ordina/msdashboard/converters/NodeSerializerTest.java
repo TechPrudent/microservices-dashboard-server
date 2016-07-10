@@ -22,8 +22,7 @@ import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.constants.Constants.STATUS;
+import static be.ordina.msdashboard.constants.Constants.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NodeSerializerTest {
@@ -32,9 +31,9 @@ public class NodeSerializerTest {
 	public void serialize() {
 		Node node = NodeBuilder.node()
 							   .withId("key1")
-							   .withDetail("type", Constants.MICROSERVICE)
-							   .withDetail(Constants.STATUS, "UP")
-							   .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(Constants.STATUS, "DOWN").withDetail("type", "REST").build())
+							   .withDetail("type", MICROSERVICE)
+							   .withDetail(STATUS, "UP")
+							   .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(STATUS, "DOWN").withDetail("type", "REST").build())
 							   .build();
 
 		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";

@@ -25,25 +25,14 @@ import java.util.Map;
 import java.util.Set;
 
 import static be.ordina.msdashboard.constants.Constants.*;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * @author Andreas Evers
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(NON_EMPTY)
 public class Node {
-
-	Node() {
-		// For Jackson
-	}
-
-	public Node(String id) {
-		this.id = id;
-		details = new HashMap<>();
-		linkedToNodeIds = new HashSet<>();
-		linkedFromNodeIds = new HashSet<>();
-		linkedToNodes = new HashSet<>();
-	}
 
 	@JsonProperty(ID)
 	private String id;
@@ -61,6 +50,18 @@ public class Node {
 	private Set<String> linkedToNodeIds = new HashSet<>();
 
 	private Set<String> linkedFromNodeIds = new HashSet<>();
+
+	Node() {
+		// For Jackson
+	}
+
+	public Node(String id) {
+		this.id = id;
+		details = new HashMap<>();
+		linkedToNodeIds = new HashSet<>();
+		linkedFromNodeIds = new HashSet<>();
+		linkedToNodes = new HashSet<>();
+	}
 
 	public void setLane(Integer lane) {
 		this.lane = lane;

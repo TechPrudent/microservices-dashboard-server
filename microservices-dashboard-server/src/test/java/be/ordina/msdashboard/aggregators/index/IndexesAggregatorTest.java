@@ -45,10 +45,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
+import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RxNetty.class})
@@ -64,9 +64,9 @@ public class IndexesAggregatorTest {
     private ApplicationEventPublisher publisher;
 
     @Before
-    public void setup() {
-        discoveryClient = Mockito.mock(DiscoveryClient.class);
-        indexToNodeConverter = Mockito.mock(IndexToNodeConverter.class);
+    public void setUp() {
+        discoveryClient = mock(DiscoveryClient.class);
+        indexToNodeConverter = mock(IndexToNodeConverter.class);
         uriResolver = new DefaultUriResolver();
         indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties, publisher);
 
@@ -77,13 +77,13 @@ public class IndexesAggregatorTest {
     @SuppressWarnings("unchecked")
     public void shouldReturnThreeNodes() throws InterruptedException {
         when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
-        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
+        ServiceInstance instance = mock(ServiceInstance.class);
         when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
 
         when(instance.getServiceId()).thenReturn("service");
         when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
 
-        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        HttpClientResponse<ByteBuf> response = mock(HttpClientResponse.class);
         when(RxNetty.createHttpRequest(any(HttpClientRequest.class))).thenReturn(Observable.just(response));
 
         when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
@@ -134,16 +134,16 @@ public class IndexesAggregatorTest {
     @SuppressWarnings("unchecked")
     public void failedIndexCallShouldReturnZeroNodes() throws InterruptedException {
         when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
-        ServiceInstance instance = Mockito.mock(ServiceInstance.class);
+        ServiceInstance instance = mock(ServiceInstance.class);
         when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
 
         when(instance.getServiceId()).thenReturn("service");
         when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
 
-        HttpClientResponse<ByteBuf> response = Mockito.mock(HttpClientResponse.class);
+        HttpClientResponse<ByteBuf> response = mock(HttpClientResponse.class);
         when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
 
-        when(response.getStatus()).thenReturn(HttpResponseStatus.SERVICE_UNAVAILABLE);
+        when(response.getStatus()).thenReturn(SERVICE_UNAVAILABLE);
         when(response.getHeaders()).thenReturn(mock(HttpResponseHeaders.class));
         when(response.getCookies()).thenReturn(Collections.emptyMap());
 
