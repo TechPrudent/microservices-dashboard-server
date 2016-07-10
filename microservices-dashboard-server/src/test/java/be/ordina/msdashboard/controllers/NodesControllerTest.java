@@ -15,6 +15,7 @@
  */
 package be.ordina.msdashboard.controllers;
 
+import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.stores.NodeStore;
@@ -37,12 +38,12 @@ public class NodesControllerTest {
 
     @InjectMocks
     private NodesController nodesController;
-
     @Mock
     private GraphRetriever graphRetriever;
-
     @Mock
     private NodeStore redisService;
+    @Mock
+    private CacheCleaningBean cacheCleaningBean;
 
     @Test
     public void getDependenciesGraphJson() {
