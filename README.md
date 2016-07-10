@@ -2,6 +2,7 @@
 [![Gitter](https://badges.gitter.im/ordina-jworks/microservices-dashboard.svg)](https://gitter.im/ordina-jworks/microservices-dashboard?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [ ![Codeship Status for ordina-jworks/microservices-dashboard-server](https://codeship.com/projects/29bfd6e0-de37-0133-bed6-5e9acf2db2e6/status?branch=master)](https://codeship.com/projects/144644)
 [![codecov](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server/branch/master/graph/badge.svg)](https://codecov.io/gh/ordina-jworks/microservices-dashboard-server)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/92621ab5fa43418b996b2b7d43e86664)](https://www.codacy.com/app/krosan/microservices-dashboard-server?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ordina-jworks/microservices-dashboard-server&amp;utm_campaign=Badge_Grade)
 [![][license img]][license]
 [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/ordina-jworks/microservices-dashboard-server.svg)](http://isitmaintained.com/project/ordina-jworks/microservices-dashboard-server "Average time to resolve an issue")
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/ordina-jworks/microservices-dashboard-server.svg)](http://isitmaintained.com/project/ordina-jworks/microservices-dashboard-server "Percentage of issues still open")
