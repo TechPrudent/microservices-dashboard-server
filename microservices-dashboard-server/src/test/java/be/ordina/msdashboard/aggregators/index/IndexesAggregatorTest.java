@@ -57,7 +57,6 @@ public class IndexesAggregatorTest {
     private DiscoveryClient discoveryClient;
     private IndexToNodeConverter indexToNodeConverter;
     private IndexesAggregator indexesAggregator;
-    private UriResolver uriResolver;
     @Mock
     private IndexProperties indexProperties;
     @Mock
@@ -67,8 +66,7 @@ public class IndexesAggregatorTest {
     public void setUp() {
         discoveryClient = mock(DiscoveryClient.class);
         indexToNodeConverter = mock(IndexToNodeConverter.class);
-        uriResolver = new DefaultUriResolver();
-        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties, publisher);
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher);
 
         PowerMockito.mockStatic(RxNetty.class);
     }

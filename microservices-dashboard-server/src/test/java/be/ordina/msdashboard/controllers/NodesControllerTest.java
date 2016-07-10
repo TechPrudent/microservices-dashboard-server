@@ -45,9 +45,6 @@ public class NodesControllerTest {
     @Mock
     private NodeStore redisService;
 
-    @Mock
-    private CacheCleaningBean cacheCleaningBean;
-
     @Test
     public void getDependenciesGraphJson() {
         doReturn(Collections.emptyMap()).when(graphRetriever).retrieve();
