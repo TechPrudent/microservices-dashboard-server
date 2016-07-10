@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard.converters;
 
-import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import org.junit.Test;
