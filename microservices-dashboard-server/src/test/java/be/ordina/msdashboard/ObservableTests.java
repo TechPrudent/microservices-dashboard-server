@@ -21,15 +21,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Notification;
 import rx.Observable;
-import rx.Observable.Transformer;
 import rx.Subscriber;
 import rx.exceptions.Exceptions;
 import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.plugins.DebugHook;
 import rx.plugins.DebugNotification;
 import rx.plugins.DebugNotificationListener;
@@ -38,9 +33,9 @@ import rx.schedulers.Schedulers;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -415,7 +410,7 @@ public class ObservableTests {
     }
 
     private String throwException(String i) {
-        if (i.equals("b4")) {
+        if ("b4".equals(i)) {
             throw new RuntimeException("Error");
         }
         return i;
@@ -543,7 +538,7 @@ public class ObservableTests {
                 })
                 .take(10)
                 .map(el -> {
-                    if (el.equals("a9")) throw new RuntimeException("Error2");
+                    if ("a9".equals(el)) throw new RuntimeException("Error2");
                     return "b" + el;
                 })
                 .doOnError(e -> logger.error("Error caught: " + e.getMessage()))
@@ -587,7 +582,7 @@ public class ObservableTests {
     }
 
     final class OperatorSuppressError<T> implements Observable.Operator<T, T> {
-        final Action1<Throwable> onError;
+        private final Action1<Throwable> onError;
 
         public OperatorSuppressError(Action1<Throwable> onError) {
             this.onError = onError;

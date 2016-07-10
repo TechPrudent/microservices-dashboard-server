@@ -15,15 +15,16 @@
  */
 package be.ordina.msdashboard.model;
 
-import static be.ordina.msdashboard.constants.Constants.DETAILS;
-import static be.ordina.msdashboard.constants.Constants.ID;
-import static be.ordina.msdashboard.constants.Constants.LANE;
-
-import java.util.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static be.ordina.msdashboard.constants.Constants.*;
 
 /**
  * @author Andreas Evers

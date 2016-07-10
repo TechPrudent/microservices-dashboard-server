@@ -18,7 +18,6 @@ package be.ordina.msdashboard.aggregators.index;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
-import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -43,7 +42,8 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;

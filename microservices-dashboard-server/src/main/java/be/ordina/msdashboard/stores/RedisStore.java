@@ -15,13 +15,10 @@
  */
 package be.ordina.msdashboard.stores;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import be.ordina.msdashboard.cache.NodeCache;
+import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.converters.JsonToObjectConverter;
+import be.ordina.msdashboard.model.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +26,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import be.ordina.msdashboard.constants.Constants;
-import be.ordina.msdashboard.model.Node;
 import rx.Observable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public class RedisStore implements NodeCache, NodeStore {
 

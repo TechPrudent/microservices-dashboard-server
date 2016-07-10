@@ -15,16 +15,15 @@
  */
 package be.ordina.msdashboard.converters;
 
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import java.io.IOException;
+
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Andreas Evers

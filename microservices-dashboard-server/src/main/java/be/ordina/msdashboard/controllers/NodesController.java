@@ -15,21 +15,18 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
-import java.util.Collection;
-import java.util.Map;
-
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.graph.GraphRetriever;
+import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.*;
 
-import be.ordina.msdashboard.model.Node;
+import java.util.Collection;
+import java.util.Map;
+
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
  * @author Andreas Evers

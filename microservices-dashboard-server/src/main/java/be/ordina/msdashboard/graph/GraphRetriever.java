@@ -25,12 +25,13 @@ import org.springframework.cache.annotation.Cacheable;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static be.ordina.msdashboard.constants.Constants.*;
-import static be.ordina.msdashboard.constants.Constants.LANE;
-import static be.ordina.msdashboard.constants.Constants.TYPE;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**

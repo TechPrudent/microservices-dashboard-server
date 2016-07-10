@@ -15,17 +15,12 @@
  */
 package be.ordina.msdashboard.aggregators.health;
 
-import static be.ordina.msdashboard.constants.Constants.CONFIGSERVER;
-import static be.ordina.msdashboard.constants.Constants.DISCOVERY;
-import static be.ordina.msdashboard.constants.Constants.GROUP;
-import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.constants.Constants.TOOLBOX;
-import static be.ordina.msdashboard.constants.Constants.TYPE;
+import be.ordina.msdashboard.model.Node;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-import be.ordina.msdashboard.model.Node;
+import static be.ordina.msdashboard.constants.Constants.*;
 
 /**
  * @author Andreas Evers

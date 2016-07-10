@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard.events;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**

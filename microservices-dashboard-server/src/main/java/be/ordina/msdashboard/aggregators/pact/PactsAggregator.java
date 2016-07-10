@@ -16,7 +16,6 @@
 package be.ordina.msdashboard.aggregators.pact;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
-import be.ordina.msdashboard.events.NodeEvent;
 import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import com.jayway.jsonpath.JsonPath;
@@ -25,7 +24,6 @@ import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;

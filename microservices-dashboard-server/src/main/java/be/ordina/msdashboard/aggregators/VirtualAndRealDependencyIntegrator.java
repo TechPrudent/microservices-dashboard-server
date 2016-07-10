@@ -15,13 +15,12 @@
  */
 package be.ordina.msdashboard.aggregators;
 
+import be.ordina.msdashboard.model.Node;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import be.ordina.msdashboard.model.Node;
 
 /**
  * @author Andreas Evers

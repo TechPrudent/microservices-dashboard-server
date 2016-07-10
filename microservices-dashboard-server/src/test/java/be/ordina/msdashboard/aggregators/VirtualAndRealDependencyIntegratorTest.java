@@ -15,16 +15,16 @@
  */
 package be.ordina.msdashboard.aggregators;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Iterator;
-import java.util.Set;
-
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import com.google.common.collect.Sets;
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class VirtualAndRealDependencyIntegratorTest {
 

@@ -16,8 +16,8 @@
 package be.ordina.msdashboard.controllers;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.graph.GraphRetriever;
+import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

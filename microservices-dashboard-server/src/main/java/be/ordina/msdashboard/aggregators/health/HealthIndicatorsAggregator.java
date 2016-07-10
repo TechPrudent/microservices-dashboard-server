@@ -31,13 +31,11 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 import static be.ordina.msdashboard.constants.Constants.*;
 
