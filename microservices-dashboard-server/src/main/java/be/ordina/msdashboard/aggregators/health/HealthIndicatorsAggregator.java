@@ -34,7 +34,6 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.Map.Entry;
 
 import static be.ordina.msdashboard.constants.Constants.*;
@@ -47,7 +46,7 @@ import static java.text.MessageFormat.format;
  * should be exposed under the <code>/health</code> endpoint:
  *
  * TODO: document desired format
- *
+ * 
  * @author Andreas Evers
  * @see <a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">
  *     Spring Boot Actuator</a>
