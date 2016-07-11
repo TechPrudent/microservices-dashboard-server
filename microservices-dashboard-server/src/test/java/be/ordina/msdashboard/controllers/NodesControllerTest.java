@@ -95,6 +95,7 @@ public class NodesControllerTest {
     public void evictCache() {
         nodesController.evictCache();
 
+        verify(cacheCleaningBean).clean();
     }
 
 }
