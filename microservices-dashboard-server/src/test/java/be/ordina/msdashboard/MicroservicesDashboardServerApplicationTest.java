@@ -59,6 +59,7 @@ public class MicroservicesDashboardServerApplicationTest {
 
     @Test
     public void contextLoads() {
+        // Intentionally left empty
     }
 
     @Test
