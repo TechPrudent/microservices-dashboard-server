@@ -38,9 +38,19 @@ import java.text.MessageFormat;
 import java.util.Map.Entry;
 
 import static be.ordina.msdashboard.constants.Constants.*;
+import static java.text.MessageFormat.format;
 
 /**
+ * Aggregates nodes from health information exposed by Spring Boot's Actuator.
+ * <p>
+ * In case Spring Boot is not used for a microservice, the following format
+ * should be exposed under the <code>/health</code> endpoint:
+ *
+ * TODO: document desired format
+ *
  * @author Andreas Evers
+ * @see <a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">
+ *     Spring Boot Actuator</a>
  */
 public class HealthIndicatorsAggregator implements NodeAggregator {
 
@@ -61,8 +71,6 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 		this.publisher = publisher;
 	}
 
-	//TODO: Caching
-	//@Cacheable(value = Constants.HEALTH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
 	@Override
 	public Observable<Node> aggregateNodes() {
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
@@ -79,38 +87,27 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
 		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io())
-				.doOnError(e -> {
-					String error = "Error retrieving services: " + e.getMessage();
-					logger.error(error);
-					publisher.publishEvent(new SystemEvent(error, e));
-				})
+				.doOnError(e -> handleSystemError("Error retrieving services: " + e.getMessage(), e))
 				.onErrorResumeNext(Observable.empty())
 				.doOnNext(s -> logger.debug("Service discovered: " + s))
 				.map(id -> id.toLowerCase())
 				.filter(id -> !id.equals(ZUUL_ID));
 	}
 
-	//TODO: Add hook for properties on GET (e.g. globalId)
 	private Observable<Node> getHealthNodesFromService(String serviceId, String url) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
 		for (Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 		return RxNetty.createHttpRequest(request)
-				.doOnError(el -> {
-					String error = MessageFormat.format("Error retrieving healthnodes in url {} with headers {}: {}",
-							request.getUri(), request.getHeaders().entries(), el);
-					logger.error(error);
-					publisher.publishEvent(new NodeEvent(serviceId, error));
-				})
+				.doOnError(el -> handleNodeError(serviceId, format("Error retrieving healthnodes in url {} with headers {}: {}",
+						request.getUri(), request.getHeaders().entries(), el), el))
 				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
 					} else {
-						String warning = "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries();
-						logger.warn(warning);
-						publisher.publishEvent(new NodeEvent(serviceId, warning));
+						handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries());
 						return false;
 					}
 				})
@@ -127,5 +124,20 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
 				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url));
+	}
+
+	private void handleNodeWarning(String serviceId, String message) {
+		logger.warn(message);
+		publisher.publishEvent(new NodeEvent(serviceId, message));
+	}
+
+	private void handleNodeError(String serviceId, String message, Throwable el) {
+		logger.error(message);
+		publisher.publishEvent(new NodeEvent(serviceId, message, el));
+	}
+
+	private void handleSystemError(String message, Throwable el) {
+		logger.error(message);
+		publisher.publishEvent(new SystemEvent(message, el));
 	}
 }

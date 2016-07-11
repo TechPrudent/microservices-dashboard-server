@@ -37,6 +37,11 @@ public class NodeEvent extends SystemEvent implements Serializable {
         this.nodeId = nodeId;
     }
 
+    public NodeEvent(String nodeId, String message, Throwable throwable) {
+        super(message, throwable);
+        this.nodeId = nodeId;
+    }
+
     public String getNodeId() {
         return nodeId;
     }

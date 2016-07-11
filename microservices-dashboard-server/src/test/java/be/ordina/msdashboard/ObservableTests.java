@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -665,6 +666,132 @@ public class ObservableTests {
                 s -> System.out.println(s),
                 error -> System.out.println("Error!")
         );
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue4() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .flatMap(el -> { if (el == 5L) throw new RuntimeException("Error1"); return Observable.just("a" + el);}) //Business logic that might fail
+                .retry(3) //retry on any error up to 3 times
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue5() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .flatMap(el -> { if (el == 4L || el == 5L || el == 6L || el == 7L) throw new RuntimeException("Error1"); return Observable.just("a" + el);}) //Business logic that might fail
+                .retry(3) //retry on any error up to 3 times
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue6() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .flatMap(el -> { if (el == 4L || el == 5L || el == 6L || el == 7L) throw new RuntimeException("Error1"); return Observable.just("a" + el);}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue7() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .flatMap(el -> { if (el > 4L) throw new RuntimeException("Error1"); return Observable.just("a" + el);}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue8() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue9() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .map(el -> { if ("a5".equals(el)) throw new RuntimeException("Error1"); return "b" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue10() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .map(el -> { if ("a5".equals(el)) throw new RuntimeException("Error1"); return "b" + el;}) //Business logic that might fail
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue11() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(subscribe());
+    }
+
+    private Subscriber<? super String> subscribe() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return new Subscriber<String>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(String s) {
+                System.out.println(s);
+            }
+        };
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue12() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .delaySubscription(3, SECONDS)
+                .toBlocking()
+                .subscribe(System.out::println);
     }
 
     /*@Test
