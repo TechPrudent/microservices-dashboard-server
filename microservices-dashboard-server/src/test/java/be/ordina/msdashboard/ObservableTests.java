@@ -36,7 +36,6 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -790,6 +789,117 @@ public class ObservableTests {
                 .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
                 .retry() //retry on any error infinitely
                 .delaySubscription(3, SECONDS)
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testMergeWithSuppressedExceptionAndContinue() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS)
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .take(10); // Okay to stop emitting
+
+        Observable<String> observable2 = Observable.interval(1L, SECONDS)
+                .publish().autoConnect()
+                .map(el -> { if (el == 6L) throw new RuntimeException("Error2"); return "b" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .take(10)
+                .retry(); // Should continue emission
+
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()))
+                .onErrorResumeNext(Observable.empty());
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test
+    public void testMergeWithSuppressedExceptionAndContinue2() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS)
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .take(10); // Okay to stop emitting
+
+        Observable<String> observable2 = Observable.interval(1L, SECONDS)
+                .take(10)
+                .publish().autoConnect()
+                .map(el -> { if (el == 6L) throw new RuntimeException("Error2"); return "b" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .retry(); // Should continue emission
+
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()))
+                .onErrorResumeNext(Observable.empty());
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test // HANGS - don't do publish().autoconnect() in the middle of operators
+    public void testMergeWithSuppressedExceptionAndContinue3() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS)
+                .take(10) // Okay to stop emitting
+                .map(el -> { if (el == 6L) throw new RuntimeException("Error1"); return "a" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .publish().autoConnect()
+                .map(el -> { if ("a4".equals(el)) throw new RuntimeException("Error3"); return el + "a";})
+                .retry(); // Should continue emission
+
+        Observable<String> observable2 = Observable.interval(1L, SECONDS)
+                .take(10)
+                .publish().autoConnect()
+                .map(el -> { if (el == 6L) throw new RuntimeException("Error2"); return "b" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .retry(); // Should continue emission
+
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable1, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()))
+                .onErrorResumeNext(Observable.empty());
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test // HANGS - don't do publish().autoconnect() in the middle of operators
+    public void testMergeWithSuppressedExceptionAndContinue4() {
+        Observable<String> observable1 = Observable.interval(1L, SECONDS)
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .take(10); // Okay to stop emitting
+
+        Observable<Observable<String>> observableWrapped =
+                Observable.from(new Observable[] { observable1 });
+
+        Observable<String> observable3 = observableWrapped.publish().autoConnect()
+                .flatMap(el -> el)
+                .map(el -> { if ("a4".equals(el)) throw new RuntimeException("Error3"); return el + "a";})
+                .retry();
+
+        Observable<String> observable2 = Observable.interval(1L, SECONDS)
+                .take(10)
+                .publish().autoConnect()
+                .map(el -> { if (el == 6L) throw new RuntimeException("Error2"); return "b" + el;})
+                .doOnEach(notification -> logger.info(notification.toString()))
+                .retry(); // Should continue emission
+
+        Observable<Observable<String>> observableObservable =
+                Observable.from(new Observable[] { observable3, observable2 });
+        Observable<String> mergedObservable = Observable.mergeDelayError(observableObservable)
+                .doOnError((a) -> logger.error("Error: " + a.toString()))
+                .onErrorResumeNext(Observable.empty());
+        mergedObservable.reduce("start-", (a, b) -> a + b + "-").toBlocking().subscribe(logger::info);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue13() {
+        Observable.interval(1L, SECONDS).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
                 .toBlocking()
                 .subscribe(System.out::println);
     }

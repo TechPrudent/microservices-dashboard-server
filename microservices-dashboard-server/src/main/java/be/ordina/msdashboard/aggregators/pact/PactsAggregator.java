@@ -93,7 +93,7 @@ public class PactsAggregator implements NodeAggregator {
 				.flatMap(response -> response.getContent())
 				.map(data -> data.toString(Charset.defaultCharset()))
 				.onErrorReturn(Throwable::toString)
-				.map(response -> (List<String>) JsonPath.read(response, selfHrefJsonPath))
+				.map(response -> JsonPath.<List<String>> read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> el.map(obj -> (String) obj))
 				.doOnNext(pactUrl -> logger.info("Pact url discovered: " + pactUrl));

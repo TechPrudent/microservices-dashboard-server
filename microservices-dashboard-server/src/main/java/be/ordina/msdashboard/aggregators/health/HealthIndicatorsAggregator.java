@@ -15,29 +15,23 @@
  */
 package be.ordina.msdashboard.aggregators.health;
 
+import be.ordina.msdashboard.aggregators.ErrorHandler;
+import be.ordina.msdashboard.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.aggregators.NodeAggregator;
-import be.ordina.msdashboard.events.NodeEvent;
-import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.RxNetty;
-import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationEventPublisher;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.nio.charset.Charset;
 import java.util.Map.Entry;
 
 import static be.ordina.msdashboard.constants.Constants.*;
-import static java.text.MessageFormat.format;
 
 /**
  * Aggregates nodes from health information exposed by Spring Boot's Actuator.
@@ -46,7 +40,34 @@ import static java.text.MessageFormat.format;
  * should be exposed under the <code>/health</code> endpoint:
  *
  * TODO: document desired format
- * 
+ * <pre>
+ * {
+ * "store":
+ * {
+ * "book":
+ * [
+ * {
+ * "category": "reference",
+ * "author": "Nigel Rees",
+ * "title": "Sayings of the Century",
+ * "price": 8.95
+ * },
+ * {
+ * "category": "fiction",
+ * "author": "Evelyn Waugh",
+ * "title": "Sword of Honour",
+ * "price": 12.99
+ * }
+ * ],
+ * "bicycle":
+ * {
+ * "color": "red",
+ * "price": 19.95
+ * }
+ * }
+ * }
+ * </pre>
+ *
  * @author Andreas Evers
  * @see <a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">
  *     Spring Boot Actuator</a>
@@ -60,14 +81,17 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private DiscoveryClient discoveryClient;
 	private UriResolver uriResolver;
 	private HealthProperties properties;
-	private ApplicationEventPublisher publisher;
+	private NettyServiceCaller caller;
+	private ErrorHandler errorHandler;
 
 	public HealthIndicatorsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
-									  final HealthProperties properties, final ApplicationEventPublisher publisher) {
+									  final HealthProperties properties, final NettyServiceCaller caller,
+									  final ErrorHandler errorHandler) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
-		this.publisher = publisher;
+		this.caller = caller;
+		this.errorHandler = errorHandler;
 	}
 
 	@Override
@@ -83,60 +107,29 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.doOnCompleted(() -> logger.info("Completed merging all health observables"));
 	}
 
-	private Observable<String> getServiceIdsFromDiscoveryClient() {
+	protected Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
 		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io())
-				.doOnError(e -> handleSystemError("Error retrieving services: " + e.getMessage(), e))
+				.doOnError(e -> errorHandler.handleSystemError("Error retrieving services: " + e.getMessage(), e))
 				.onErrorResumeNext(Observable.empty())
 				.doOnNext(s -> logger.debug("Service discovered: " + s))
 				.map(id -> id.toLowerCase())
 				.filter(id -> !id.equals(ZUUL_ID));
 	}
 
-	private Observable<Node> getHealthNodesFromService(String serviceId, String url) {
+	protected Observable<Node> getHealthNodesFromService(String serviceId, String url) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
 		for (Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
-		return RxNetty.createHttpRequest(request)
-				.doOnError(el -> handleNodeError(serviceId, format("Error retrieving healthnodes in url {} with headers {}: {}",
-						request.getUri(), request.getHeaders().entries(), el), el))
-				.onErrorResumeNext(Observable.empty())
-				.filter(r -> {
-					if (r.getStatus().code() < 400) {
-						return true;
-					} else {
-						handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries());
-						return false;
-					}
-				})
-				.flatMap(AbstractHttpContentHolder::getContent)
-				.map(data -> data.toString(Charset.defaultCharset()))
-				.map(response -> {
-					JacksonJsonParser jsonParser = new JacksonJsonParser();
-					return jsonParser.parseMap(response);
-				})
-				.map((source) -> HealthToNodeConverter.convertToNodes(serviceId, source))
+		return caller.retrieveJsonFromRequest(serviceId, request)
+				.map(source -> HealthToNodeConverter.convertToNodes(serviceId, source))
 				.flatMap(el -> el)
 				.filter(node -> !HYSTRIX.equals(node.getId()) && !DISK_SPACE.equals(node.getId())
 						&& !DISCOVERY.equals(node.getId()) && !CONFIGSERVER.equals(node.getId()))
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
-				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url));
-	}
-
-	private void handleNodeWarning(String serviceId, String message) {
-		logger.warn(message);
-		publisher.publishEvent(new NodeEvent(serviceId, message));
-	}
-
-	private void handleNodeError(String serviceId, String message, Throwable el) {
-		logger.error(message);
-		publisher.publishEvent(new NodeEvent(serviceId, message, el));
-	}
-
-	private void handleSystemError(String message, Throwable el) {
-		logger.error(message);
-		publisher.publishEvent(new SystemEvent(message, el));
+				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))
+				.retry();
 	}
 }

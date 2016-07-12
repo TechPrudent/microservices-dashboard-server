@@ -15,6 +15,8 @@
  */
 package be.ordina.msdashboard.config;
 
+import be.ordina.msdashboard.aggregators.ErrorHandler;
+import be.ordina.msdashboard.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.aggregators.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
@@ -65,12 +67,11 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Configuration
-    @AutoConfigureAfter({ EurekaConfiguration.class, AggregatorsConfiguration.class })
+    @AutoConfigureAfter({ HealthConfiguration.class, IndexConfiguration.class, PactConfiguration.class })
     public static class GraphConfiguration {
 
         @Autowired
         private NodeStore nodeStore;
-
         @Autowired
         private CacheCleaningBean cacheCleaningBean;
 
@@ -88,7 +89,6 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         public NodesController nodesController() {
             return new NodesController(graphRetriever(), nodeStore, cacheCleaningBean);
         }
-
     }
 
     @Configuration
@@ -107,23 +107,29 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         }
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public ErrorHandler errorHandler(ApplicationEventPublisher publisher) {
+        return new ErrorHandler(publisher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public NettyServiceCaller nettyServiceCaller(ApplicationEventPublisher publisher) {
+        return new NettyServiceCaller(errorHandler(publisher));
+    }
+
     @Configuration
     @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
-    public static class EurekaConfiguration {
+    public static class IndexConfiguration {
 
         @Autowired
         private DiscoveryClient discoveryClient;
 
         @Bean
         @ConditionalOnMissingBean
-        public HealthIndicatorsAggregator healthIndicatorsAggregator(ApplicationEventPublisher publisher) {
-            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), publisher);
-        }
-
-        @ConfigurationProperties("msdashboard.health")
-        @Bean
-        public HealthProperties healthProperties() {
-            return new HealthProperties();
+        public IndexesAggregator indexesAggregator(ApplicationEventPublisher publisher) {
+            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver(), indexProperties(), publisher);
         }
 
         @ConfigurationProperties("msdashboard.index")
@@ -133,21 +139,46 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         }
 
         @Bean
-        @ConditionalOnMissingBean
-        public IndexesAggregator indexesAggregator(ApplicationEventPublisher publisher) {
-            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver(), indexProperties(), publisher);
-        }
-
-        @Bean
+        @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
         @ConditionalOnMissingBean
         public UriResolver uriResolver() {
             return new EurekaUriResolver();
         }
-
     }
 
     @Configuration
-    public static class AggregatorsConfiguration {
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    public static class HealthConfiguration {
+
+        @Autowired
+        private DiscoveryClient discoveryClient;
+        @Autowired
+        private NettyServiceCaller caller;
+        @Autowired
+        private ErrorHandler errorHandler;
+
+        @Bean
+        @ConditionalOnMissingBean
+        public HealthIndicatorsAggregator healthIndicatorsAggregator(ApplicationEventPublisher publisher) {
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), caller, errorHandler);
+        }
+
+        @ConfigurationProperties("msdashboard.health")
+        @Bean
+        public HealthProperties healthProperties() {
+            return new HealthProperties();
+        }
+
+        @Bean
+        @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+        @ConditionalOnMissingBean
+        public UriResolver uriResolver() {
+            return new EurekaUriResolver();
+        }
+    }
+
+    @Configuration
+    public static class PactConfiguration {
 
         @ConfigurationProperties("msdashboard.pact")
         @Bean
