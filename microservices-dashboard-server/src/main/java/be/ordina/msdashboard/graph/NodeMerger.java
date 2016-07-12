@@ -42,11 +42,11 @@ public class NodeMerger {
                     .findFirst();
 
             if (nodeIndex.isPresent()) {
-                logger.info("Node previously added, merging");
+                logger.info("Node with id '{}' previously added, merging", node.getId());
                 mergedNodes.get(nodeIndex.get())
                         .mergeWith(node);
             } else {
-                logger.info("Node was not merged before, adding it to the list");
+                logger.info("Node with id '{}' was not merged before, adding it to the list", node.getId());
                 mergedNodes.add(node);
             }
 
