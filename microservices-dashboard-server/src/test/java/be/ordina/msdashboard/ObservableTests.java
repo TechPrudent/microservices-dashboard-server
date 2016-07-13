@@ -32,6 +32,8 @@ import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -897,6 +899,60 @@ public class ObservableTests {
         Observable.interval(1L, SECONDS).take(10)
                 .publish()  // Turn source into hot Publisher
                 .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test // HANGS - Observable(Iterable) hangs on errors unless it is subscribed on a separate thread
+    public void testSuppressExceptionAndContinue14() {
+        List<Long> list = new ArrayList<>();
+        list.add(1L);
+        list.add(2L);
+        list.add(null);
+        list.add(3L);
+        Observable.from(list).take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test
+    public void testSuppressExceptionAndContinue15() {
+        List<Long> list = new ArrayList<>();
+        list.add(1L);
+        list.add(2L);
+        list.add(null);
+        list.add(3L);
+        Observable.from(list).subscribeOn(Schedulers.io()) // Need to subscribe on a separate thread to not hang on error
+                .take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+                .retry() //retry on any error infinitely
+                .toBlocking()
+                .subscribe(System.out::println);
+    }
+
+    @Test // HANGS - subscribeOn should be before publish & autoConnect for it to have an effect
+    public void testSuppressExceptionAndContinue16() {
+        List<Long> list = new ArrayList<>();
+        list.add(1L);
+        list.add(2L);
+        list.add(null);
+        list.add(3L);
+        Observable.from(list)
+                .take(10)
+                .publish()  // Turn source into hot Publisher
+                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+                .subscribeOn(Schedulers.io()) // Need to subscribe on a separate thread to not hang on error
                 .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
                 .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
                 .retry() //retry on any error infinitely

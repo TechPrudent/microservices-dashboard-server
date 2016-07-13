@@ -97,24 +97,25 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	@Override
 	public Observable<Node> aggregateNodes() {
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
-				.map(id -> new ImmutablePair<String, String>(id, uriResolver.resolveHealthCheckUrl(discoveryClient.getInstances(id).get(0))))
-				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
+				.doOnNext(el -> {System.out.println("0: " + el);})
+				.map(id -> new ImmutablePair<>(id, uriResolver.resolveHealthCheckUrl(discoveryClient.getInstances(id).get(0))))
+				.doOnNext(pair -> {System.out.println("1: " + pair); logger.info("Creating health observable: " + pair);})
 				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
-				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
+				.doOnNext(el -> {System.out.println("2: " + el); logger.debug("Unmerged health observable: " + el);})
 				.doOnCompleted(() -> logger.info("Completed getting all health observables"));
 		return Observable.merge(observableObservable)
-				.doOnNext(el -> logger.debug("Merged health node: " + el.getId()))
+				.doOnNext(el -> {System.out.println("3: " + el); logger.debug("Merged health node: " + el.getId());})
+				.doOnError(e -> System.out.println(e))
 				.doOnCompleted(() -> logger.info("Completed merging all health observables"));
 	}
-
 	protected Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
-		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io())
-				.doOnError(e -> errorHandler.handleSystemError("Error retrieving services: " + e.getMessage(), e))
-				.onErrorResumeNext(Observable.empty())
-				.doOnNext(s -> logger.debug("Service discovered: " + s))
+		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
 				.map(id -> id.toLowerCase())
-				.filter(id -> !id.equals(ZUUL_ID));
+				.filter(id -> !id.equals(ZUUL_ID))
+				.doOnNext(s -> logger.debug("Service discovered: " + s))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+				.retry();
 	}
 
 	protected Observable<Node> getHealthNodesFromService(String serviceId, String url) {
@@ -129,7 +130,8 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 						&& !DISCOVERY.equals(node.getId()) && !CONFIGSERVER.equals(node.getId()))
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
+				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))
 				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))
-				.retry();
+				.onErrorResumeNext(Observable.empty());
 	}
 }

@@ -57,6 +57,7 @@ public class NettyServiceCaller {
                     JacksonJsonParser jsonParser = new JacksonJsonParser();
                     return jsonParser.parseMap(response);
                 })
+                .doOnNext(r -> System.out.println("MAP: " + r))
                 .onErrorResumeNext(Observable.empty());
     }
 }
