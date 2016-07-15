@@ -25,10 +25,12 @@ import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.util.List;
 import java.util.Map.Entry;
 
 import static be.ordina.msdashboard.constants.Constants.*;
@@ -97,17 +99,28 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	@Override
 	public Observable<Node> aggregateNodes() {
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
-				.doOnNext(el -> {System.out.println("0: " + el);})
-				.map(id -> new ImmutablePair<>(id, uriResolver.resolveHealthCheckUrl(discoveryClient.getInstances(id).get(0))))
-				.doOnNext(pair -> {System.out.println("1: " + pair); logger.info("Creating health observable: " + pair);})
+				.map(id -> new ImmutablePair<>(id, resolveHealthCheckUrl(id)))
+				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
 				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
-				.doOnNext(el -> {System.out.println("2: " + el); logger.debug("Unmerged health observable: " + el);})
-				.doOnCompleted(() -> logger.info("Completed getting all health observables"));
+				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+				.doOnCompleted(() -> logger.info("Completed getting all health observables"))
+				.retry();
 		return Observable.merge(observableObservable)
-				.doOnNext(el -> {System.out.println("3: " + el); logger.debug("Merged health node: " + el.getId());})
-				.doOnError(e -> System.out.println(e))
+				.doOnNext(el -> logger.debug("Merged health node: " + el.getId()))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.doOnCompleted(() -> logger.info("Completed merging all health observables"));
 	}
+
+	private String resolveHealthCheckUrl(String id) {
+		List<ServiceInstance> instances = discoveryClient.getInstances(id);
+		if (instances.isEmpty()) {
+			throw new IllegalStateException("No instances found for service " + id);
+		} else {
+			return uriResolver.resolveHealthCheckUrl(instances.get(0));
+		}
+	}
+
 	protected Observable<String> getServiceIdsFromDiscoveryClient() {
 		logger.info("Discovering services for health");
 		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()

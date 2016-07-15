@@ -28,19 +28,19 @@
 			<groupId>be.ordina</groupId>
 			<artifactId>microservices-dashboard-server</artifactId>
 			<version>0.2.0-SNAPSHOT</version>
-			<exclusions>
+			<!--<exclusions>
 				<exclusion>
 					<artifactId>microservices-dashboard-ui</artifactId>
 					<groupId>be.ordina</groupId>
 				</exclusion>
-			</exclusions>
+			</exclusions>-->
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<artifactId>microservices-dashboard-ui</artifactId>
 			<groupId>be.ordina</groupId>
 			<version>0.1.0-20160711.133154-29</version>
-		</dependency>
+		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

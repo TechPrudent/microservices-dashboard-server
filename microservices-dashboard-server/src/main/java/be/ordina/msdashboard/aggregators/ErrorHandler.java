@@ -40,12 +40,12 @@ public class ErrorHandler {
     }
 
     public void handleNodeError(String serviceId, String message, Throwable el) {
-        logger.error(message);
+        logger.error(message, el);
         publisher.publishEvent(new NodeEvent(serviceId, message, el));
     }
 
     public void handleSystemError(String message, Throwable el) {
-        logger.error(message);
+        logger.error(message, el);
         publisher.publishEvent(new SystemEvent(message, el));
     }
 }

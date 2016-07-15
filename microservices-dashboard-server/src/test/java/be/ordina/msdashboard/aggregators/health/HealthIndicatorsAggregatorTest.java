@@ -33,11 +33,9 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import rx.Observable;
 import rx.observers.TestSubscriber;
+import rx.schedulers.Schedulers;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static be.ordina.msdashboard.constants.Constants.CONFIGSERVER;
 import static be.ordina.msdashboard.constants.Constants.DISCOVERY;
@@ -48,10 +46,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
+ * Tests for {@link HealthIndicatorsAggregator}
+ *
  * @author Andreas Evers
  */
 @RunWith(PowerMockRunner.class)
@@ -75,11 +76,6 @@ public class HealthIndicatorsAggregatorTest {
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
 
     @Test
-    public void aggregatesEverything() {
-
-    }
-
-    @Test
     public void shouldGetHealthNodesFromService() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         Map retrievedMap = new HashMap();
@@ -99,8 +95,6 @@ public class HealthIndicatorsAggregatorTest {
                 .containsExactlyElementsOf(requestHeaders().entrySet());
         assertThat(nodes).containsOnly(new Node("Node1"), new Node("Node2"));
     }
-
-    // shouldFailCompletelyOnBadHeaders
 
     @Test(expected = RuntimeException.class)
     public void shouldFailEntireHealthNodeRetrievalChainOnGlobalRuntimeExceptions() {
@@ -252,13 +246,81 @@ public class HealthIndicatorsAggregatorTest {
             return asList(serviceInstance);
         });
         when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getHealthNodesFromService(anyString(), anyString());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        assertThat(testSubscriber.getOnNextEvents()).extracting("id").containsExactly("svc1", null, "zuul", "svc3");
+        testSubscriber.assertCompleted();
+    }
+
+    @Test
+    public void shouldEmitErrorOnClassCastException() {
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
+
+        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"));
+        doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
+        when(discoveryClient.getInstances(anyString())).then(i -> {
+            ServiceInstance serviceInstance = mock(ServiceInstance.class);
+            when(serviceInstance.getServiceId()).thenReturn(i.getArgumentAt(0, String.class));
+            return asList(serviceInstance);
+        });
+        when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
+        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getHealthNodesFromService(anyString(), anyString()); // will give classcastexception
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertNoValues();
-//        testSubscriber.assertCompleted();
+        testSubscriber.assertError(ClassCastException.class);
+    }
 
+    @Test
+    public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
+
+        Observable observable = Observable.from(asList("svc1","error","svc3"))
+                .subscribeOn(Schedulers.io()).publish().autoConnect();
+        doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
+        when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
+            ServiceInstance serviceInstance = mock(ServiceInstance.class);
+            when(serviceInstance.getServiceId()).thenReturn(i.getArgumentAt(0, String.class));
+            return asList(serviceInstance);
+        });
+        when(discoveryClient.getInstances(startsWith("error"))).thenReturn(new ArrayList<>());
+        when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class)))
+                .then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class)))))
+                .when(aggregator).getHealthNodesFromService(anyString(), anyString());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).extracting("id").containsExactly("svc1", "svc3");
+        testSubscriber.assertNoErrors();
+        verify(errorHandler, times(1)).handleSystemError(anyString(), any(Throwable.class));
+    }
+
+    @Test
+    public void shouldAggregateAllValidNodesOnNullInput() {
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
+
+        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"))
+                .subscribeOn(Schedulers.io()).publish().autoConnect();
+        doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
+        when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
+            ServiceInstance serviceInstance = mock(ServiceInstance.class);
+            when(serviceInstance.getServiceId()).thenReturn(i.getArgumentAt(0, String.class));
+            return asList(serviceInstance);
+        });
+        doThrow(new RuntimeException()).when(discoveryClient).getInstances(startsWith("zuul"));
+        when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString());
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).extracting("id").containsExactly("svc1", "svc3");
+        verify(errorHandler, times(2)).handleSystemError(anyString(), any(Throwable.class));
     }
 }
