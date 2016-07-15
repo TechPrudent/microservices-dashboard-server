@@ -42,6 +42,7 @@ public class HealthToNodeConverter {
 		ownDetails.put(TYPE, MICROSERVICE);
 		nodes.add(topLevelNode);
 		for (String key : source.keySet()) {
+			// TODO: externalize common nodes
 			if (!STATUS.equals(key) && !HYSTRIX.equals(key) && !DISK_SPACE.equals(key)
 					&& !DISCOVERY.equals(key) && !CONFIGSERVER.equals(key)) {
 				Object nested = source.get(key);

@@ -38,35 +38,25 @@ import static be.ordina.msdashboard.constants.Constants.*;
 /**
  * Aggregates nodes from health information exposed by Spring Boot's Actuator.
  * <p>
- * In case Spring Boot is not used for a microservice, the following format
- * should be exposed under the <code>/health</code> endpoint:
+ * In case Spring Boot is not used for a microservice, your service must comply to
+ * the health format exposed by Spring Boot under the <code>/health</code> endpoint.
+ * Example of a health response:
  *
- * TODO: document desired format
  * <pre>
  * {
- * "store":
- * {
- * "book":
- * [
- * {
- * "category": "reference",
- * "author": "Nigel Rees",
- * "title": "Sayings of the Century",
- * "price": 8.95
- * },
- * {
- * "category": "fiction",
- * "author": "Evelyn Waugh",
- * "title": "Sword of Honour",
- * "price": 12.99
- * }
- * ],
- * "bicycle":
- * {
- * "color": "red",
- * "price": 19.95
- * }
- * }
+ *   "status": "UP",
+ *   "foo": "bar",
+ *   "serviceWhichThisServiceCalls": {
+ *     "status": "UNKNOWN",
+ *     "type": "SOAP",
+ *     "group": "SVCGROUP"
+ *   },
+ *   "anotherServiceWhichThisServiceCalls": {
+ *     "status": "DOWN",
+ *     "type": "REST",
+ *     "group": "SVCGROUP",
+ *     "foo": "bar"
+ *   }
  * }
  * </pre>
  *
