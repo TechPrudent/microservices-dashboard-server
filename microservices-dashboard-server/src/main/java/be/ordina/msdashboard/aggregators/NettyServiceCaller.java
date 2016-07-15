@@ -41,13 +41,13 @@ public class NettyServiceCaller {
     public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
         return RxNetty.createHttpRequest(request)
                 .publish().autoConnect()
-                .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving healthnodes in url {} with headers {}: {}",
+                .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {} with headers {}: {}",
                         request.getUri(), request.getHeaders().entries(), el), el))
                 .filter(r -> {
                     if (r.getStatus().code() < 400) {
                         return true;
                     } else {
-                        errorHandler.handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for call " + request.getUri() + " with headers " + r.getHeaders().entries());
+                        errorHandler.handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for url " + request.getUri() + " with headers " + r.getHeaders().entries());
                         return false;
                     }
                 })
