@@ -108,6 +108,23 @@ public class HealthToNodeConverterTest {
     }
 
     @Test
+    public void shouldIgnoreRandomNodes() throws IOException {
+        Map<String, Object> source = OBJECT_READER.forType(Map.class)
+                .readValue("{\"status\":\"UP\", " +
+                        "\"random\": {\"version\": \"1.0.0\", " +
+                        "\"type\": \"SOAP\", \"group\": \"test\"}}");
+
+        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        observable.toBlocking().subscribe(testSubscriber);
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).extracting("id").containsExactly("svc1");
+        assertThat(nodes).extracting("details").extracting("status").containsExactly("UP");
+        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE");
+    }
+
+    @Test
     public void shouldConvertOwnDetails() throws IOException {
         Map<String, Object> source = OBJECT_READER.forType(Map.class)
                 .readValue("{\"status\":\"UP\", \"foo\":\"bar\"}");

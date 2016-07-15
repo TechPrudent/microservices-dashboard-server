@@ -52,7 +52,6 @@ public class HealthToNodeConverter {
 					topLevelNode.getLinkedToNodeIds().add(nestedNode.getId());
 					nestedNode.getLinkedFromNodeIds().add(topLevelNode.getId());
 					nodes.add(nestedNode);
-//					node.getLinkedToNodes().add(convertMapToNode((Map)nested));
 				} else {
 					ownDetails.put(key, source.get(key));
 				}
