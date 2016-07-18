@@ -44,7 +44,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.embedded.RedisServer;
-import redis.embedded.ports.EphemeralPortProvider;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -95,20 +94,13 @@ public class RedisConfiguration {
 
     private class InMemoryRedis {
 
-        @Value("${spring.redis.port:0}")
+        @Value("${spring.redis.port:6379}")
         private int redisPort;
 
         private RedisServer redisServer;
 
         @PostConstruct
         public void startRedis() throws IOException {
-            if (redisPort == 0) {
-                EphemeralPortProvider ephemeralPortProvider = new EphemeralPortProvider();
-                while (redisPort == 0) {
-                    redisPort = ephemeralPortProvider.next();
-                }
-            }
-
             if (WINDOWS == getOS()) {
                 redisServer = RedisServer.builder().setting("maxheap 512Mb").port(redisPort).build();
             } else {
