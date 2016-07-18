@@ -33,6 +33,8 @@ import static be.ordina.msdashboard.constants.Constants.HYSTRIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * Tests for {@link HealthToNodeConverter}
+ *
  * @author Andreas Evers
  */
 public class HealthToNodeConverterTest {

@@ -48,7 +48,9 @@ import redis.embedded.RedisServer;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.lang.reflect.Method;
+
+import static redis.embedded.util.OS.WINDOWS;
+import static redis.embedded.util.OSDetector.getOS;
 
 /**
  * @author Andreas Evers
@@ -99,7 +101,11 @@ public class RedisConfiguration {
 
         @PostConstruct
         public void startRedis() throws IOException {
-            redisServer = new RedisServer(redisPort);
+            if (WINDOWS == getOS()) {
+                redisServer = RedisServer.builder().setting("maxheap 512Mb").port(redisPort).build();
+            } else {
+                redisServer = new RedisServer(redisPort);
+            }
             redisServer.start();
         }
 
@@ -127,17 +133,14 @@ public class RedisConfiguration {
 
     @Bean
     public KeyGenerator simpleKeyGenerator() {
-        return new KeyGenerator() {
-            @Override
-            public Object generate(Object target, Method method, Object... params) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName());
-                sb.append(method.getName());
-                for (Object obj : params) {
-                    sb.append(obj.toString());
-                }
-                return sb.toString();
+        return (target, method, params) -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getName());
+            sb.append(method.getName());
+            for (Object obj : params) {
+                sb.append(obj.toString());
             }
+            return sb.toString();
         };
     }
 
