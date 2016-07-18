@@ -13,7 +13,6 @@ spring:
     admin.url: http://localhost:8085
   redis:
     host: localhost
-    port: 6379
     pool:
       max-wait: 10000
 
