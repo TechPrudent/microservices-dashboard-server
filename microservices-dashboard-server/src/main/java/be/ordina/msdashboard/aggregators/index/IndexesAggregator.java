@@ -23,11 +23,13 @@ import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
+
 import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
@@ -161,6 +163,6 @@ public class IndexesAggregator implements NodeAggregator {
                 })
                 .flatMap(r -> r.getContent().map(bb -> bb.toString(Charset.defaultCharset())))
                 .observeOn(Schedulers.computation())
-                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, source));
+                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, (String) source));
     }
 }
