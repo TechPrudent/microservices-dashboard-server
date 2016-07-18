@@ -109,6 +109,7 @@ public class MicroservicesDashboardServerApplicationTest {
 
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
+        body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
         // System.out.println("BODY: " + body);
         JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
