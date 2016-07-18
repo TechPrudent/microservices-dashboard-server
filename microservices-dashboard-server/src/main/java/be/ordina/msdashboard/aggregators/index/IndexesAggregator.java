@@ -15,36 +15,30 @@
  */
 package be.ordina.msdashboard.aggregators.index;
 
+import be.ordina.msdashboard.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.events.NodeEvent;
 import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
-
 import rx.Observable;
-import rx.Observer;
 import rx.schedulers.Schedulers;
 
-import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author Tim Ysewyn
  * @author Andreas Evers
  */
-//TODO: Reuse code from HealthIndicatorsAggregator and apply composition
 public class IndexesAggregator implements NodeAggregator {
 
     private static final Logger logger = LoggerFactory.getLogger(IndexesAggregator.class);
@@ -53,82 +47,64 @@ public class IndexesAggregator implements NodeAggregator {
     private final IndexToNodeConverter indexToNodeConverter;
     private final ApplicationEventPublisher publisher;
     private final IndexProperties properties;
-    private UriResolver uriResolver;
+    private final UriResolver uriResolver;
+    private final NettyServiceCaller caller;
 
     public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient,
-                             UriResolver uriResolver, final IndexProperties properties,
-                             final ApplicationEventPublisher publisher) {
+                             UriResolver uriResolver, IndexProperties properties,
+                             ApplicationEventPublisher publisher, NettyServiceCaller caller) {
         this.indexToNodeConverter = indexToNodeConverter;
         this.discoveryClient = discoveryClient;
         this.uriResolver = uriResolver;
         this.properties = properties;
         this.publisher = publisher;
+        this.caller = caller;
     }
 
-    //TODO: Caching
-    //@Cacheable(value = Constants.INDEX_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
+    @Override
     public Observable<Node> aggregateNodes() {
-        return Observable.from(discoveryClient.getServices())
-                .observeOn(Schedulers.io())
+        return getServicesFromDiscoveryClient()
+                .flatMap(this::getFirstInstanceForService)
+                .flatMap(this::getIndexFromServiceInstance)
+                .doOnNext(el -> logger.debug("Emitting node with id '{}'", el.getId()))
+                .doOnError(e -> {
+                    String error = "Error while emitting a node: " + e.getMessage();
+                    logger.error(error);
+                    publisher.publishEvent(new SystemEvent(error, e));
+                })
+                .doOnCompleted(() -> logger.info("Completed emitting all index nodes"));
+    }
+
+    private Observable<String> getServicesFromDiscoveryClient() {
+        logger.info("Discovering services");
+        return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
+                .map(String::toLowerCase)
+                .doOnNext(s -> logger.debug("Service discovered: " + s))
                 .doOnError(e -> {
                     String error = "Error retrieving services: " + e.getMessage();
                     logger.error(error);
                     publisher.publishEvent(new SystemEvent(error, e));
                 })
-                .onErrorResumeNext(Observable.empty())
-                .doOnNext(service -> {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Sending instance retrieval request for serviceId '{}'", service);
-                    }
-                })
-                .map(this::getFirstInstanceForService)
-                .filter(Objects::nonNull)
-                .flatMap(this::getIndexFromServiceInstance)
-                .doOnEach(new Observer<Node>() {
-
-                    private int totalNodesEmitted = 0;
-
-                    @Override
-                    public void onCompleted() {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Emitted {} nodes", totalNodesEmitted);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        String error = "Error retrieving a node: " + e.getMessage();
-                        logger.error(error);
-                        publisher.publishEvent(new SystemEvent(error, e));
-                    }
-
-                    @Override
-                    public void onNext(Node node) {
-                        ++totalNodesEmitted;
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Emitting node with id '{}'", node.getId());
-                            logger.debug("{}", node);
-                        }
-                    }
-                });
+                .retry();
     }
 
-    private ServiceInstance getFirstInstanceForService(String serviceId) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Getting first instance for serviceId '{}'", serviceId);
-        }
+    private Observable<ServiceInstance> getFirstInstanceForService(String serviceId) {
+        logger.debug("Getting first instance for service '{}'", serviceId);
 
         List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
 
-        if (instances.size() > 0) {
-            return instances.get(0);
-        } else {
-            String warning = "No instances found for serviceId " + serviceId;
+        Observable<ServiceInstance> observableServiceInstance;
+
+        if (instances.isEmpty()) {
+            String warning = "No instances found for service '" + serviceId + "'";
             logger.warn(warning);
             publisher.publishEvent(new NodeEvent(serviceId, warning));
-            return null;
+            observableServiceInstance = Observable.empty();
+        } else {
+            observableServiceInstance = Observable.just(instances.get(0));
         }
+
+        return observableServiceInstance;
     }
 
     private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
@@ -139,30 +115,12 @@ public class IndexesAggregator implements NodeAggregator {
             request.withHeader(header.getKey(), header.getValue());
         }
 
-        //TODO: Add hook for headers on GET (e.g. accept = application/hal+json")
-        return RxNetty.createHttpRequest(request)
-                .doOnError(el -> {
-                    String error = MessageFormat.format("Error retrieving healthnodes in url {} with headers {}: {}",
-                                    request.getUri(), request.getHeaders().entries(), el);
-                    logger.error(error);
-                    publisher.publishEvent(new NodeEvent(serviceId, error));
-                })
-                .onErrorResumeNext(Observable.empty())
-                .filter(r -> {
-                    if (r.getStatus().code() < 400) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("'GET {}' returned '{}'", url, r.getStatus());
-                        }
-                        return true;
-                    } else {
-                        String warning = "Exception " + r.getStatus() + " for call " + url + " with headers " + r.getHeaders().entries();
-                        logger.warn(warning);
-                        publisher.publishEvent(new NodeEvent(serviceId, warning));
-                        return false;
-                    }
-                })
-                .flatMap(r -> r.getContent().map(bb -> bb.toString(Charset.defaultCharset())))
-                .observeOn(Schedulers.computation())
-                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, (String) source));
+        return caller.retrieveJsonFromRequest(serviceId, request)
+                .map(JSONObject::new)
+                .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, source))
+                .doOnNext(el -> logger.info("Index node {} discovered in url: {}", el.getId(), url))
+                .doOnError(e -> logger.error("Error while fetching node: ", e))
+                .doOnCompleted(() -> logger.info("Completed emissions of an index node observable for url: " + url))
+                .onErrorResumeNext(Observable.empty());
     }
 }

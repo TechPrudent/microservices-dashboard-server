@@ -125,11 +125,13 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Autowired
         private DiscoveryClient discoveryClient;
+        @Autowired
+        private NettyServiceCaller caller;
 
         @Bean
         @ConditionalOnMissingBean
         public IndexesAggregator indexesAggregator(ApplicationEventPublisher publisher) {
-            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver(), indexProperties(), publisher);
+            return new IndexesAggregator(new IndexToNodeConverter(), discoveryClient, uriResolver(), indexProperties(), publisher, caller);
         }
 
         @ConfigurationProperties("msdashboard.index")
