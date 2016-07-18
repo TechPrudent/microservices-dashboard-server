@@ -6,6 +6,9 @@ microservices-dashboard-server-sample/target/
 *.iml
 .idea/
 .ssh/
+.metadata/
+Servers/
+RemoteSystemsTempFiles/
 microservices-dashboard-server/.factorypath
 samples/microservices-dashboard-simple/target
 samples/microservices-dashboard-simple-mocks/target
