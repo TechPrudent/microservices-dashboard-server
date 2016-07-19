@@ -45,19 +45,28 @@ public class IndexToNodeConverter {
 	private static final String UP = "UP";
 
 	public Observable<Node> convert(String serviceId, String serviceUri, String source) {
-		try {
-			JSONObject index = new JSONObject(source);
+		Observable<Node> observable;
 
-			if (index.has(LINKS)) {
-				return Observable.from(getNodesFromJSON(serviceId, serviceUri, index));
-			} else {
-				logger.error("Index deserialization fails because no HAL _links was found at the root");
-				return Observable.empty();
-			}
+		try {
+			observable = convert(serviceId, serviceUri, new JSONObject(source));
 		} catch (JSONException je) {
 			logger.error("Could not parse JSON: {}", je);
-			return Observable.empty();
+			observable = Observable.empty();
 		}
+		return observable;
+	}
+
+	public Observable<Node> convert(String serviceId, String serviceUri, JSONObject index) {
+		Observable<Node> observable;
+
+		if (index.has(LINKS)) {
+			observable = Observable.from(getNodesFromJSON(serviceId, serviceUri, index));
+		} else {
+			logger.error("Index deserialization fails because no HAL _links was found at the root");
+			observable = Observable.empty();
+		}
+
+		return observable;
 	}
 
 	@SuppressWarnings("unchecked")

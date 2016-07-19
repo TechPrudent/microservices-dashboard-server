@@ -1,5 +1,5 @@
 [ {
-  "message" : "Exception 404 Not Found for call http://localhost:8089/service2 with headers [Cache-Control=must-revalidate,no-cache,no-store, Content-Type=text/html; charset=ISO-8859-1, Server=Jetty(9.2.16.v20160414)]",
+  "message" : "Exception 404 Not Found for url http://localhost:8089/service2 with headers [Cache-Control=must-revalidate,no-cache,no-store, Content-Type=text/html; charset=ISO-8859-1, Server=Jetty(9.2.16.v20160414)]",
   "throwable" : null,
   "nodeId" : "service2"
 }, {

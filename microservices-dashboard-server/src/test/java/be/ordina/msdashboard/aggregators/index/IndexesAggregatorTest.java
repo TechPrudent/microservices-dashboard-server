@@ -15,23 +15,15 @@
  */
 package be.ordina.msdashboard.aggregators.index;
 
+import be.ordina.msdashboard.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-import io.reactivex.netty.protocol.http.client.HttpClientResponse;
-import io.reactivex.netty.protocol.http.client.HttpResponseHeaders;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -41,32 +33,34 @@ import rx.observers.TestSubscriber;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({RxNetty.class})
 public class IndexesAggregatorTest {
 
     private DiscoveryClient discoveryClient;
     private IndexToNodeConverter indexToNodeConverter;
-    private IndexesAggregator indexesAggregator;
-    @Mock
     private IndexProperties indexProperties;
-    @Mock
     private ApplicationEventPublisher publisher;
+    private NettyServiceCaller caller;
+    private IndexesAggregator indexesAggregator;
 
     @Before
     public void setUp() {
         discoveryClient = mock(DiscoveryClient.class);
         indexToNodeConverter = mock(IndexToNodeConverter.class);
-        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher);
-
-        PowerMockito.mockStatic(RxNetty.class);
+        indexProperties = mock(IndexProperties.class);
+        caller = mock(NettyServiceCaller.class);
+        publisher = mock(ApplicationEventPublisher.class);
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller);
     }
 
     @Test
@@ -79,17 +73,15 @@ public class IndexesAggregatorTest {
         when(instance.getServiceId()).thenReturn("service");
         when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
 
-        HttpClientResponse<ByteBuf> response = mock(HttpClientResponse.class);
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class))).thenReturn(Observable.just(response));
+        Map<String, String> properties = new HashMap<>();
+        properties.put("header", "value");
+        when(indexProperties.getRequestHeaders()).thenReturn(properties);
 
-        when(response.getStatus()).thenReturn(HttpResponseStatus.OK);
-        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
-        ByteBufUtil.writeUtf8(byteBuf, "source");
-        when(response.getContent()).thenReturn(Observable.just(byteBuf));
+        Map<String, Object> indexCallResult = Collections.singletonMap("", "");
+        when(caller.retrieveJsonFromRequest(eq("service"), any(HttpClientRequest.class))).thenReturn(Observable.just(indexCallResult));
 
         Node node = new NodeBuilder().withId("service").build();
-
-        when(indexToNodeConverter.convert("service", "http://localhost:8089/service", "source")).thenReturn(Observable.just(node));
+        when(indexToNodeConverter.convert(eq("service"), eq("http://localhost:8089/service"), any(JSONObject.class))).thenReturn(Observable.just(node));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -128,7 +120,7 @@ public class IndexesAggregatorTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void failedIndexCallShouldReturnZeroNodes() throws InterruptedException {
+    public void emptyObservableFromIndexCallShouldReturnZeroNodes() throws InterruptedException {
         when(discoveryClient.getServices()).thenReturn(Collections.singletonList("service"));
         ServiceInstance instance = mock(ServiceInstance.class);
         when(discoveryClient.getInstances("service")).thenReturn(Collections.singletonList(instance));
@@ -136,12 +128,7 @@ public class IndexesAggregatorTest {
         when(instance.getServiceId()).thenReturn("service");
         when(instance.getUri()).thenReturn(URI.create("http://localhost:8089/service"));
 
-        HttpClientResponse<ByteBuf> response = mock(HttpClientResponse.class);
-        when(RxNetty.createHttpGet("http://localhost:8089/service")).thenReturn(Observable.just(response));
-
-        when(response.getStatus()).thenReturn(SERVICE_UNAVAILABLE);
-        when(response.getHeaders()).thenReturn(mock(HttpResponseHeaders.class));
-        when(response.getCookies()).thenReturn(Collections.emptyMap());
+        when(caller.retrieveJsonFromRequest(eq("service"), any(HttpClientRequest.class))).thenReturn(Observable.empty());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);

@@ -19,6 +19,8 @@ import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
 import rx.Observable;
 
@@ -31,6 +33,8 @@ import static java.text.MessageFormat.format;
  * @author Andreas Evers
  */
 public class NettyServiceCaller {
+
+    private static final Logger logger = LoggerFactory.getLogger(NettyServiceCaller.class);
 
     private ErrorHandler errorHandler;
 
@@ -57,7 +61,7 @@ public class NettyServiceCaller {
                     JacksonJsonParser jsonParser = new JacksonJsonParser();
                     return jsonParser.parseMap(response);
                 })
-                .doOnNext(r -> System.out.println("MAP: " + r))
+                .doOnNext(r -> logger.info("MAP: {}", r))
                 .onErrorResumeNext(Observable.empty());
     }
 }
