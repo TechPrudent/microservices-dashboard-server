@@ -15,14 +15,21 @@
  */
 package be.ordina.msdashboard.converters;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
-import org.junit.Test;
+import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
+import static be.ordina.msdashboard.constants.Constants.STATUS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 
-import static be.ordina.msdashboard.constants.Constants.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
+
+import com.google.common.collect.Maps;
 
 public class NodeSerializerTest {
 
@@ -49,6 +56,14 @@ public class NodeSerializerTest {
 		System.out.println(out);
 		assertThat(bytes).isEqualTo(nodeAsJson.getBytes());
 	}
+	
+	@Test
+	public void serializeNoNode(){
+		HashMap<String, String> map = Maps.newHashMap(); 
+		NodeSerializer nodeSerializer = new NodeSerializer();
+		byte[] serialized = nodeSerializer.serialize(map);
+		assertNotNull(serialized);
+	}
 
 	@Test
 	public void deserialize() {
@@ -69,5 +84,12 @@ public class NodeSerializerTest {
 		assertThat(node1.getDetails().size()).isEqualTo(2);
 		assertThat(node1.getDetails().get("type")).isEqualTo("REST");
 		assertThat(node1.getDetails().get(STATUS)).isEqualTo("DOWN");
+	}
+	
+	@Test
+	public void deserializeNull(){
+		NodeSerializer nodeSerializer = new NodeSerializer();
+		Node node = nodeSerializer.deserialize(null);
+		assertNull(node);
 	}
 }
