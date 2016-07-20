@@ -53,7 +53,7 @@ public class MappingsToNodeConverterTest {
         assertThat(nodes).extracting("id").containsExactly("svc1","/home");
         assertThat(nodes).extracting("lane").containsExactly(2,1);
         assertThat(nodes).extracting("details").extracting("status").containsExactly("UP","UP");
-        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE","ENDPOINT");
+        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE","RESOURCE");
         assertThat(nodes).extracting("details").extracting("url").containsExactly(null,"/home");
         assertThat(nodes).extracting("details").extracting("methods").containsExactly(null,"GET");
     }
@@ -200,7 +200,7 @@ public class MappingsToNodeConverterTest {
         List<Node> nodes = testSubscriber.getOnNextEvents();
         assertThat(nodes).extracting("id").containsExactly("svc1","/home");
         assertThat(nodes).extracting("details").extracting("status").containsExactly("UP","UP");
-        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE","ENDPOINT");
+        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE","RESOURCE");
     }
 
     @Test

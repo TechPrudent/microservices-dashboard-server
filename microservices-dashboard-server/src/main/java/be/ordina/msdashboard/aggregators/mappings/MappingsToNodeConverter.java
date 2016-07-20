@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
+import static be.ordina.msdashboard.constants.Constants.RESOURCE;
 import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static be.ordina.msdashboard.constants.Constants.TYPE;
 
@@ -53,7 +54,7 @@ public class MappingsToNodeConverter {
 						Node nestedNode = new Node(url);
 						nestedNode.setLane(1);
 						nestedNode.addDetail("url", url);
-						nestedNode.addDetail("type", "ENDPOINT");
+						nestedNode.addDetail("type", RESOURCE);
 						nestedNode.addDetail("status", "UP");
 						extractMethods(key).ifPresent(methods -> nestedNode.addDetail("methods", methods));
 						topLevelNode.getLinkedFromNodeIds().add(nestedNode.getId());

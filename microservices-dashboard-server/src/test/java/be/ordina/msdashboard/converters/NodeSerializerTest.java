@@ -15,21 +15,19 @@
  */
 package be.ordina.msdashboard.converters;
 
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
+import com.google.common.collect.Maps;
+import org.junit.Test;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+
 import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
 import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-
-import org.junit.Test;
-
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
-
-import com.google.common.collect.Maps;
 
 /**
  * Tests for {@link NodeSerializer}
@@ -44,10 +42,9 @@ public class NodeSerializerTest {
 							   .withId("key1")
 							   .withDetail("type", MICROSERVICE)
 							   .withDetail(STATUS, "UP")
-							   .withLinkedToNode(NodeBuilder.node().withId("1a").withDetail(STATUS, "DOWN").withDetail("type", "REST").build())
 							   .build();
 
-		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
+		String nodeAsJson = "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"}}";
 
 		NodeSerializer nodeSerializer = new NodeSerializer();
 
@@ -82,13 +79,6 @@ public class NodeSerializerTest {
 		assertThat(node.getDetails().size()).isEqualTo(2);
 		assertThat(node.getDetails().get("type")).isEqualTo(MICROSERVICE);
 		assertThat(node.getDetails().get(STATUS)).isEqualTo("UP");
-		assertThat(node.getLinkedToNodes().size()).isEqualTo(1);
-
-		Node node1 = node.getLinkedToNodes().iterator().next();
-		assertThat(node1.getId()).isEqualTo("1a");
-		assertThat(node1.getDetails().size()).isEqualTo(2);
-		assertThat(node1.getDetails().get("type")).isEqualTo("REST");
-		assertThat(node1.getDetails().get(STATUS)).isEqualTo("DOWN");
 	}
 	
 	@Test

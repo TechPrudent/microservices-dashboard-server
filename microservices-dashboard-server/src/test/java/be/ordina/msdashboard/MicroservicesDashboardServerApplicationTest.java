@@ -94,6 +94,11 @@ public class MicroservicesDashboardServerApplicationTest {
         assertLinkBetweenIds(r, "svc3:svc3rsc2", "service3");
         assertLinkBetweenIds(r, "svc4:svc4rsc1", "service4");
         assertLinkBetweenIds(r, "svc4:svc4rsc2", "service4");
+        assertLinkBetweenIds(r, "/endpoint1/", "service1");
+        assertLinkBetweenIds(r, "/endpoint2", "service1");
+        assertLinkBetweenIds(r, "/endpoint3/", "service3");
+        assertLinkBetweenIds(r, "/endpoint4", "service3");
+        assertLinkBetweenIds(r, "/endpoint5/", "service4");
         assertLinkBetweenIds(r, "service1", "backend2");
         assertLinkBetweenIds(r, "service1", "discoveryComposite");
         assertLinkBetweenIds(r, "service1", "backend1");
@@ -109,7 +114,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertLinkBetweenIds(r, "service4", "loyalty-program");
         assertLinkBetweenIds(r, "service4", "backend9");
         assertLinkBetweenIds(r, "service4", "db");
-        assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(22);
+        assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(27);
 
         ResponseEntity<String> errors = new TestRestTemplate()
                 .getForEntity("http://localhost:" + port + "/events", String.class);
