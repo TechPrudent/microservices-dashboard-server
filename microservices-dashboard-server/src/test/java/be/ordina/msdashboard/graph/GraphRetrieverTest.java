@@ -15,11 +15,15 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.converters.ObjectToJsonConverter;
-import be.ordina.msdashboard.stores.NodeStore;
+import static be.ordina.msdashboard.JsonHelper.load;
+import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
+import static be.ordina.msdashboard.model.NodeBuilder.node;
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,17 +32,17 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
+
 import rx.Observable;
-
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-
-import static be.ordina.msdashboard.JsonHelper.*;
-import static be.ordina.msdashboard.model.NodeBuilder.node;
-import static com.google.common.collect.Sets.newHashSet;
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.converters.ObjectToJsonConverter;
+import be.ordina.msdashboard.stores.NodeStore;
 
 /**
+ * Tests for {@link GraphRetriever}
+ *
  * @author Andreas Evers
  * @author Tim Ysewyn
  */

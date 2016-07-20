@@ -31,6 +31,11 @@ import be.ordina.msdashboard.model.NodeBuilder;
 
 import com.google.common.collect.Maps;
 
+/**
+ * Tests for {@link NodeSerializer}
+ *
+ * @author Tim Ysewyn
+ */
 public class NodeSerializerTest {
 
 	@Test

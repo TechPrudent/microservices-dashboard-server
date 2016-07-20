@@ -15,10 +15,12 @@
  */
 package be.ordina.msdashboard.caching;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.cache.CachingProperties;
-import be.ordina.msdashboard.config.RedisConfiguration;
-import be.ordina.msdashboard.stores.RedisStore;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,9 +29,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CachingProperties;
+import be.ordina.msdashboard.config.RedisConfiguration;
+import be.ordina.msdashboard.stores.RedisStore;
 
+/**
+ * Tests for {@link CachingConfig}
+ *
+ * @author Tim Ysewyn
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class CachingConfigTest {
 

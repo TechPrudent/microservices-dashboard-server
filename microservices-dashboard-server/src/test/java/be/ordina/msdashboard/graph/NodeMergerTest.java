@@ -15,18 +15,21 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
 
 /**
+ * Tests for {@link NodeMerger}
+ *
  * @author Tim Ysewyn
  */
 public class NodeMergerTest {

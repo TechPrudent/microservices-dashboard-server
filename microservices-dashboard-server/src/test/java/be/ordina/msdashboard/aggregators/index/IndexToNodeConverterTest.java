@@ -15,17 +15,23 @@
  */
 package be.ordina.msdashboard.aggregators.index;
 
-import be.ordina.msdashboard.model.Node;
-import org.junit.Before;
-import org.junit.Test;
-import rx.observers.TestSubscriber;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 
+import rx.observers.TestSubscriber;
+import be.ordina.msdashboard.model.Node;
+
+/**
+ * Tests for {@link IndexToNodeConverter}
+ *
+ * @author Tim Ysewyn
+ */
 public class IndexToNodeConverterTest {
 
     private IndexToNodeConverter indexToNodeConverter;

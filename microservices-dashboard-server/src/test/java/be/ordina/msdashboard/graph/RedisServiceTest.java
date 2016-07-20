@@ -15,8 +15,17 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.stores.RedisStore;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -27,13 +36,14 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.stores.RedisStore;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
+/**
+ * Tests for {@link RedisStore}
+ *
+ * @author Andreas Evers
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class RedisServiceTest {
 

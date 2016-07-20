@@ -15,15 +15,21 @@
  */
 package be.ordina.msdashboard.converters;
 
-import be.ordina.msdashboard.constants.Constants;
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
 
+/**
+ * Tests for {@link ObjectToJsonConverter}
+ *
+ * @author Andreas Evers
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class ObjectToJsonConverterTest {
 

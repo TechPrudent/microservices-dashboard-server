@@ -15,10 +15,14 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.graph.GraphRetriever;
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.stores.NodeStore;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -26,13 +30,16 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpEntity;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.graph.GraphRetriever;
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.stores.NodeStore;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
+/**
+ * Tests for {@link NodesController}
+ *
+ * @author Tim Ysewyn
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class NodesControllerTest {
 

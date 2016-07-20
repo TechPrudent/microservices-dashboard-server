@@ -15,19 +15,31 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
-import org.junit.Test;
+import static be.ordina.msdashboard.constants.Constants.BACKEND;
+import static be.ordina.msdashboard.constants.Constants.DETAILS;
+import static be.ordina.msdashboard.constants.Constants.ID;
+import static be.ordina.msdashboard.constants.Constants.LANE;
+import static be.ordina.msdashboard.constants.Constants.LINKS;
+import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
+import static be.ordina.msdashboard.constants.Constants.NODES;
+import static be.ordina.msdashboard.constants.Constants.RESOURCE;
+import static be.ordina.msdashboard.constants.Constants.TYPE;
+import static be.ordina.msdashboard.constants.Constants.UI_COMPONENT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static be.ordina.msdashboard.constants.Constants.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
 
 /**
+ * Tests for {@link GraphMapper}
+ *
  * @author Tim Ysewyn
  */
 public class GraphMapperTest {

@@ -15,11 +15,19 @@
  */
 package be.ordina.msdashboard.aggregators.index;
 
-import be.ordina.msdashboard.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
-import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,21 +36,19 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
+
 import rx.Observable;
 import rx.observers.TestSubscriber;
+import be.ordina.msdashboard.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
+import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+/**
+ * Tests for {@link IndexesAggregator}
+ *
+ * @author Tim Ysewyn
+ */
 @RunWith(PowerMockRunner.class)
 public class IndexesAggregatorTest {
 
