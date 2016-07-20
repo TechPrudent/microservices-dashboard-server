@@ -1,5 +1,0 @@
-spring:
-  cloud:
-    config:
-      uri: http://mstbp-config-ws.glb.ebc.local:10062/configuration
-      failFast: true
