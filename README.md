@@ -131,7 +131,7 @@ There are several that you can contribute to microservices-dashboard-server:
 
 Spring REST Docs is open source software released under the [Apache 2.0 license][5].
 
-[license]:LICENSE-2.0.txt
+[license]:LICENSE.txt
 [license img]:https://img.shields.io/badge/License-Apache%202-blue.svg
 [1]: CODE_OF_CONDUCT.md
 [2]: https://help.github.com/articles/using-pull-requests/
