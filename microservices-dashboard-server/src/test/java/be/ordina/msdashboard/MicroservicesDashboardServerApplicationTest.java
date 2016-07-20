@@ -78,7 +78,7 @@ public class MicroservicesDashboardServerApplicationTest {
         long totalTime = System.currentTimeMillis() - startTime;
         assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
         String body = removeBlankNodes(graph.getBody());
-        // System.out.println("BODY: " + body);
+        System.out.println("BODY: " + body);
         System.out.println("Time spent waiting for /graph: " + totalTime);
 
         JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
@@ -117,7 +117,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
-        // System.out.println("BODY: " + body);
+        System.out.println("BODY: " + body);
         JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }

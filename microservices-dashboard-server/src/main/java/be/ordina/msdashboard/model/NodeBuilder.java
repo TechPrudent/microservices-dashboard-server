@@ -25,8 +25,6 @@ public class NodeBuilder {
 	private String id;
 	private Map<String, Object> details;
 	private Integer lane;
-	@Deprecated
-	private Set<Node> linkedToNodes;
 	private Set<String> linkedToNodeIds;
 	private Set<String> linkedFromNodeIds;
 
@@ -42,11 +40,6 @@ public class NodeBuilder {
 
 	public NodeBuilder havingDetails(final Map<String, Object> details) {
 		this.details = details;
-		return this;
-	}
-
-	public NodeBuilder havingLinkedToNodes(final Set<Node> linkedToNodes) {
-		this.linkedToNodes = linkedToNodes;
 		return this;
 	}
 
@@ -68,14 +61,6 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder withLinkedToNode(final Node node) {
-		if (linkedToNodes == null) {
-			linkedToNodes = new HashSet<>();
-		}
-		linkedToNodes.add(node);
-		return this;
-	}
-
 	public NodeBuilder withLinkedToNodeId(final String nodeId) {
 		if (linkedToNodeIds == null) {
 			linkedToNodeIds = new HashSet<>();
@@ -92,15 +77,9 @@ public class NodeBuilder {
 		return this;
 	}
 
-	public NodeBuilder withLinkedNodes(final Collection<Node> nodes) {
-		nodes.stream().forEach(this::withLinkedToNode);
-		return this;
-	}
-
 	public Node build() {
 		Node node = new Node(id);
 		node.setLane(lane);
-		node.setLinkedToNodes(linkedToNodes);
 		node.setLinkedToNodeIds(linkedToNodeIds);
 		node.setLinkedFromNodeIds(linkedFromNodeIds);
 		node.setDetails(details);

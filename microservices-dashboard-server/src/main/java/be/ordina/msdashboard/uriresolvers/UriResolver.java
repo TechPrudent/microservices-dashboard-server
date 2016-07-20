@@ -26,4 +26,6 @@ public interface UriResolver {
 
     String resolveHealthCheckUrl(ServiceInstance instance);
 
+    String resolveMappingsUrl(ServiceInstance instance);
+
 }

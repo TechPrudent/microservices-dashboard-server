@@ -15,17 +15,16 @@
  */
 package be.ordina.msdashboard.graph;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.model.NodeBuilder;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link NodeMerger}
@@ -62,7 +61,13 @@ public class NodeMergerTest {
         Node node2 = new NodeBuilder().withId("service1").withDetail("type", "microservice").build();
 
         List<Node> nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertMerge(nodes);
 
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node2)), node1);
+        assertMerge(nodes);
+    }
+
+    private void assertMerge(List<Node> nodes) {
         assertThat(nodes).isNotEmpty();
         assertThat(nodes).hasSize(1);
 
@@ -74,6 +79,49 @@ public class NodeMergerTest {
         Map<String, Object> details = node.getDetails();
         assertThat(details.containsKey("type")).isTrue();
         assertThat(details.get("type")).isEqualTo("microservice");
+    }
+
+    @Test
+    public void shouldMergeStatusCorrectly() {
+        Node node1 = new NodeBuilder().withId("service1").withDetail("status", "UP").build();
+        Node node2 = new NodeBuilder().withId("service1").withDetail("status", "DOWN").build();
+        List<Node> nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "DOWN");
+
+        node1 = new NodeBuilder().withId("service1").withDetail("status", "DOWN").build();
+        node2 = new NodeBuilder().withId("service1").withDetail("status", "UP").build();
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "DOWN");
+
+        node1 = new NodeBuilder().withId("service1").withDetail("status", "UP").build();
+        node2 = new NodeBuilder().withId("service1").withDetail("status", "UNKNOWN").build();
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "UP");
+
+        node1 = new NodeBuilder().withId("service1").withDetail("status", "UNKNOWN").build();
+        node2 = new NodeBuilder().withId("service1").withDetail("status", "DOWN").build();
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "DOWN");
+
+        node1 = new NodeBuilder().withId("service1").withDetail("status", "UNKNOWN").build();
+        node2 = new NodeBuilder().withId("service1").build();
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "UNKNOWN");
+
+        node1 = new NodeBuilder().withId("service1").withDetail("status", "UP").build();
+        node2 = new NodeBuilder().withId("service1").build();
+        nodes = NodeMerger.merge().call(new ArrayList<>(Collections.singletonList(node1)), node2);
+        assertStatus(nodes, "UP");
+    }
+
+    private void assertStatus(List<Node> nodes, String status) {
+        assertThat(nodes).isNotEmpty();
+        assertThat(nodes).hasSize(1);
+        Node node = nodes.get(0);
+        assertThat(node.getDetails()).isNotEmpty();
+        Map<String, Object> details = node.getDetails();
+        assertThat(details.containsKey("status")).isTrue();
+        assertThat(details.get("status")).isEqualTo(status);
     }
 
 }

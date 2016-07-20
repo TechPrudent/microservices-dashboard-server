@@ -31,4 +31,9 @@ public class DefaultUriResolver implements UriResolver {
     public String resolveHealthCheckUrl(ServiceInstance instance) {
         return instance.getUri() + "/health";
     }
+
+    @Override
+    public String resolveMappingsUrl(ServiceInstance instance) {
+        return instance.getUri() + "/mappings";
+    }
 }

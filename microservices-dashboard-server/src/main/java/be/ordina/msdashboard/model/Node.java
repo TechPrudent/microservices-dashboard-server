@@ -24,7 +24,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static be.ordina.msdashboard.constants.Constants.*;
+import static be.ordina.msdashboard.constants.Constants.DETAILS;
+import static be.ordina.msdashboard.constants.Constants.ID;
+import static be.ordina.msdashboard.constants.Constants.LANE;
+import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
@@ -43,10 +46,6 @@ public class Node {
 	@JsonProperty(LANE)
 	private Integer lane;
 
-	@Deprecated
-	@JsonProperty("linkedToNodes")
-	private Set<Node> linkedToNodes = new HashSet<>();
-
 	private Set<String> linkedToNodeIds = new HashSet<>();
 
 	private Set<String> linkedFromNodeIds = new HashSet<>();
@@ -60,7 +59,6 @@ public class Node {
 		details = new HashMap<>();
 		linkedToNodeIds = new HashSet<>();
 		linkedFromNodeIds = new HashSet<>();
-		linkedToNodes = new HashSet<>();
 	}
 
 	public void setLane(Integer lane) {
@@ -77,17 +75,6 @@ public class Node {
 
 	public String getId() {
 		return id;
-	}
-
-	public Set<Node> getLinkedToNodes() {
-		if (linkedToNodes == null) {
-			return new HashSet<>();
-		}
-		return linkedToNodes;
-	}
-
-	public void setLinkedToNodes(Set<Node> linkedToNodes) {
-		this.linkedToNodes = linkedToNodes;
 	}
 
 	public Set<String> getLinkedToNodeIds() {
@@ -128,6 +115,9 @@ public class Node {
 	}
 
 	public void mergeWith(Node node) {
+		if (lane == null) {
+			lane = node.getLane();
+		}
 		if (linkedToNodeIds == null) {
 			linkedToNodeIds = node.getLinkedToNodeIds();
 		} else {
@@ -143,9 +133,23 @@ public class Node {
 		} else {
 			details.forEach((k, v) -> {
 				if (v != null) {
-					node.getDetails().merge(k, v, (v1, v2) -> {
-						return v1;
-					});
+					if (k.equals(STATUS)) {
+						if (node.getDetails().get(k) != null) {
+							details.merge(k, node.getDetails().get(k), (v1, v2) -> {
+								if (v1.equals("DOWN") || v2.equals("DOWN")) {
+									return "DOWN";
+								} else if (v1.equals("UP") || v2.equals("UP")) {
+									return "UP";
+								} else {
+									return "UNKNOWN";
+								}
+							});
+						}
+					} else {
+						if (node.getDetails().get(k) != null) {
+							details.merge(k, node.getDetails().get(k), (v1, v2) -> v1);
+						}
+					}
 				}
 			});
 		}
@@ -161,8 +165,6 @@ public class Node {
 		if (!id.equals(node.id)) return false;
 		if (details != null ? !details.equals(node.details) : node.details != null) return false;
 		if (lane != null ? !lane.equals(node.lane) : node.lane != null) return false;
-		if (linkedToNodes != null ? !linkedToNodes.equals(node.linkedToNodes) : node.linkedToNodes != null)
-			return false;
 		if (linkedToNodeIds != null ? !linkedToNodeIds.equals(node.linkedToNodeIds) : node.linkedToNodeIds != null)
 			return false;
 		return !(linkedFromNodeIds != null ? !linkedFromNodeIds.equals(node.linkedFromNodeIds) : node.linkedFromNodeIds != null);
@@ -181,7 +183,6 @@ public class Node {
 				"id='" + id + '\'' +
 				", details=" + details +
 				", lane=" + lane +
-				", linkedToNodes=" + linkedToNodes +
 				", linkedToNodeIds=" + linkedToNodeIds +
 				", linkedFromNodeIds=" + linkedFromNodeIds +
 				'}';

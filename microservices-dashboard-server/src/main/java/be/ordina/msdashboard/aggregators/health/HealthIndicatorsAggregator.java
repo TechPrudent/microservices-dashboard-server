@@ -66,8 +66,6 @@ import static be.ordina.msdashboard.constants.Constants.*;
  */
 public class HealthIndicatorsAggregator implements NodeAggregator {
 
-	protected static final String ZUUL_ID = "zuul";
-
 	private static final Logger logger = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
 
 	private DiscoveryClient discoveryClient;

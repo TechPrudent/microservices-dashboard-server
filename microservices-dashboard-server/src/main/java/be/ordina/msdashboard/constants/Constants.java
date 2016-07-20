@@ -54,4 +54,5 @@ public class Constants {
 	public static final String REST = "REST";
 	public static final String SOAP = "SOAP";
 	public static final String JMS = "JMS";
+    public static final String ZUUL_ID = "zuul";
 }

@@ -16,13 +16,13 @@
 package be.ordina.msdashboard.aggregators;
 
 import be.ordina.msdashboard.model.Node;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * TODO: To be reviewed + refactored
  * @author Andreas Evers
  */
 public class VirtualAndRealDependencyIntegrator {
@@ -43,10 +43,10 @@ public class VirtualAndRealDependencyIntegrator {
 	}
 
 	private void aggregateNodes(final Node realNode, final Node virtualNode) {
-		Set<Node> realLinkedNodes = realNode.getLinkedToNodes();
+		/*Set<Node> realLinkedNodes = realNode.getLinkedToNodes();
 		Set<Node> virtualLinkedNodes = virtualNode.getLinkedToNodes();
 		if (virtualLinkedNodes.size() > realLinkedNodes.size()) {
 			realLinkedNodes.addAll(CollectionUtils.subtract(virtualLinkedNodes, realLinkedNodes));
-		}
+		}*/
 	}
 }

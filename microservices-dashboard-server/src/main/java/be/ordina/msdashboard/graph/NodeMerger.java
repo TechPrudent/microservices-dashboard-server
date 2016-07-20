@@ -43,8 +43,7 @@ public class NodeMerger {
 
             if (nodeIndex.isPresent()) {
                 logger.info("Node with id '{}' previously added, merging", node.getId());
-                mergedNodes.get(nodeIndex.get())
-                        .mergeWith(node);
+                mergedNodes.get(nodeIndex.get()).mergeWith(node);
             } else {
                 logger.info("Node with id '{}' was not merged before, adding it to the list", node.getId());
                 mergedNodes.add(node);

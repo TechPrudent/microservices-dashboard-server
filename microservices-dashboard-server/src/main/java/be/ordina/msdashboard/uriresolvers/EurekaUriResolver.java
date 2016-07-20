@@ -32,4 +32,9 @@ public class EurekaUriResolver implements UriResolver {
     public String resolveHealthCheckUrl(ServiceInstance instance) {
         return ((EurekaDiscoveryClient.EurekaServiceInstance) instance).getInstanceInfo().getHealthCheckUrl();
     }
+
+    @Override
+    public String resolveMappingsUrl(ServiceInstance instance) {
+        return resolveHealthCheckUrl(instance).replaceFirst("health", "mappings");
+    }
 }

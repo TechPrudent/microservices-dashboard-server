@@ -24,6 +24,8 @@ import be.ordina.msdashboard.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.mappings.MappingsAggregator;
+import be.ordina.msdashboard.aggregators.mappings.MappingsProperties;
 import be.ordina.msdashboard.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
@@ -161,7 +163,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Bean
         @ConditionalOnMissingBean
-        public HealthIndicatorsAggregator healthIndicatorsAggregator(ApplicationEventPublisher publisher) {
+        public HealthIndicatorsAggregator healthIndicatorsAggregator() {
             return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), caller, errorHandler);
         }
 
@@ -169,6 +171,37 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         @Bean
         public HealthProperties healthProperties() {
             return new HealthProperties();
+        }
+
+        @Bean
+        @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+        @ConditionalOnMissingBean
+        public UriResolver uriResolver() {
+            return new EurekaUriResolver();
+        }
+    }
+
+    @Configuration
+    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    public static class MappingsConfiguration {
+
+        @Autowired
+        private DiscoveryClient discoveryClient;
+        @Autowired
+        private NettyServiceCaller caller;
+        @Autowired
+        private ErrorHandler errorHandler;
+
+        @Bean
+        @ConditionalOnMissingBean
+        public MappingsAggregator mappingsAggregator() {
+            return new MappingsAggregator(discoveryClient, uriResolver(), mappingsProperties(), caller, errorHandler);
+        }
+
+        @ConfigurationProperties("msdashboard.mappings")
+        @Bean
+        public MappingsProperties mappingsProperties() {
+            return new MappingsProperties();
         }
 
         @Bean

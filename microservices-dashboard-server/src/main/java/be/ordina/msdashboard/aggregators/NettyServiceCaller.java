@@ -61,7 +61,7 @@ public class NettyServiceCaller {
                     JacksonJsonParser jsonParser = new JacksonJsonParser();
                     return jsonParser.parseMap(response);
                 })
-                .doOnNext(r -> logger.info("MAP: {}", r))
+                .doOnNext(r -> logger.info("Json retrieved from call: {}", r))
                 .onErrorResumeNext(Observable.empty());
     }
 }
