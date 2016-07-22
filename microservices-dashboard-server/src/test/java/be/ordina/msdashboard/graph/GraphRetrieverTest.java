@@ -15,15 +15,12 @@
  */
 package be.ordina.msdashboard.graph;
 
-import static be.ordina.msdashboard.JsonHelper.load;
-import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.model.NodeBuilder.node;
-import static com.google.common.collect.Sets.newHashSet;
-
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.converters.ObjectToJsonConverter;
+import be.ordina.msdashboard.properties.LabelProperties;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,13 +29,16 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
 import rx.Observable;
-import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.converters.ObjectToJsonConverter;
-import be.ordina.msdashboard.stores.NodeStore;
+
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Map;
+
+import static be.ordina.msdashboard.JsonHelper.load;
+import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
+import static be.ordina.msdashboard.model.NodeBuilder.node;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Tests for {@link GraphRetriever}
@@ -51,6 +51,8 @@ public class GraphRetrieverTest {
 
 	private GraphRetriever graphRetriever;
 
+	private LabelProperties labelProperties = new LabelProperties();
+
 	@Mock
 	private HealthIndicatorsAggregator healthIndicatorsAggregator;
 	@Mock
@@ -62,7 +64,7 @@ public class GraphRetrieverTest {
 
 	@Before
 	public void setUp() {
-		graphRetriever = new GraphRetriever(Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
+		graphRetriever = new GraphRetriever(labelProperties, Arrays.asList(healthIndicatorsAggregator, indexesAggregator, pactsAggregator), redisService);
 	}
 
 	@Test

@@ -237,6 +237,12 @@
             <artifactId>netty-all</artifactId>
             <version>4.0.30.Final</version>
         </dependency>
+        <!-- Documentation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <repositories>

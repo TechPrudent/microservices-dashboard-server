@@ -33,7 +33,7 @@ import be.ordina.msdashboard.controllers.EventsController;
 import be.ordina.msdashboard.controllers.NodesController;
 import be.ordina.msdashboard.events.EventListener;
 import be.ordina.msdashboard.graph.GraphRetriever;
-import be.ordina.msdashboard.properties.Labels;
+import be.ordina.msdashboard.properties.LabelProperties;
 import be.ordina.msdashboard.stores.NodeStore;
 import be.ordina.msdashboard.stores.SimpleStore;
 import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
@@ -62,16 +62,12 @@ import java.util.List;
 @AutoConfigureAfter({ RedisConfiguration.class })
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public Labels labels() {
-        return new Labels();
-    }
-
     @Configuration
     @AutoConfigureAfter({ HealthConfiguration.class, IndexConfiguration.class, PactConfiguration.class })
     public static class GraphConfiguration {
 
+        @Autowired
+        private LabelProperties labelProperties;
         @Autowired
         private NodeStore nodeStore;
         @Autowired
@@ -83,7 +79,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         @Bean
         @ConditionalOnMissingBean
         public GraphRetriever graphRetriever() {
-            return new GraphRetriever(aggregators, nodeStore);
+            return new GraphRetriever(labelProperties, aggregators, nodeStore);
         }
 
         @Bean

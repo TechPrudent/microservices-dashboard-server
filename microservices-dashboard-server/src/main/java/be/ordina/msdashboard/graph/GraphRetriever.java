@@ -17,6 +17,7 @@ package be.ordina.msdashboard.graph;
 
 import be.ordina.msdashboard.aggregators.NodeAggregator;
 import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.properties.LabelProperties;
 import be.ordina.msdashboard.stores.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +44,10 @@ public class GraphRetriever {
 
 	private final List<NodeAggregator> aggregators;
 	private final NodeStore redisService;
+	private final LabelProperties labelProperties;
 
-	public GraphRetriever(List<NodeAggregator> aggregators, NodeStore redisService) {
+	public GraphRetriever(LabelProperties labelProperties, List<NodeAggregator> aggregators, NodeStore redisService) {
+		this.labelProperties = labelProperties;
 		this.aggregators = aggregators;
 		this.redisService = redisService;
 	}
@@ -86,21 +89,21 @@ public class GraphRetriever {
 
 	private List<Map<Object, Object>> constructLanes() {
 		List<Map<Object, Object>> lanes = new ArrayList<>();
-		lanes.add(constructLane(0, UI));
-		lanes.add(constructLane(1, RESOURCES));
-		lanes.add(constructLane(2, MICROSERVICES));
-		lanes.add(constructLane(3, BACKEND));
+		lanes.add(constructLane(0, labelProperties.getLane().getUi()));
+		lanes.add(constructLane(1, labelProperties.getLane().getResources()));
+		lanes.add(constructLane(2, labelProperties.getLane().getMicroservices()));
+		lanes.add(constructLane(3, labelProperties.getLane().getBackends()));
 		return lanes;
 	}
 
 	private List<String> constructTypes() {
 		List<String> types = new ArrayList<>();
-		types.add(DB);
-		types.add(MICROSERVICE);
-		types.add(REST);
-		types.add(SOAP);
-		types.add(JMS);
-		types.add(RESOURCE);
+		types.add(labelProperties.getType().getDb());
+		types.add(labelProperties.getType().getMicroservice());
+		types.add(labelProperties.getType().getRest());
+		types.add(labelProperties.getType().getSoap());
+		types.add(labelProperties.getType().getJms());
+		types.add(labelProperties.getType().getResource());
 		return types;
 	}
 
