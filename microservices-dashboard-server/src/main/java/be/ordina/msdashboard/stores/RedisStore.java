@@ -77,7 +77,7 @@ public class RedisStore implements NodeCache, NodeStore {
 
 	@Override
 	public void deleteNode(final String nodeId) {
-		redisTemplate.delete(nodeId);
+		redisTemplate.delete(KEY_PREFIX + nodeId);
 		evictGraphCache();
 	}
 
