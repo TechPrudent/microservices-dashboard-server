@@ -136,9 +136,9 @@ public class Node {
 					if (k.equals(STATUS)) {
 						if (node.getDetails().get(k) != null) {
 							details.merge(k, node.getDetails().get(k), (v1, v2) -> {
-								if (v1.equals("DOWN") || v2.equals("DOWN")) {
+								if ("DOWN".equals(v1) || "DOWN".equals(v2)) {
 									return "DOWN";
-								} else if (v1.equals("UP") || v2.equals("UP")) {
+								} else if ("UP".equals(v1) || "UP".equals(v2)) {
 									return "UP";
 								} else {
 									return "UNKNOWN";
@@ -173,7 +173,6 @@ public class Node {
 
 	@Override
 	public int hashCode() {
-		if (id == null) System.out.println("ID IS NULL: " + toString());
 		return id.hashCode();
 	}
 

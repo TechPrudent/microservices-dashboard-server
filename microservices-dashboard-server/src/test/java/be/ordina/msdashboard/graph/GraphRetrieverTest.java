@@ -15,15 +15,11 @@
  */
 package be.ordina.msdashboard.graph;
 
-import static be.ordina.msdashboard.JsonHelper.load;
-import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.model.NodeBuilder.node;
-import static com.google.common.collect.Sets.newHashSet;
-
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-
+import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.converters.ObjectToJsonConverter;
+import be.ordina.msdashboard.stores.NodeStore;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,13 +28,18 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
-import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.converters.ObjectToJsonConverter;
-import be.ordina.msdashboard.stores.NodeStore;
+
+import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Map;
+
+import static be.ordina.msdashboard.JsonHelper.load;
+import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
+import static be.ordina.msdashboard.model.NodeBuilder.node;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Tests for {@link GraphRetriever}
@@ -48,6 +49,8 @@ import be.ordina.msdashboard.stores.NodeStore;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class GraphRetrieverTest {
+
+	private static final Logger logger = LoggerFactory.getLogger(GraphRetrieverTest.class);
 
 	private GraphRetriever graphRetriever;
 
@@ -93,7 +96,7 @@ public class GraphRetrieverTest {
 		Map<String, Object> graph = graphRetriever.retrieve();
 		long totalTime = System.currentTimeMillis() - startTime;
 
-		System.out.println("Time spent waiting for processing: " + totalTime);
+		logger.info("Time spent waiting for processing: " + totalTime);
 		ObjectToJsonConverter<Map<String, Object>> converter = new ObjectToJsonConverter<>();
 		String nodeAsJson = converter.convert(graph);
 		JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/GraphRetrieverTest.json")),

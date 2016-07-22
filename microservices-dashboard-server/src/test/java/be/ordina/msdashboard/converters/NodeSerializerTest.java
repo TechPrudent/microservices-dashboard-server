@@ -19,6 +19,8 @@ import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
 import com.google.common.collect.Maps;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -35,6 +37,8 @@ import static org.junit.Assert.assertNull;
  * @author Tim Ysewyn
  */
 public class NodeSerializerTest {
+
+	private static final Logger logger = LoggerFactory.getLogger(NodeSerializerTest.class);
 
 	@Test
 	public void serialize() {
@@ -55,7 +59,7 @@ public class NodeSerializerTest {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		System.out.println(out);
+		logger.info(out);
 		assertThat(bytes).isEqualTo(nodeAsJson.getBytes());
 	}
 	

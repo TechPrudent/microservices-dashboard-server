@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -61,6 +62,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
         classes = { TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class })
 public class MicroservicesDashboardServerApplicationTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
+
     @Value("${local.server.port}")
     private int port = 0;
 
@@ -78,8 +81,8 @@ public class MicroservicesDashboardServerApplicationTest {
         long totalTime = System.currentTimeMillis() - startTime;
         assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
         String body = removeBlankNodes(graph.getBody());
-        System.out.println("BODY: " + body);
-        System.out.println("Time spent waiting for /graph: " + totalTime);
+        // logger.info("BODY: " + body);
+        logger.info("Time spent waiting for /graph: " + totalTime);
 
         JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
@@ -122,7 +125,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
-        System.out.println("BODY: " + body);
+        // logger.info("BODY: " + body);
         JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }
@@ -135,7 +138,7 @@ public class MicroservicesDashboardServerApplicationTest {
             int targetIndex = link.get("target");
             String sourceNodeId = (String) ((Map) nodes.get(sourceIndex)).get(ID);
             String targetNodeId = (String) ((Map) nodes.get(targetIndex)).get(ID);
-            System.out.println("Graph contains links between: " + sourceNodeId + " and " + targetNodeId);
+            logger.info("Graph contains links between: " + sourceNodeId + " and " + targetNodeId);
         }
     }
 
