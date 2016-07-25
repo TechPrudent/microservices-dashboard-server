@@ -1,0 +1,7 @@
+coverage:
+  ignore:
+    - microservices-dashboard-server/src/test/.*
+    - .*/model/.*
+    - .*/.*Properties.java
+    - microservices-dashboard-server/src/main/java/be/ordina/msdashboard/config/Constants.java
+    - microservices-dashboard-server/src/main/java/be/ordina/msdashboard/config/Labels.java
