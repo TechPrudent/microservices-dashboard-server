@@ -15,9 +15,11 @@
  */
 package be.ordina.msdashboard.aggregators.pact;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -26,6 +28,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import io.reactivex.netty.protocol.http.client.HttpClientResponse;
+import io.reactivex.netty.protocol.http.client.HttpResponseHeaders;
 
 import java.util.List;
 
@@ -42,6 +45,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import be.ordina.msdashboard.constants.Constants;
+import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 
 @RunWith(PowerMockRunner.class)
@@ -176,5 +180,60 @@ public class PactsAggregatorTest {
  		assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
  		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
  		assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
+     }
+    
+    
+    @SuppressWarnings("unchecked")
+  	@Test
+    public void getPactUrlsNotFound() throws InterruptedException {
+
+         HttpClientResponse<ByteBuf> urlsNotFoundResponse = mock(HttpClientResponse.class);
+         when(urlsNotFoundResponse.getContent()).thenReturn(null);
+         when(urlsNotFoundResponse.getStatus()).thenReturn(HttpResponseStatus.NOT_FOUND);
+         HttpResponseHeaders httpResponseHeaders = mock(HttpResponseHeaders.class);
+         when(httpResponseHeaders.entries()).thenReturn(newArrayList());
+         when(urlsNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
+          
+         when(RxNetty.createHttpRequest(any(HttpClientRequest.class))).thenReturn(Observable.just(urlsNotFoundResponse));
+      	
+         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+         pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+         testSubscriber.assertNoErrors();
+
+         List<Node> nodes = testSubscriber.getOnNextEvents();
+         assertThat(nodes).isEmpty();
+         
+         verify(publisher).publishEvent(any(SystemEvent.class));
+    }
+    
+    @SuppressWarnings("unchecked")
+ 	@Test
+     public void nodeOneNotFound() throws InterruptedException {
+
+        HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
+        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
+        ByteBufUtil.writeUtf8(byteBuf, onePactSource);
+        when(urlsResponse.getContent()).thenReturn(Observable.just(byteBuf));
+        when(urlsResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
+         
+        HttpClientResponse<ByteBuf> pactNotFoundResponse = mock(HttpClientResponse.class);
+        when(pactNotFoundResponse.getContent()).thenReturn(null);
+        when(pactNotFoundResponse.getStatus()).thenReturn(HttpResponseStatus.NOT_FOUND);
+        HttpResponseHeaders httpResponseHeaders = mock(HttpResponseHeaders.class);
+        when(httpResponseHeaders.entries()).thenReturn(newArrayList());
+        when(pactNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
+         
+        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+         	.thenReturn(Observable.just(urlsResponse), Observable.just(pactNotFoundResponse));
+         
+     	
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
+
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).isEmpty();
+        
+        verify(publisher).publishEvent(any(SystemEvent.class));
      }
 }
