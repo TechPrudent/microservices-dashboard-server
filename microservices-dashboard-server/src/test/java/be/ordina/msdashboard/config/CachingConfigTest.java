@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.caching;
+package be.ordina.msdashboard.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,7 +31,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CachingProperties;
-import be.ordina.msdashboard.config.RedisConfiguration;
 import be.ordina.msdashboard.nodes.stores.RedisStore;
 
 /**
