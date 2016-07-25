@@ -41,12 +41,12 @@ public class EventsController {
     }
 
     @RequestMapping(value = "/events", method = GET)
-    public Collection<SystemEvent> getAllNodes() {
+    public Collection<SystemEvent> getEvents() {
         return eventStore.getEvents();
     }
 
     @RequestMapping(value = "/events", method = DELETE)
-    public void deleteAllNodes() {
+    public void deleteEvents() {
         eventStore.deleteEvents();
     }
 }

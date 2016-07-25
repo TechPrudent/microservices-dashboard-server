@@ -50,14 +50,15 @@ public class EventsControllerTest {
     	events.add(new SystemEvent());
         when(eventStore.getEvents()).thenReturn(events);
         
-        Collection<SystemEvent> nodes = eventsController.getAllNodes();
+        Collection<SystemEvent> nodes = eventsController.getEvents();
+
         assertThat(nodes).isNotNull();
         assertThat(nodes.size()).isEqualTo(1);
     }
 
     @Test
     public void deleteAllNodes() {
-    	eventsController.deleteAllNodes();
+    	eventsController.deleteEvents();
     	verify(eventStore).deleteEvents();
     }
 }
