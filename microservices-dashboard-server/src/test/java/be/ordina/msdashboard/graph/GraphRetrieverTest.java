@@ -15,10 +15,10 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.stores.NodeStore;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.nodes.stores.NodeStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ import java.util.Map;
 
 import static be.ordina.msdashboard.JsonHelper.load;
 import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.model.NodeBuilder.node;
+import static be.ordina.msdashboard.nodes.model.NodeBuilder.node;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**

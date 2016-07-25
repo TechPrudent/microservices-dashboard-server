@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.events.EventListener;
-import be.ordina.msdashboard.events.SystemEvent;
+import be.ordina.msdashboard.nodes.events.EventListener;
+import be.ordina.msdashboard.nodes.events.SystemEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

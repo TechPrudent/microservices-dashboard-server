@@ -15,16 +15,16 @@
  */
 package be.ordina.msdashboard.graph;
 
-import static be.ordina.msdashboard.constants.Constants.BACKEND;
-import static be.ordina.msdashboard.constants.Constants.DETAILS;
-import static be.ordina.msdashboard.constants.Constants.ID;
-import static be.ordina.msdashboard.constants.Constants.LANE;
-import static be.ordina.msdashboard.constants.Constants.LINKS;
-import static be.ordina.msdashboard.constants.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.constants.Constants.NODES;
-import static be.ordina.msdashboard.constants.Constants.RESOURCE;
-import static be.ordina.msdashboard.constants.Constants.TYPE;
-import static be.ordina.msdashboard.constants.Constants.UI_COMPONENT;
+import static be.ordina.msdashboard.config.Constants.BACKEND;
+import static be.ordina.msdashboard.config.Constants.DETAILS;
+import static be.ordina.msdashboard.config.Constants.ID;
+import static be.ordina.msdashboard.config.Constants.LANE;
+import static be.ordina.msdashboard.config.Constants.LINKS;
+import static be.ordina.msdashboard.config.Constants.MICROSERVICE;
+import static be.ordina.msdashboard.config.Constants.NODES;
+import static be.ordina.msdashboard.config.Constants.RESOURCE;
+import static be.ordina.msdashboard.config.Constants.TYPE;
+import static be.ordina.msdashboard.config.Constants.UI_COMPONENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
@@ -34,8 +34,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.model.NodeBuilder;
 
 /**
  * Tests for {@link GraphMapper}

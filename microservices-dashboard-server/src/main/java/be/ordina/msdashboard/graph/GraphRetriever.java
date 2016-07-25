@@ -15,9 +15,9 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.aggregators.NodeAggregator;
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.stores.NodeStore;
+import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.stores.NodeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static be.ordina.msdashboard.constants.Constants.*;
+import static be.ordina.msdashboard.config.Constants.*;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**

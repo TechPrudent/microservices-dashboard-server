@@ -15,14 +15,14 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.model.Node;
+import be.ordina.msdashboard.nodes.model.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.functions.Func1;
 
 import java.util.*;
 
-import static be.ordina.msdashboard.constants.Constants.*;
+import static be.ordina.msdashboard.config.Constants.*;
 
 /**
  * @author Tim Ysewyn

@@ -17,9 +17,9 @@ package be.ordina.msdashboard;
 
 import static be.ordina.msdashboard.JsonHelper.load;
 import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.constants.Constants.ID;
-import static be.ordina.msdashboard.constants.Constants.LINKS;
-import static be.ordina.msdashboard.constants.Constants.NODES;
+import static be.ordina.msdashboard.config.Constants.ID;
+import static be.ordina.msdashboard.config.Constants.LINKS;
+import static be.ordina.msdashboard.config.Constants.NODES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;

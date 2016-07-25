@@ -32,7 +32,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CachingProperties;
 import be.ordina.msdashboard.config.RedisConfiguration;
-import be.ordina.msdashboard.stores.RedisStore;
+import be.ordina.msdashboard.nodes.stores.RedisStore;
 
 /**
  * Tests for {@link CachingConfig}

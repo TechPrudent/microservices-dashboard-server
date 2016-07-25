@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.graph;
 
-import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.model.NodeBuilder;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.model.NodeBuilder;
 import org.junit.Test;
 
 import java.util.ArrayList;

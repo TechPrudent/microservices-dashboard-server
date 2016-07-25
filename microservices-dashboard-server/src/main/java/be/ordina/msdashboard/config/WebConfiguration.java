@@ -15,30 +15,29 @@
  */
 package be.ordina.msdashboard.config;
 
-import be.ordina.msdashboard.aggregators.ErrorHandler;
-import be.ordina.msdashboard.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.aggregators.NodeAggregator;
-import be.ordina.msdashboard.aggregators.VirtualAndRealDependencyIntegrator;
-import be.ordina.msdashboard.aggregators.health.HealthIndicatorsAggregator;
-import be.ordina.msdashboard.aggregators.health.HealthProperties;
-import be.ordina.msdashboard.aggregators.index.IndexProperties;
-import be.ordina.msdashboard.aggregators.index.IndexToNodeConverter;
-import be.ordina.msdashboard.aggregators.index.IndexesAggregator;
-import be.ordina.msdashboard.aggregators.mappings.MappingsAggregator;
-import be.ordina.msdashboard.aggregators.mappings.MappingsProperties;
-import be.ordina.msdashboard.aggregators.pact.PactProperties;
-import be.ordina.msdashboard.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.aggregators.VirtualAndRealDependencyIntegrator;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
+import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
+import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
+import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
+import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsAggregator;
+import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsProperties;
+import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
+import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.controllers.EventsController;
-import be.ordina.msdashboard.controllers.NodesController;
-import be.ordina.msdashboard.events.EventListener;
+import be.ordina.msdashboard.controllers.GraphController;
+import be.ordina.msdashboard.nodes.events.EventListener;
 import be.ordina.msdashboard.graph.GraphRetriever;
-import be.ordina.msdashboard.properties.Labels;
-import be.ordina.msdashboard.stores.NodeStore;
-import be.ordina.msdashboard.stores.SimpleStore;
-import be.ordina.msdashboard.uriresolvers.DefaultUriResolver;
-import be.ordina.msdashboard.uriresolvers.EurekaUriResolver;
-import be.ordina.msdashboard.uriresolvers.UriResolver;
+import be.ordina.msdashboard.nodes.stores.NodeStore;
+import be.ordina.msdashboard.nodes.stores.SimpleStore;
+import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
+import be.ordina.msdashboard.nodes.uriresolvers.EurekaUriResolver;
+import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -88,8 +87,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Bean
         @ConditionalOnMissingBean
-        public NodesController nodesController() {
-            return new NodesController(graphRetriever(), nodeStore, cacheCleaningBean);
+        public GraphController nodesController() {
+            return new GraphController(graphRetriever(), nodeStore, cacheCleaningBean);
         }
     }
 
