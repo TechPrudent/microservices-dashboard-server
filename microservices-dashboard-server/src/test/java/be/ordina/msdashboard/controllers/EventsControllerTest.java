@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.nodes.events.EventListener;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.stores.EventStore;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,13 +42,13 @@ public class EventsControllerTest {
     private EventsController eventsController;
     
     @Mock
-    private EventListener eventListener;
+    private EventStore eventStore;
     
     @Test
     public void getAllNodes() {
     	ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<SystemEvent>();
     	events.add(new SystemEvent());
-        when(eventListener.getEvents()).thenReturn(events);
+        when(eventStore.getEvents()).thenReturn(events);
         
         Collection<SystemEvent> nodes = eventsController.getAllNodes();
         assertThat(nodes).isNotNull();
@@ -58,6 +58,6 @@ public class EventsControllerTest {
     @Test
     public void deleteAllNodes() {
     	eventsController.deleteAllNodes();
-    	verify(eventListener).deleteEvents();
+    	verify(eventStore).deleteEvents();
     }
 }

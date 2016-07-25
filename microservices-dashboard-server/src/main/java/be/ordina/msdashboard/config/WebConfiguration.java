@@ -31,7 +31,7 @@ import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.controllers.EventsController;
 import be.ordina.msdashboard.controllers.GraphController;
-import be.ordina.msdashboard.nodes.events.EventListener;
+import be.ordina.msdashboard.nodes.stores.EventStore;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.stores.NodeStore;
 import be.ordina.msdashboard.nodes.stores.SimpleStore;
@@ -103,8 +103,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Bean
         @ConditionalOnMissingBean
-        public EventListener eventListener() {
-            return new EventListener();
+        public EventStore eventListener() {
+            return new EventStore();
         }
     }
 

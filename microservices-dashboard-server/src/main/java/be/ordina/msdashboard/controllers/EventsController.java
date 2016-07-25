@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.nodes.events.EventListener;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.stores.EventStore;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,19 +34,19 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 @ResponseBody
 public class EventsController {
 
-    private EventListener eventListener;
+    private EventStore eventStore;
 
-    public EventsController(EventListener eventListener) {
-        this.eventListener = eventListener;
+    public EventsController(EventStore eventStore) {
+        this.eventStore = eventStore;
     }
 
     @RequestMapping(value = "/events", method = GET)
     public Collection<SystemEvent> getAllNodes() {
-        return eventListener.getEvents();
+        return eventStore.getEvents();
     }
 
     @RequestMapping(value = "/events", method = DELETE)
     public void deleteAllNodes() {
-        eventListener.deleteEvents();
+        eventStore.deleteEvents();
     }
 }

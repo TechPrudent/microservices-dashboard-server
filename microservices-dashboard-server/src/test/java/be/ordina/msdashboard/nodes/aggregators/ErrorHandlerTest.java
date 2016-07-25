@@ -25,8 +25,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
-import be.ordina.msdashboard.nodes.events.NodeEvent;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.model.NodeEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 
 /**
  * Tests for {@link ErrorHandler}

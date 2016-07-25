@@ -16,7 +16,7 @@
 package be.ordina.msdashboard.nodes.aggregators.pact;
 
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.model.Node;
 import com.jayway.jsonpath.JsonPath;
 import io.netty.buffer.ByteBuf;

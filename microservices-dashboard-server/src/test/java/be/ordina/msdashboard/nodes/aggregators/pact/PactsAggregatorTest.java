@@ -47,7 +47,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import be.ordina.msdashboard.config.Constants;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.model.Node;
 
 /**

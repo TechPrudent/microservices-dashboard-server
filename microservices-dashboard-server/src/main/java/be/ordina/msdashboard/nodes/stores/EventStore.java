@@ -13,31 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.nodes.events;
+package be.ordina.msdashboard.nodes.stores;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author Andreas Evers
  */
-public class EventListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(EventListener.class);
+public class EventStore {
 
     private ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<>();
 
     @org.springframework.context.event.EventListener
     public void handleContextRefresh(SystemEvent event) {
-        try {
-            logger.info("Storing event: " + event);
-            boolean added = events.add(event);
-            logger.info("Added event: " + added);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        events.add(event);
     }
 
     public ConcurrentSkipListSet<SystemEvent> getEvents() {

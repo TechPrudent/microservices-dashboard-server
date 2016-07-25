@@ -17,8 +17,8 @@ package be.ordina.msdashboard.nodes.aggregators.index;
 
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.events.NodeEvent;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.model.NodeEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;

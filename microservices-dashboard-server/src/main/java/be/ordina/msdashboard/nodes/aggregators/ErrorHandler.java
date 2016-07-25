@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.nodes.aggregators;
 
-import be.ordina.msdashboard.nodes.events.NodeEvent;
-import be.ordina.msdashboard.nodes.events.SystemEvent;
+import be.ordina.msdashboard.nodes.model.NodeEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

@@ -12,11 +12,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+package be.ordina.msdashboard.nodes.stores;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import be.ordina.msdashboard.nodes.model.SystemEvent;
+import org.junit.Test;
 
 /**
- * Support for storing and retrieving events.
+ * Tests for {@link EventStore}
+ *
+ * @author Tim De Bruyn
  */
-package be.ordina.msdashboard.nodes.events;
+public class EventStoreTest {
+
+	private EventStore eventStore = new EventStore();
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void operationsOnEvents(){
+		eventStore.handleContextRefresh(new SystemEvent());
+		assertThat(eventStore.getEvents().size()).isEqualTo(1);
+		eventStore.deleteEvents();
+		assertThat(eventStore.getEvents()).isEmpty();
+	}
+}
