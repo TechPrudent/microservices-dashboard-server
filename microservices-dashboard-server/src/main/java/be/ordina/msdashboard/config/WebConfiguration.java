@@ -18,7 +18,6 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.aggregators.VirtualAndRealDependencyIntegrator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
@@ -226,12 +225,6 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         public PactsAggregator pactsAggregator(ApplicationEventPublisher publisher) {
             return new PactsAggregator(pactProperties(), publisher);
         }
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public VirtualAndRealDependencyIntegrator virtualAndRealDependencyIntegrator() {
-        return new VirtualAndRealDependencyIntegrator();
     }
 
     @Bean
