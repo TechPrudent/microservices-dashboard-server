@@ -15,10 +15,10 @@
  */
 package be.ordina.msdashboard.nodes.stores;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link EventStore}
@@ -32,7 +32,7 @@ public class EventStoreTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void operationsOnEvents(){
-		eventStore.handleContextRefresh(new SystemEvent());
+		eventStore.handleContextRefresh(new SystemEvent("A system event occurred"));
 		assertThat(eventStore.getEvents().size()).isEqualTo(1);
 		eventStore.deleteEvents();
 		assertThat(eventStore.getEvents()).isEmpty();

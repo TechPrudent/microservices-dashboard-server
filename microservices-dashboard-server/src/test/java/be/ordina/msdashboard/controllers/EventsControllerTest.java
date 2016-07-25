@@ -46,10 +46,10 @@ public class EventsControllerTest {
     
     @Test
     public void getAllNodes() {
-    	ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<SystemEvent>();
-    	events.add(new SystemEvent());
+    	ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<>();
+    	events.add(new SystemEvent("A system event occurred"));
         when(eventStore.getEvents()).thenReturn(events);
-        
+
         Collection<SystemEvent> nodes = eventsController.getEvents();
 
         assertThat(nodes).isNotNull();

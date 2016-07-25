@@ -32,9 +32,6 @@ public class SystemEvent implements Serializable, Comparable {
     private String message;
     private Throwable throwable;
 
-    public SystemEvent() {
-    }
-
     public SystemEvent(String message) {
         this.message = message;
     }
