@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static be.ordina.msdashboard.constants.Constants.DETAILS;
-import static be.ordina.msdashboard.constants.Constants.ID;
 import static be.ordina.msdashboard.constants.Constants.LANE;
 import static be.ordina.msdashboard.constants.Constants.STATUS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
@@ -37,7 +36,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 @JsonInclude(NON_EMPTY)
 public class Node {
 
-	@JsonProperty(ID)
+	//@JsonProperty(ID)
 	private String id;
 
 	@JsonProperty(DETAILS)

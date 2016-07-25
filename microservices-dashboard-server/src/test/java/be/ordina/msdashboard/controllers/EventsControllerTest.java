@@ -15,21 +15,20 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collection;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
+import be.ordina.msdashboard.events.EventListener;
+import be.ordina.msdashboard.events.SystemEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import be.ordina.msdashboard.events.EventListener;
-import be.ordina.msdashboard.events.SystemEvent;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link EventsController}
@@ -47,7 +46,7 @@ public class EventsControllerTest {
     
     @Test
     public void getAllNodes() {
-    	ConcurrentLinkedDeque<SystemEvent> events = new ConcurrentLinkedDeque<SystemEvent>();
+    	ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<SystemEvent>();
     	events.add(new SystemEvent());
         when(eventListener.getEvents()).thenReturn(events);
         

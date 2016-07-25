@@ -125,7 +125,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
-        // logger.info("BODY: " + body);
+        logger.info("BODY: " + body);
         JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }

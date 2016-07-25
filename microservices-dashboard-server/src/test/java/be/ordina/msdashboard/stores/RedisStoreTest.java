@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.graph;
+package be.ordina.msdashboard.stores;
 
 import be.ordina.msdashboard.model.Node;
-import be.ordina.msdashboard.stores.RedisStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -34,7 +33,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests for {@link RedisStore}
@@ -42,9 +43,9 @@ import static org.mockito.Mockito.*;
  * @author Andreas Evers
  */
 @RunWith(MockitoJUnitRunner.class)
-public class RedisServiceTest {
+public class RedisStoreTest {
 
-	private static final String nodeAsJson= "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedNodes\":[{\"id\":\"1a\",\"details\":{\"type\":\"REST\",\"status\":\"DOWN\"}}]}";
+	private static final String nodeAsJson= "{\"id\":\"key1\",\"details\":{\"type\":\"MICROSERVICE\",\"status\":\"UP\"},\"linkedToNodeIds\":[\"test1\",\"test2\"],\"linkedFromNodeIds\":[\"test3\",\"test4\"]}";
 
 	@InjectMocks
 	private RedisStore redisService;

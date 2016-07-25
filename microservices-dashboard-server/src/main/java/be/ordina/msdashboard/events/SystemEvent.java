@@ -15,14 +15,17 @@
  */
 package be.ordina.msdashboard.events;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Simple system event when something goes wrong
  *
  * @author Andreas Evers
  */
-public class SystemEvent implements Serializable {
+public class SystemEvent implements Serializable, Comparable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,20 +62,16 @@ public class SystemEvent implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SystemEvent that = (SystemEvent) o;
-
-        if (message != null ? !message.equals(that.message) : that.message != null) return false;
-        return throwable != null ? throwable.equals(that.throwable) : that.throwable == null;
-
+        return Objects.deepEquals(this, o);
     }
 
     @Override
     public int hashCode() {
-        int result = message != null ? message.hashCode() : 0;
-        result = 31 * result + (throwable != null ? throwable.hashCode() : 0);
-        return result;
+        return Objects.hash(message, throwable);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return CompareToBuilder.reflectionCompare(this, o);
     }
 }

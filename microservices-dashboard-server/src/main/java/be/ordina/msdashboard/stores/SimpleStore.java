@@ -15,8 +15,9 @@
  */
 package be.ordina.msdashboard.stores;
 
-import be.ordina.msdashboard.converters.JsonToObjectConverter;
 import be.ordina.msdashboard.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import rx.Observable;
 
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class SimpleStore implements NodeStore {
     }
 
     private Node getNode(String nodeData) {
-        JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
-        return converter.convert(nodeData);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(new ObjectMapper());
+        return serializer.deserialize(nodeData.getBytes(), Node.class);
     }
 }
