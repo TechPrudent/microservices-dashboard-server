@@ -30,7 +30,9 @@ import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import io.reactivex.netty.protocol.http.client.HttpClientResponse;
 import io.reactivex.netty.protocol.http.client.HttpResponseHeaders;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +50,11 @@ import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.events.SystemEvent;
 import be.ordina.msdashboard.model.Node;
 
+/**
+ * Tests for {@link PactsAggregator}
+ *
+ * @author Tim De Bruyn
+ */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({RxNetty.class})
 public class PactsAggregatorTest {
@@ -58,15 +65,6 @@ public class PactsAggregatorTest {
     private ApplicationEventPublisher publisher;
     
 	private PactsAggregator pactsAggregator;
-	
-    @Before
-    public void setUp() {
-        pactsAggregator = new PactsAggregator(pactProperties, publisher);
-        ReflectionTestUtils.setField(pactsAggregator, "selfHrefJsonPath", "$.pacts[*]._links.self.href");
-        ReflectionTestUtils.setField(pactsAggregator, "pactBrokerUrl", "http://localhost:8089");
-        ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
-        PowerMockito.mockStatic(RxNetty.class);
-    }
 	
     String onePactSource = "{\"pacts\": [{\"_links\": {\"self\":"
 			+ " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
@@ -99,6 +97,24 @@ public class PactsAggregatorTest {
 			+ "\"http://someServer.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
 			+ "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
 	
+	
+    @Before
+    public void setUp() {
+        when(pactProperties.getRequestHeaders()).thenReturn(requestHeaders());
+        pactsAggregator = new PactsAggregator(pactProperties, publisher);
+        ReflectionTestUtils.setField(pactsAggregator, "selfHrefJsonPath", "$.pacts[*]._links.self.href");
+        ReflectionTestUtils.setField(pactsAggregator, "pactBrokerUrl", "http://localhost:8089");
+        ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
+        PowerMockito.mockStatic(RxNetty.class);
+    }
+    
+    private Map<String,String> requestHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Accept", "application/hal+json");
+        headers.put("Accept-Language", "en-us,en;q=0.5");
+        return headers;
+    }
+    
     @SuppressWarnings("unchecked")
 	@Test
     public void shouldReturnTwoNodes() throws InterruptedException {

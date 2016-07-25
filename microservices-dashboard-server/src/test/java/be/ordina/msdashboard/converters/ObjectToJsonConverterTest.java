@@ -15,14 +15,25 @@
  */
 package be.ordina.msdashboard.converters;
 
+import static be.ordina.msdashboard.model.NodeBuilder.node;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
 import be.ordina.msdashboard.constants.Constants;
 import be.ordina.msdashboard.model.Node;
 import be.ordina.msdashboard.model.NodeBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 /**
  * TODO: To be reviewed (missing linkedNodeIds)
@@ -51,12 +62,32 @@ public class ObjectToJsonConverterTest {
     }
 
     @Test
-    public void shouldReturnNull() {
+    public void shouldReturnNull() throws Exception {
         ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
 
         String nodeAsJson = converter.convert(null);
 
         assertThat(nodeAsJson).isNull();
     }
+    
+    @SuppressWarnings("deprecation")
+	@Test(expected=IllegalArgumentException.class)
+    public void shouldFail() throws Exception{
+    	ObjectToJsonConverter<Node> converter = new ObjectToJsonConverter<>();
+    	ObjectWriter objectWriter = mock(ObjectWriter.class);
+        setFinalStatic(ObjectToJsonConverter.class.getDeclaredField("OBJECT_WRITER"), objectWriter);
+        
+        when(objectWriter.writeValueAsString(Mockito.any(Node.class))).thenThrow(new JsonGenerationException("some json generating error"));
+        
+        converter.convert(node().build());
+    }
 
+    
+    private void setFinalStatic(Field field, Object newValue) throws Exception {
+        field.setAccessible(true);        
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        field.set(null, newValue);
+    }
 }
