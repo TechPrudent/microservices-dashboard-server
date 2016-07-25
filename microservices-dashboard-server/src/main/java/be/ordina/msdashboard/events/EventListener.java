@@ -15,21 +15,32 @@
  */
 package be.ordina.msdashboard.events;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author Andreas Evers
  */
 public class EventListener {
 
-    private ConcurrentLinkedDeque events = new ConcurrentLinkedDeque();
+    private static final Logger logger = LoggerFactory.getLogger(EventListener.class);
+
+    private ConcurrentSkipListSet<SystemEvent> events = new ConcurrentSkipListSet<>();
 
     @org.springframework.context.event.EventListener
     public void handleContextRefresh(SystemEvent event) {
-        events.add(event);
+        try {
+            logger.info("Storing event: " + event);
+            boolean added = events.add(event);
+            logger.info("Added event: " + added);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
-    public ConcurrentLinkedDeque getEvents() {
+    public ConcurrentSkipListSet<SystemEvent> getEvents() {
         return events;
     }
 

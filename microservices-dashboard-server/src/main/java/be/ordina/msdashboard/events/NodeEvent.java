@@ -15,6 +15,8 @@
  */
 package be.ordina.msdashboard.events;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -63,5 +65,10 @@ public class NodeEvent extends SystemEvent implements Serializable {
         int result = super.hashCode();
         result = 31 * result + (nodeId != null ? nodeId.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return CompareToBuilder.reflectionCompare(this, o);
     }
 }

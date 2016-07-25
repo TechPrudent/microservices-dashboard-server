@@ -17,8 +17,8 @@ package be.ordina.msdashboard.stores;
 
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.constants.Constants;
-import be.ordina.msdashboard.converters.JsonToObjectConverter;
 import be.ordina.msdashboard.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import rx.Observable;
 
 import java.util.ArrayList;
@@ -88,8 +89,8 @@ public class RedisStore implements NodeCache, NodeStore {
 	}
 
 	private Node getNode(String nodeData) {
-		JsonToObjectConverter<Node> converter = new JsonToObjectConverter<>(Node.class);
-		return converter.convert(nodeData);
+		GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(new ObjectMapper());
+		return serializer.deserialize(nodeData.getBytes(), Node.class);
 	}
 
 	@Override
