@@ -71,4 +71,13 @@ public class NodeEvent extends SystemEvent implements Serializable {
     public int compareTo(Object o) {
         return CompareToBuilder.reflectionCompare(this, o);
     }
+
+    @Override
+    public String toString() {
+        return "NodeEvent{" +
+                "nodeId='" + nodeId + '\'' +
+                ", message='" + getMessage() + '\'' +
+                ", throwable=" + getThrowable() +
+                "}";
+    }
 }
