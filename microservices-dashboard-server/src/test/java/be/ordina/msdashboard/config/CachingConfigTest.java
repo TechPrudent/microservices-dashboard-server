@@ -71,9 +71,7 @@ public class CachingConfigTest {
 
         cacheCleaningBean.clean();
 
-        verify(redisService, times(0)).evictHealthsCache();
-        verify(redisService, times(0)).evictIndexesCache();
-        verify(redisService, times(0)).evictPactsCache();
+        verify(redisService, times(0)).evictGraphCache();
     }
 
     @Test
@@ -87,9 +85,7 @@ public class CachingConfigTest {
 
         cacheCleaningBean.clean();
 
-        verify(redisService, times(1)).evictHealthsCache();
-        verify(redisService, times(1)).evictIndexesCache();
-        verify(redisService, times(1)).evictPactsCache();
+        verify(redisService, times(1)).evictGraphCache();
     }
 
 }

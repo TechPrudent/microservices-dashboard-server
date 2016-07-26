@@ -109,21 +109,4 @@ public class RedisStore implements NodeCache, NodeStore {
 		// Intentionally left empty
 	}
 
-	@Override
-	@CacheEvict(value = Constants.HEALTH_CACHE_NAME, allEntries = true)
-	public void evictHealthsCache() {
-		// Intentionally left empty
-	}
-
-	@Override
-	@CacheEvict(value = Constants.INDEX_CACHE_NAME, allEntries = true)
-	public void evictIndexesCache() {
-		// Intentionally left empty
-	}
-
-	@Override
-	@CacheEvict(value = Constants.PACTS_CACHE_NAME, allEntries = true)
-	public void evictPactsCache() {
-		// Intentionally left empty
-	}
 }

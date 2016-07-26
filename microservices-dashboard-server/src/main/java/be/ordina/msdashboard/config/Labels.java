@@ -37,9 +37,6 @@ public class Labels {
 	private String status = "status";
 	private String diskSpace = "diskSpace";
 	private String hystrix = "hystrix";
-	private String healthCacheName = "healths";
-	private String indexCacheName = "indexes";
-	private String pactsCacheName = "pacts";
 	private String directed = "directed";
 	private String multigraph = "multigraph";
 	private String graph = "graph";
@@ -154,30 +151,6 @@ public class Labels {
 
 	public void setHystrix(String hystrix) {
 		this.hystrix = hystrix;
-	}
-
-	public String getHealthCacheName() {
-		return healthCacheName;
-	}
-
-	public void setHealthCacheName(String healthCacheName) {
-		this.healthCacheName = healthCacheName;
-	}
-
-	public String getIndexCacheName() {
-		return indexCacheName;
-	}
-
-	public void setIndexCacheName(String indexCacheName) {
-		this.indexCacheName = indexCacheName;
-	}
-
-	public String getPactsCacheName() {
-		return pactsCacheName;
-	}
-
-	public void setPactsCacheName(String pactsCacheName) {
-		this.pactsCacheName = pactsCacheName;
 	}
 
 	public String getDirected() {

@@ -124,13 +124,4 @@ public class RedisStoreTest {
 		verify(redisConnection).flushDb();
 	}
 
-	@Test
-	public void evictHealthsCache() {
-		redisService.evictHealthsCache();
-	}
-
-	@Test
-	public void evictIndexesCache() {
-		redisService.evictIndexesCache();
-	}
 }

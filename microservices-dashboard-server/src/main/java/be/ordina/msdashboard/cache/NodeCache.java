@@ -29,19 +29,4 @@ public interface NodeCache {
      */
     void evictGraphCache();
 
-    /**
-     * Evicts only the health cache.
-     */
-    void evictHealthsCache();
-
-    /**
-     * Evicts only the index cache.
-     */
-    void evictIndexesCache();
-
-    /**
-     * Evicts only the pact cache.
-     */
-    void evictPactsCache();
-
 }
