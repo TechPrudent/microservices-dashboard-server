@@ -15,19 +15,20 @@
  */
 package be.ordina.msdashboard.nodes.aggregators;
 
+import static java.text.MessageFormat.format;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.RxNetty;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.json.JacksonJsonParser;
-import rx.Observable;
 
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import static java.text.MessageFormat.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.json.JacksonJsonParser;
+
+import rx.Observable;
 
 /**
  * @author Andreas Evers
@@ -45,7 +46,7 @@ public class NettyServiceCaller {
     public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
         return RxNetty.createHttpRequest(request)
                 .publish().autoConnect()
-                .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {} with headers {}: {}",
+                .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {1} with headers {2}: {3}",
                         request.getUri(), request.getHeaders().entries(), el), el))
                 .filter(r -> {
                     if (r.getStatus().code() < 400) {
