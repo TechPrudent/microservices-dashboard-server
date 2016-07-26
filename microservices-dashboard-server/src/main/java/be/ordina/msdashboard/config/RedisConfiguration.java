@@ -111,7 +111,7 @@ public class RedisConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheProperties cachingProperties() {
+    public CacheProperties cacheProperties() {
         return new CacheProperties();
     }
 
