@@ -16,10 +16,9 @@
 package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.cache.CacheCleaningBean;
-import be.ordina.msdashboard.cache.CachingProperties;
+import be.ordina.msdashboard.cache.CacheProperties;
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.config.RedisConfiguration.RedisOrMockCondition;
-import be.ordina.msdashboard.nodes.stores.NodeStore;
 import be.ordina.msdashboard.nodes.stores.RedisStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,7 +58,7 @@ import static redis.embedded.util.OSDetector.getOS;
  */
 @Configuration
 @EnableCaching
-@EnableConfigurationProperties(CachingProperties.class)
+@EnableConfigurationProperties(CacheProperties.class)
 @Conditional(RedisOrMockCondition.class)
 @AutoConfigureBefore(WebConfiguration.class)
 @AutoConfigureAfter(RedisAutoConfiguration.class)
@@ -67,16 +66,16 @@ import static redis.embedded.util.OSDetector.getOS;
 public class RedisConfiguration {
 
     @Autowired
-    private CachingProperties cachingProperties;
+    private CacheProperties cacheProperties;
 
     @Bean
-    public NodeStore nodeStore(final RedisConnectionFactory factory) {
+    public RedisStore redisStore(final RedisConnectionFactory factory) {
         return new RedisStore(redisTemplate(factory), factory);
     }
 
     @Bean
-    public CacheCleaningBean cacheCleaningBean(@Qualifier("nodeStore") NodeCache nodeCache){
-        return new CacheCleaningBean(nodeCache, cachingProperties.isEvict());
+    public CacheCleaningBean cacheCleaningBean(@Qualifier("redisStore") NodeCache nodeCache){
+        return new CacheCleaningBean(nodeCache, cacheProperties.isEvict());
     }
 
     @Bean
@@ -119,16 +118,16 @@ public class RedisConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CachingProperties cachingProperties() {
-        return new CachingProperties();
+    public CacheProperties cacheProperties() {
+        return new CacheProperties();
     }
 
     @Bean
     public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        cacheManager.setDefaultExpiration(cachingProperties.getDefaultExpiration());
+        cacheManager.setDefaultExpiration(cacheProperties.getDefaultExpiration());
         RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();
-        redisCachePrefix.prefix(cachingProperties.getRedisCachePrefix());
+        redisCachePrefix.prefix(cacheProperties.getRedisCachePrefix());
         cacheManager.setCachePrefix(redisCachePrefix);
         return cacheManager;
     }

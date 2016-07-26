@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.stores.NodeStore;
@@ -38,13 +37,10 @@ public class GraphController {
 
 	private GraphRetriever graphRetriever;
 	private NodeStore nodeStore;
-	private CacheCleaningBean cacheCleaningBean;
 
-	public GraphController(GraphRetriever graphRetriever, NodeStore nodeStore,
-                           CacheCleaningBean cacheCleaningBean) {
+	public GraphController(GraphRetriever graphRetriever, NodeStore nodeStore) {
 		this.graphRetriever = graphRetriever;
 		this.nodeStore = nodeStore;
-		this.cacheCleaningBean = cacheCleaningBean;
 	}
 
 	//TODO: Support table response?
@@ -76,10 +72,5 @@ public class GraphController {
 	@RequestMapping(value = "/flush", method = DELETE)
 	public void flushAll() {
 		nodeStore.flushDB();
-	}
-
-	@RequestMapping(value = "/evictCache", method = POST)
-	public void evictCache(){
-		cacheCleaningBean.clean();
 	}
 }

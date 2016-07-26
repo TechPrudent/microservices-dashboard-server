@@ -15,6 +15,10 @@
  */
 package be.ordina.msdashboard.config;
 
+import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CacheProperties;
+import be.ordina.msdashboard.cache.NodeCache;
+import be.ordina.msdashboard.controllers.CacheController;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
@@ -27,7 +31,6 @@ import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.controllers.EventsController;
 import be.ordina.msdashboard.controllers.GraphController;
 import be.ordina.msdashboard.nodes.stores.EventStore;
@@ -56,6 +59,7 @@ import java.util.List;
  * Auto-configuration for the main functionality of the microservices dashboard.
  *
  * @author Andreas Evers
+ * @author Tim Ysewyn
  */
 @Configuration
 @EnableConfigurationProperties
@@ -69,13 +73,24 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Configuration
+    public static class CacheConfiguration {
+
+        @Autowired
+        private CacheCleaningBean cacheCleaningBean;
+
+        @Bean
+        @ConditionalOnMissingBean
+        public CacheController cacheController() {
+            return new CacheController(cacheCleaningBean);
+        }
+    }
+
+    @Configuration
     @AutoConfigureAfter({ HealthConfiguration.class, IndexConfiguration.class, PactConfiguration.class })
     public static class GraphConfiguration {
 
         @Autowired
         private NodeStore nodeStore;
-        @Autowired
-        private CacheCleaningBean cacheCleaningBean;
 
         @Autowired(required = false)
         private List<NodeAggregator> aggregators = new ArrayList<>();
@@ -88,8 +103,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Bean
         @ConditionalOnMissingBean
-        public GraphController nodesController() {
-            return new GraphController(graphRetriever(), nodeStore, cacheCleaningBean);
+        public GraphController graphController() {
+            return new GraphController(graphRetriever(), nodeStore);
         }
     }
 

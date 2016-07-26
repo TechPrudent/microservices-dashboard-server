@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties("spring.cache")
-public class CachingProperties {
+public class CacheProperties {
 
 	private String redisCachePrefix = "DEFAULT_PREFIX_";
 	private long defaultExpiration = 30;

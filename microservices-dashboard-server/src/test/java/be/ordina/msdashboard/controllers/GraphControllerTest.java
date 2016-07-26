@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.stores.NodeStore;
@@ -47,9 +46,7 @@ public class GraphControllerTest {
     @Mock
     private GraphRetriever graphRetriever;
     @Mock
-    private NodeStore redisService;
-    @Mock
-    private CacheCleaningBean cacheCleaningBean;
+    private NodeStore nodeStore;
 
     @Test
     public void getDependenciesGraphJson() {
@@ -64,12 +61,12 @@ public class GraphControllerTest {
     public void saveNode() {
         graphController.saveNode("nodeAsJson");
 
-        verify(redisService).saveNode("nodeAsJson");
+        verify(nodeStore).saveNode("nodeAsJson");
     }
 
     @Test
     public void getAllNodes() {
-        doReturn(Collections.emptyList()).when(redisService).getAllNodes();
+        doReturn(Collections.emptyList()).when(nodeStore).getAllNodes();
 
         Collection<Node> nodes = graphController.getAllNodes();
 
@@ -80,28 +77,21 @@ public class GraphControllerTest {
     public void deleteNode() {
         graphController.deleteNode("nodeId");
 
-        verify(redisService).deleteNode("nodeId");
+        verify(nodeStore).deleteNode("nodeId");
     }
 
     @Test
     public void deleteAllNodes() {
         graphController.deleteAllNodes();
 
-        verify(redisService).deleteAllNodes();
+        verify(nodeStore).deleteAllNodes();
     }
 
     @Test
     public void flushAll() {
         graphController.flushAll();
 
-        verify(redisService).flushDB();
-    }
-
-    @Test
-    public void evictCache() {
-        graphController.evictCache();
-
-        verify(cacheCleaningBean).clean();
+        verify(nodeStore).flushDB();
     }
 
 }
