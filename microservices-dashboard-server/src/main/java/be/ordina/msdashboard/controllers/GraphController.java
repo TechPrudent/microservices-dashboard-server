@@ -37,13 +37,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 public class GraphController {
 
 	private GraphRetriever graphRetriever;
-	private NodeStore redisService;
+	private NodeStore nodeStore;
 	private CacheCleaningBean cacheCleaningBean;
 
 	public GraphController(GraphRetriever graphRetriever, NodeStore nodeStore,
                            CacheCleaningBean cacheCleaningBean) {
 		this.graphRetriever = graphRetriever;
-		this.redisService = nodeStore;
+		this.nodeStore = nodeStore;
 		this.cacheCleaningBean = cacheCleaningBean;
 	}
 
@@ -55,27 +55,27 @@ public class GraphController {
 
 	@RequestMapping(value = "/node", method = POST)
 	public void saveNode(@RequestBody final String nodeData) {
-		redisService.saveNode(nodeData);
+		nodeStore.saveNode(nodeData);
 	}
 
 	@RequestMapping(value = "/node", method = GET)
 	public Collection<Node> getAllNodes() {
-		return redisService.getAllNodes();
+		return nodeStore.getAllNodes();
 	}
 
 	@RequestMapping(value = "/node/{nodeId}", method = DELETE)
 	public void deleteNode(@PathVariable String nodeId) {
-		redisService.deleteNode(nodeId);
+		nodeStore.deleteNode(nodeId);
 	}
 
 	@RequestMapping(value = "/node", method = DELETE)
 	public void deleteAllNodes() {
-		redisService.deleteAllNodes();
+		nodeStore.deleteAllNodes();
 	}
 
 	@RequestMapping(value = "/flush", method = DELETE)
 	public void flushAll() {
-		redisService.flushDB();
+		nodeStore.flushDB();
 	}
 
 	@RequestMapping(value = "/evictCache", method = POST)
