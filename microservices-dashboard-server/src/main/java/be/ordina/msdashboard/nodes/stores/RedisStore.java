@@ -34,6 +34,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * {@link NodeStore} and {@link NodeCache} implemented by Redis.
+ *
+ * @author Andreas Evers
+ */
 public class RedisStore implements NodeCache, NodeStore {
 
 	private static final Logger logger = LoggerFactory.getLogger(RedisStore.class);

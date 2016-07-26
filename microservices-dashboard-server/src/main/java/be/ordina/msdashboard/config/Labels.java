@@ -18,6 +18,8 @@ package be.ordina.msdashboard.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Labels for the dashboard UI.
+ *
  * @author Andreas Evers
  */
 // TODO: fix this class and externalize properties better

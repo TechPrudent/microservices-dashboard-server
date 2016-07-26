@@ -21,6 +21,8 @@ import rx.Observable;
 import java.util.Collection;
 
 /**
+ * Interface for storage of {@link Node}s.
+ *
  * @author Andreas Evers
  */
 public interface NodeStore {

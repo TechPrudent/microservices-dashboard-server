@@ -18,6 +18,8 @@ package be.ordina.msdashboard.nodes.uriresolvers;
 import org.springframework.cloud.client.ServiceInstance;
 
 /**
+ * Resolves urls from a {@link ServiceInstance} using a default
+ * opinionated approach.
  * @author Andreas Evers
  */
 public class DefaultUriResolver implements UriResolver {

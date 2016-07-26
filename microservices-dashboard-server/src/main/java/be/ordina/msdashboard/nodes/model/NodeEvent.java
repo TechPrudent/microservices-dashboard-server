@@ -20,7 +20,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import java.io.Serializable;
 
 /**
- * Simple node event when something goes wrong
+ * Simple node event when something goes wrong.
  *
  * @author Andreas Evers
  */

@@ -31,6 +31,9 @@ import org.springframework.boot.json.JacksonJsonParser;
 import rx.Observable;
 
 /**
+ * Convenience class for retrieving JSON using
+ * <a href="https://github.com/ReactiveX/RxNetty">RxNetty</a>.
+ *
  * @author Andreas Evers
  */
 public class NettyServiceCaller {
@@ -43,6 +46,16 @@ public class NettyServiceCaller {
         this.errorHandler = errorHandler;
     }
 
+    /**
+     * Calls the remote service using the provided request, applies error handling and
+     * converts the response into a {@link Map}. The entire request and response are
+     * executed and handled in a hot observable.
+     *
+     * @param serviceId the id of the service for which the request is made
+     * @param request the request which has to be executed using RxNetty
+     * @return an {@link Observable} emitting the JSON response as a Map with String keys
+     * and Object values.
+     */
     public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
         return RxNetty.createHttpRequest(request)
                 .publish().autoConnect()

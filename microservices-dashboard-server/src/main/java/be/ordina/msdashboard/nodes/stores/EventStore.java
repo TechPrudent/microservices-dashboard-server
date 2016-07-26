@@ -20,6 +20,9 @@ import be.ordina.msdashboard.nodes.model.SystemEvent;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
+ * Store for {@link SystemEvent}s, populated by an
+ * {@link org.springframework.context.event.EventListener} emitting events.
+ *
  * @author Andreas Evers
  */
 public class EventStore {

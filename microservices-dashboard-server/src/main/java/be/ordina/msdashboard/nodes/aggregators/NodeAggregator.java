@@ -19,9 +19,22 @@ import be.ordina.msdashboard.nodes.model.Node;
 import rx.Observable;
 
 /**
+ * Interface for retrieving and aggregating nodes.
+ * A NodeAggregator will generally call a set of remote sources to retrieve
+ * information which can be processed and converted into {@link Node}s.
+ * <p>
+ * Observables should be created and returned. Ideally services such as
+ * {@link NettyServiceCaller} should be used to make use of for instance RxNetty
+ * which returns an {@link Observable} from the start.
+ * Alternatively, although not recommended, is to cast a normal Collection of
+ * Nodes into an Observable using {@code return Observable.from(nodes);}
  * @author Andreas Evers
  */
 public interface NodeAggregator {
 
+    /**
+     * Retrieves and aggregated nodes from one or more external sources.
+     * @return an Observable of Nodes, preferably hot
+     */
     Observable<Node> aggregateNodes();
 }

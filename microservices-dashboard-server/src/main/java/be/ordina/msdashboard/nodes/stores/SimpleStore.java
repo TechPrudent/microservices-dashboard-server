@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Simple {@link NodeStore} using a {@link ConcurrentHashMap} as
+ * implementation.
+ *
  * @author Andreas Evers
  */
 public class SimpleStore implements NodeStore {

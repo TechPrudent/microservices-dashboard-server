@@ -18,6 +18,8 @@ package be.ordina.msdashboard.nodes.model;
 import java.util.*;
 
 /**
+ * Builder for a {@link Node}.
+ *
  * @author Andreas Evers
  */
 public class NodeBuilder {

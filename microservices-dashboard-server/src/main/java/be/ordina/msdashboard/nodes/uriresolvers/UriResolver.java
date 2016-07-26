@@ -18,14 +18,31 @@ package be.ordina.msdashboard.nodes.uriresolvers;
 import org.springframework.cloud.client.ServiceInstance;
 
 /**
+ * Resolves urls from a {@link ServiceInstance}.
+ *
  * @author Andreas Evers
  */
 public interface UriResolver {
 
+    /**
+     * Resolves the homepage url of the given instance
+     * @param instance the instance for which the url has to be resolved
+     * @return the homepage url
+     */
     String resolveHomePageUrl(ServiceInstance instance);
 
+    /**
+     * Resolves the health check url of the given instance
+     * @param instance the instance for which the url has to be resolved
+     * @return the health check url
+     */
     String resolveHealthCheckUrl(ServiceInstance instance);
 
+    /**
+     * Resolves the mappings url of the given instance
+     * @param instance the instance for which the url has to be resolved
+     * @return the mappings url
+     */
     String resolveMappingsUrl(ServiceInstance instance);
 
 }

@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * Simple system event when something goes wrong
+ * Simple system event when something goes wrong.
  *
  * @author Andreas Evers
  */

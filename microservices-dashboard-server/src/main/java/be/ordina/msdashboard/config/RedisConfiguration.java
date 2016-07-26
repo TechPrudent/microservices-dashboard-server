@@ -53,6 +53,8 @@ import static redis.embedded.util.OS.WINDOWS;
 import static redis.embedded.util.OSDetector.getOS;
 
 /**
+ * Auto-configuration for redis specific beans.
+ *
  * @author Andreas Evers
  */
 @Configuration

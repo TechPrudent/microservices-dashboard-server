@@ -16,6 +16,8 @@
 package be.ordina.msdashboard.config;
 
 /**
+ * Constants.
+ *
  * @author Andreas Evers
  */
 public class Constants {

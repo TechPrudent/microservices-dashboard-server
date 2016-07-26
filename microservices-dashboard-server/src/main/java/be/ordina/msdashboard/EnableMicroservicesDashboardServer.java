@@ -21,7 +21,13 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
+ * Enables the microservices dashboard functionality on your Spring Boot
+ * application. Will enrich your application with auto-configuration and
+ * endpoints such as {@code /graph}.
+ *
  * @author Andreas Evers
+ * @see <a href="http://ordina-jworks.github.io/microservices-dashboard/0.2.0-SNAPSHOT/#getting-started">
+ *     Microservices Dashboard reference documentation</a>
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

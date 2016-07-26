@@ -19,6 +19,9 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
 
 /**
+ * Resolves urls from a {@link ServiceInstance} using Eureka's
+ * {@link org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient.EurekaServiceInstance}
+ * abstraction.
  * @author Andreas Evers
  */
 public class EurekaUriResolver implements UriResolver {

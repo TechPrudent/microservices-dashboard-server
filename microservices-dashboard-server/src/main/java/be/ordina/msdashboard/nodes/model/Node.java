@@ -25,18 +25,22 @@ import java.util.Map;
 import java.util.Set;
 
 import static be.ordina.msdashboard.config.Constants.DETAILS;
+import static be.ordina.msdashboard.config.Constants.ID;
 import static be.ordina.msdashboard.config.Constants.LANE;
 import static be.ordina.msdashboard.config.Constants.STATUS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
+ * General representation of an item presented in the graph on the UI.
+ * Nodes can have links to other nodes and contain a set of details.
+ *
  * @author Andreas Evers
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(NON_EMPTY)
 public class Node {
 
-	//@JsonProperty(ID)
+	@JsonProperty(ID)
 	private String id;
 
 	@JsonProperty(DETAILS)

@@ -53,6 +53,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Auto-configuration for the main functionality of the microservices dashboard.
+ *
  * @author Andreas Evers
  */
 @Configuration

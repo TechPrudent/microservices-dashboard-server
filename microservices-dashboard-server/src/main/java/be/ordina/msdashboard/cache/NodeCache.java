@@ -15,17 +15,33 @@
  */
 package be.ordina.msdashboard.cache;
 
+import be.ordina.msdashboard.nodes.model.Node;
+
 /**
+ * Interface for cache implementations for {@link Node}s.
+ *
  * @author Andreas Evers
  */
 public interface NodeCache {
 
+    /**
+     * Evicts the entire graph cache.
+     */
     void evictGraphCache();
 
+    /**
+     * Evicts only the health cache.
+     */
     void evictHealthsCache();
 
+    /**
+     * Evicts only the index cache.
+     */
     void evictIndexesCache();
 
+    /**
+     * Evicts only the pact cache.
+     */
     void evictPactsCache();
 
 }
