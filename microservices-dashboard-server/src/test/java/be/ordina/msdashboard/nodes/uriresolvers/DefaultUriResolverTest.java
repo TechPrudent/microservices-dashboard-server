@@ -46,4 +46,11 @@ public class DefaultUriResolverTest {
     	when(serviceInstance.getUri()).thenReturn(new URI("http://localhost"));
     	assertEquals("http://localhost/health", defaultUriResolver.resolveHealthCheckUrl(serviceInstance));
     }
+    
+    @Test
+    public void resolveMappingsUrl() throws Exception {
+    	ServiceInstance serviceInstance = Mockito.mock(ServiceInstance.class);
+    	when(serviceInstance.getUri()).thenReturn(new URI("http://localhost"));
+    	assertEquals("http://localhost/mappings", defaultUriResolver.resolveMappingsUrl(serviceInstance));
+    }
 }
