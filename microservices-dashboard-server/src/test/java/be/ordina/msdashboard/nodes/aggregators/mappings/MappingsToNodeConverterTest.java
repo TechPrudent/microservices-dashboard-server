@@ -15,19 +15,22 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import be.ordina.msdashboard.nodes.model.Node;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import org.junit.Test;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
+
+import rx.Observable;
+import rx.observers.TestSubscriber;
+import be.ordina.msdashboard.nodes.model.Node;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 /**
  * Tests for {@link MappingsToNodeConverter}
@@ -228,5 +231,15 @@ public class MappingsToNodeConverterTest {
         assertThat(nodes).extracting("details").extracting("status").containsExactly("UP");
         assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE");
         testSubscriber.assertCompleted();
+    }
+    
+    @Test(expected=IllegalStateException.class)
+    public void shouldThrowIllegalStateMethodMissing() throws JsonProcessingException, IOException{
+        Map<String, Object> source = OBJECT_READER.forType(Map.class).readValue("{\"{[/home],methods=[GET]}\" : {" +
+                "    \"bean\" : \"requestMappingHandlerMapping\", " +
+                "    \"nomethod\" : \"public java.lang.String be.ordina.controllers.HomeController.home()\"" +
+                "  }}");
+
+        MappingsToNodeConverter.convertToNodes("svc1", source);
     }
 }

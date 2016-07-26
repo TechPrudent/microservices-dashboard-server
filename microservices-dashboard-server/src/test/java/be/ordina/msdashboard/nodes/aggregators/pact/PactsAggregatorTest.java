@@ -47,8 +47,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import be.ordina.msdashboard.config.Constants;
-import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
 
 /**
  * Tests for {@link PactsAggregator}
@@ -252,4 +252,36 @@ public class PactsAggregatorTest {
         
         verify(publisher).publishEvent(any(SystemEvent.class));
      }
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void onErrorWhenGettingPactsUrl(){
+        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+     		.thenReturn(Observable.error(new RuntimeException()));
+        
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertError(RuntimeException.class);
+        
+        verify(publisher).publishEvent(any(SystemEvent.class));
+    }
+    
+    @SuppressWarnings("unchecked")
+	@Test
+    public void onErrorWhenGettingNodeOne(){
+        HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
+        ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
+        ByteBufUtil.writeUtf8(byteBuf, onePactSource);
+        when(urlsResponse.getContent()).thenReturn(Observable.just(byteBuf));
+        when(urlsResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
+         
+        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+         	.thenReturn(Observable.just(urlsResponse), Observable.error(new RuntimeException()));
+        
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertError(RuntimeException.class);
+        
+        verify(publisher).publishEvent(any(SystemEvent.class));
+    }
 }
