@@ -15,13 +15,10 @@
  */
 package be.ordina.msdashboard.config;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CacheProperties;
-import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.config.RedisConfiguration.RedisOrMockCondition;
 import be.ordina.msdashboard.nodes.stores.RedisStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -55,6 +52,7 @@ import static redis.embedded.util.OSDetector.getOS;
  * Auto-configuration for redis specific beans.
  *
  * @author Andreas Evers
+ * @author Tim Ysewyn
  */
 @Configuration
 @EnableCaching
@@ -71,11 +69,6 @@ public class RedisConfiguration {
     @Bean
     public RedisStore redisStore(final RedisConnectionFactory factory) {
         return new RedisStore(redisTemplate(factory), factory);
-    }
-
-    @Bean
-    public CacheCleaningBean cacheCleaningBean(@Qualifier("redisStore") NodeCache nodeCache){
-        return new CacheCleaningBean(nodeCache, cacheProperties.isEvict());
     }
 
     @Bean
@@ -118,7 +111,7 @@ public class RedisConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheProperties cacheProperties() {
+    public CacheProperties cachingProperties() {
         return new CacheProperties();
     }
 

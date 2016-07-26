@@ -15,10 +15,12 @@
  */
 package be.ordina.msdashboard.config;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
 import be.ordina.msdashboard.cache.CacheProperties;
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.controllers.CacheController;
+import be.ordina.msdashboard.controllers.EventsController;
+import be.ordina.msdashboard.controllers.GraphController;
+import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
@@ -31,10 +33,7 @@ import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.controllers.EventsController;
-import be.ordina.msdashboard.controllers.GraphController;
 import be.ordina.msdashboard.nodes.stores.EventStore;
-import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.stores.NodeStore;
 import be.ordina.msdashboard.nodes.stores.SimpleStore;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
@@ -76,12 +75,15 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     public static class CacheConfiguration {
 
         @Autowired
-        private CacheCleaningBean cacheCleaningBean;
+        private CacheProperties cacheProperties;
+
+        @Autowired
+        private NodeCache nodeCache;
 
         @Bean
         @ConditionalOnMissingBean
         public CacheController cacheController() {
-            return new CacheController(cacheCleaningBean);
+            return new CacheController(cacheProperties, nodeCache);
         }
     }
 
@@ -252,7 +254,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     @ConditionalOnMissingBean
-    public CacheCleaningBean cacheCleaningBean() {
+    public NodeCache nodeCache() {
         return null;
     }
 

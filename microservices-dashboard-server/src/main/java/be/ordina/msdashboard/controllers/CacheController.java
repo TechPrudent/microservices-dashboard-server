@@ -15,7 +15,8 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CacheProperties;
+import be.ordina.msdashboard.cache.NodeCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,17 +36,19 @@ public class CacheController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CacheController.class);
 
-	private final CacheCleaningBean cacheCleaningBean;
+	private final CacheProperties cacheProperties;
+	private final NodeCache nodeCache;
 
-	public CacheController(CacheCleaningBean cacheCleaningBean) {
-		this.cacheCleaningBean = cacheCleaningBean;
+	public CacheController(CacheProperties cacheProperties, NodeCache nodeCache) {
+		this.cacheProperties = cacheProperties;
+		this.nodeCache = nodeCache;
 	}
 
 	@RequestMapping(value = "/evictCache", method = POST)
 	public void evictCache(){
-		if (cacheCleaningBean != null) {
+		if (nodeCache != null && cacheProperties.isEvict()) {
 			logger.info("Cleaning cache");
-			cacheCleaningBean.clean();
+			nodeCache.evictGraphCache();
 		}
 	}
 

@@ -15,17 +15,18 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheCleaningBean;
+import be.ordina.msdashboard.cache.CacheProperties;
+import be.ordina.msdashboard.cache.NodeCache;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
- * Tests for {@link GraphController}
+ * Tests for {@link CacheController}
  *
  * @author Tim Ysewyn
  */
@@ -35,13 +36,26 @@ public class CacheControllerTest {
     @InjectMocks
     private CacheController cacheController;
     @Mock
-    private CacheCleaningBean cacheCleaningBean;
+    private CacheProperties cacheProperties;
+    @Mock
+    private NodeCache nodeCache;
 
     @Test
-    public void shouldTriggerTheCacheCleaningBean() {
+    public void shouldEvictCache() {
+        doReturn(true).when(cacheProperties).isEvict();
+
         cacheController.evictCache();
 
-        verify(cacheCleaningBean).clean();
+        verify(nodeCache).evictGraphCache();
+    }
+
+    @Test
+    public void shouldNotEvictCache() {
+        doReturn(false).when(cacheProperties).isEvict();
+
+        cacheController.evictCache();
+
+        verifyZeroInteractions(nodeCache);
     }
 
 }
