@@ -48,7 +48,7 @@ public class MappingsToNodeConverter {
 		for (String key : source.keySet()) {
 			if (validMappingKey(key)) {
 				Object mapping = source.get(key);
-				if (mapping instanceof Map && ((Map) mapping).containsKey(METHOD)) {
+				if (mapping instanceof Map) {
 					if (isNonSpringMapping((Map) mapping)){
 						String url = extractUrl(key);
 						Node nestedNode = new Node(url);
@@ -61,8 +61,6 @@ public class MappingsToNodeConverter {
 						nestedNode.getLinkedToNodeIds().add(topLevelNode.getId());
 						nodes.add(nestedNode);
 					}
-				} else {
-					throw new IllegalStateException("Mappings of " + serviceId + " should contain 'method' as field (violating key: " + key + ")");
 				}
 			}
 		}
@@ -90,7 +88,7 @@ public class MappingsToNodeConverter {
 	}
 
 	protected static boolean isNonSpringMapping(Map<String, String> mapping) {
-		return !mapping.get(METHOD).matches("[a-z]* .* org\\.springframework.*");
+		return !mapping.containsKey(METHOD) || !mapping.get(METHOD).matches("[a-z]* .* org\\.springframework.*");
 	}
 
 	protected static boolean validMappingKey(String key) {

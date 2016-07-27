@@ -29,3 +29,10 @@ pact-broker:
   url: http://localhost:8089
   latest-url: /pacts/latest
   self-href-jsonPath: $.pacts[*]._links.self[0].href
+
+
+msdashboard:
+  health:
+    request-headers:
+      test-header1: test-value1
+      test-header2: test-value2

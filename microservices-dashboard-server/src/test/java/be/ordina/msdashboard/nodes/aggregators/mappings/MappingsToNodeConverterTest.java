@@ -15,22 +15,19 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import be.ordina.msdashboard.nodes.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import org.junit.Test;
+import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-
-import rx.Observable;
-import rx.observers.TestSubscriber;
-import be.ordina.msdashboard.nodes.model.Node;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link MappingsToNodeConverter}
@@ -178,6 +175,21 @@ public class MappingsToNodeConverterTest {
     }
 
     @Test
+    public void shouldHandleSmallestPossibleMapping() throws IOException {
+        Map<String, Object> source = OBJECT_READER.forType(Map.class)
+                .readValue("{\"{[/]}\" : {}}");
+
+        Observable<Node> observable = MappingsToNodeConverter.convertToNodes("svc1", source);
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        observable.toBlocking().subscribe(testSubscriber);
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).extracting("id").containsExactly("svc1","/");
+        assertThat(nodes).extracting("details").extracting("status").containsExactly("UP","UP");
+        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE","RESOURCE");
+    }
+
+    @Test
     public void shouldIgnoreCommonNodes() throws IOException {
         Map<String, Object> source = OBJECT_READER.forType(Map.class)
                 .readValue("{\"_links\" : {" +
@@ -233,13 +245,21 @@ public class MappingsToNodeConverterTest {
         testSubscriber.assertCompleted();
     }
     
-    @Test(expected=IllegalStateException.class)
-    public void shouldThrowIllegalStateMethodMissing() throws JsonProcessingException, IOException{
+    @Test
+    public void shouldIgnoreMethodMissing() throws IOException {
         Map<String, Object> source = OBJECT_READER.forType(Map.class).readValue("{\"{[/home],methods=[GET]}\" : {" +
                 "    \"bean\" : \"requestMappingHandlerMapping\", " +
                 "    \"nomethod\" : \"public java.lang.String be.ordina.controllers.HomeController.home()\"" +
                 "  }}");
 
-        MappingsToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = MappingsToNodeConverter.convertToNodes("svc1", source);
+
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        observable.toBlocking().subscribe(testSubscriber);
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).extracting("id").containsExactly("svc1", "/home");
+        assertThat(nodes).extracting("details").extracting("status").containsExactly("UP", "UP");
+        assertThat(nodes).extracting("details").extracting("type").containsExactly("MICROSERVICE", "RESOURCE");
+        testSubscriber.assertCompleted();
     }
 }
