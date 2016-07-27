@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pacts/provider/awards/consumer/awards-view/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pacts-awards-view-awards.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pacts/provider/loyalty-program/consumer/loyalty-app/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pacts-loyalty-app-loyalty-program.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

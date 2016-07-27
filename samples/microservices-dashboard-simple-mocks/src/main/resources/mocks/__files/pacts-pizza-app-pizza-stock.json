@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "pactSpecificationVersion": "2.0.0"
+  },
+  "consumer": {
+    "name": "pizza-app"
+  },
+  "provider": {
+    "name": "pizza-stock"
+  },
+  "interactions": [
+    {
+      "request": {
+        "path": "rel://sto:update-pizza-stock"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:pizza-stock-changes"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:pizza-stocks"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:pizza-stock-reservation"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:pizza-stocks-availability"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:cancel-reservation"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://sto:pizza-stocks-changes"
+      }
+    }
+  ]
+}

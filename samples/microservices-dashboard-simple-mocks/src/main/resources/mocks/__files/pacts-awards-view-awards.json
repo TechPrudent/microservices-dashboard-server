@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "pactSpecificationVersion": "2.0.0"
+  },
+  "consumer": {
+    "name": "awards-view"
+  },
+  "provider": {
+    "name": "awards"
+  },
+  "interactions": [
+    {
+      "provider_state": "awards exist",
+      "description": "a request for awards",
+      "request": {
+        "method": "get",
+        "path": "rel://awa:award-view",
+        "query": "",
+        "headers": {
+          "accept": "application/vnd.ord.awards.v1+json;charset=UTF-8",
+          "x-application-state": "{\"userId\": 12345}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "awards": [
+            {
+              "type": "movie ticket",
+              "number": 234681219
+            },
+            {
+              "type": "free minutes",
+              "number": 900943241
+            }
+          ]
+        },
+        "headers": {}
+      }
+    },
+    {
+      "provider_state": "awards are available",
+      "description": "a request for a specific award",
+      "request": {
+        "method": "get",
+        "path": "/rel://awa:awards",
+        "query": "",
+        "headers": {
+          "accept": "application/vnd.ord.award.v1+json;charset=UTF-8",
+          "x-application-state": "{\"userId\": 12345}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "access-number": 323324
+        },
+        "headers": {}
+      }
+    }
+  ],
+  "pactFileName": "some-filename",
+  "updatedAt": "2016-04-05T12:33:44+00:00",
+  "createdAt": "2016-03-21T18:09:31+00:00",
+  "_links": {}
+}

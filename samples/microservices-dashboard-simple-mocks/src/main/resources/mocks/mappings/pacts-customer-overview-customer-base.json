@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pacts/provider/customer-base/consumer/customer-overview/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pacts-customer-overview-customer-base.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

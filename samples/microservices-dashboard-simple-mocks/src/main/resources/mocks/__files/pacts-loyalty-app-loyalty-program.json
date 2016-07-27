@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "pactSpecificationVersion": "2.0.0"
+  },
+  "consumer": {
+    "name": "loyalty-app"
+  },
+  "provider": {
+    "name": "loyalty-program"
+  },
+  "interactions": [
+    {
+      "request": {
+        "path": "rel://lp:loyalty-program-subscription-details"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://lp:loyalty-points-transaction"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://lp:loyalty-points-history"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://lp:loyalty-program-subscription"
+      }
+    },
+    {
+      "request": {
+        "path": "/rel://lp:loyalty-points-transfer-eligibility"
+      }
+    }
+  ]
+}

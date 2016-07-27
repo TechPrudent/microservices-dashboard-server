@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "pactSpecificationVersion": "2.0.0"
+  },
+  "consumer": {
+    "name": "customer-overview"
+  },
+  "provider": {
+    "name": "customer-base"
+  },
+  "interactions": [
+    {
+      "provider_state": "customers exist",
+      "description": "a request for customer summary",
+      "request": {
+        "method": "get",
+        "path": "rel://cuba:customer-summary",
+        "query": "",
+        "headers": {
+          "accept": "application/vnd.ord.customer.v1+json;charset=UTF-8",
+          "x-application-state": "{\"userId\": 12345}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "customers": [
+            {
+              "name": "Andreas Evers",
+              "age": 29,
+              "nationality": "Belgian"
+            },
+            {
+              "name": "Tim Ysewyn",
+              "age": 27,
+              "nationality": "Belgian"
+            }
+          ]
+        },
+        "headers": {}
+      }
+    },
+    {
+      "provider_state": "the access-number of the customer is available",
+      "description": "a request for the customer's access number",
+      "request": {
+        "method": "get",
+        "path": "/rel://cuba:access-number",
+        "query": "",
+        "headers": {
+          "accept": "application/vnd.ord.customer-an.v1+json;charset=UTF-8",
+          "x-application-state": "{\"userId\": 12345}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "access-number": 323324
+        },
+        "headers": {}
+      }
+    },
+    {
+      "provider_state": "the customer has no addresses",
+      "description": "a request for customer addresses",
+      "request": {
+        "method": "get",
+        "path": "/rel://cuba:addresses",
+        "query": "",
+        "headers": {
+          "accept": "application/vnd.ord.customer-addr.v1+json;charset=UTF-8",
+          "x-application-state": "{\"userId\": 12345}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {},
+        "headers": {}
+      }
+    }
+  ],
+  "pactFileName": "some-filename",
+  "updatedAt": "2016-04-05T12:33:44+00:00",
+  "createdAt": "2016-03-21T18:09:31+00:00",
+  "_links": {}
+}

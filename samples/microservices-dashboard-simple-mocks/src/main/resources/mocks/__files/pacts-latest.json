@@ -82,6 +82,170 @@
           }
         ]
       }
+    },
+    {
+      "createdAt": "2016-01-20T13:42:00+00:00",
+      "_embedded": {
+        "consumer": {
+          "name": "customer-overview",
+          "_embedded": {
+            "version": {
+              "number": "1.0.0",
+              "_links": {
+                "self": {
+                  "href": "http://localhost:8089/pacticipants/customer-overview/versions/1.0.0"
+                }
+              }
+            }
+          },
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/customer-overview"
+            }
+          }
+        },
+        "provider": {
+          "name": "customer-base",
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/customer-base"
+            }
+          }
+        }
+      },
+      "_links": {
+        "self": [
+          {
+            "href": "http://localhost:8089/pacts/provider/customer-base/consumer/customer-overview/latest"
+          },
+          {
+            "href": "http://localhost:8089/pacts/provider/customer-base/consumer/customer-overview/version/1.0.0"
+          }
+        ]
+      }
+    },
+    {
+      "createdAt": "2016-01-20T13:42:00+00:00",
+      "_embedded": {
+        "consumer": {
+          "name": "awards-view",
+          "_embedded": {
+            "version": {
+              "number": "1.0.0",
+              "_links": {
+                "self": {
+                  "href": "http://localhost:8089/pacticipants/awards-view/versions/1.0.0"
+                }
+              }
+            }
+          },
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/awards-view"
+            }
+          }
+        },
+        "provider": {
+          "name": "awards",
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/awards"
+            }
+          }
+        }
+      },
+      "_links": {
+        "self": [
+          {
+            "href": "http://localhost:8089/pacts/provider/awards/consumer/awards-view/latest"
+          },
+          {
+            "href": "http://localhost:8089/pacts/provider/awards/consumer/awards-view/version/1.0.0"
+          }
+        ]
+      }
+    },
+    {
+      "createdAt": "2016-01-20T13:42:00+00:00",
+      "_embedded": {
+        "consumer": {
+          "name": "loyalty-app",
+          "_embedded": {
+            "version": {
+              "number": "1.0.0",
+              "_links": {
+                "self": {
+                  "href": "http://localhost:8089/pacticipants/loyalty-app/versions/1.0.0"
+                }
+              }
+            }
+          },
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/loyalty-app"
+            }
+          }
+        },
+        "provider": {
+          "name": "loyalty-program",
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/loyalty-program"
+            }
+          }
+        }
+      },
+      "_links": {
+        "self": [
+          {
+            "href": "http://localhost:8089/pacts/provider/loyalty-program/consumer/loyalty-app/latest"
+          },
+          {
+            "href": "http://localhost:8089/pacts/provider/loyalty-program/consumer/loyalty-app/version/1.0.0"
+          }
+        ]
+      }
+    },
+    {
+      "createdAt": "2016-01-20T13:42:00+00:00",
+      "_embedded": {
+        "consumer": {
+          "name": "pizza-app",
+          "_embedded": {
+            "version": {
+              "number": "1.0.0",
+              "_links": {
+                "self": {
+                  "href": "http://localhost:8089/pacticipants/pizza-app/versions/1.0.0"
+                }
+              }
+            }
+          },
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/pizza-app"
+            }
+          }
+        },
+        "provider": {
+          "name": "pizza-stock",
+          "_links": {
+            "self": {
+              "href": "http://localhost:8089/pacticipants/pizza-stock"
+            }
+          }
+        }
+      },
+      "_links": {
+        "self": [
+          {
+            "href": "http://localhost:8089/pacts/provider/pizza-stock/consumer/pizza-app/latest"
+          },
+          {
+            "href": "http://localhost:8089/pacts/provider/pizza-stock/consumer/pizza-app/version/1.0.0"
+          }
+        ]
+      }
     }
   ],
   "_links": {
@@ -97,6 +261,26 @@
       {
         "href": "http://localhost:8089/pacts/provider/ordering-pets/consumer/pet-store-catalog-view/latest",
         "name": "Latest pact between pet-store-catalog-view and ordering-pets",
+        "title": "Pact"
+      },
+      {
+        "href": "http://localhost:8089/pacts/provider/customer-base/consumer/customer-overview/latest",
+        "name": "Latest pact between customer-overview and customer-base",
+        "title": "Pact"
+      },
+      {
+        "href": "http://localhost:8089/pacts/provider/awards/consumer/awards-view/latest",
+        "name": "Latest pact between awards-view and awards",
+        "title": "Pact"
+      },
+      {
+        "href": "http://localhost:8089/pacts/provider/loyalty-program/consumer/loyalty-app/latest",
+        "name": "Latest pact between loyalty-app and loyalty-program",
+        "title": "Pact"
+      },
+      {
+        "href": "http://localhost:8089/pacts/provider/pizza-stock/consumer/pizza-app/latest",
+        "name": "Latest pact between pizza-app and pizza-stock",
         "title": "Pact"
       }
     ]

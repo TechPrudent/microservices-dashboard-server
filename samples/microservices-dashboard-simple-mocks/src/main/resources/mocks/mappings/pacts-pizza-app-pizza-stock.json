@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/pacts/provider/pizza-stock/consumer/pizza-app/latest"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "pacts-pizza-app-pizza-stock.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
