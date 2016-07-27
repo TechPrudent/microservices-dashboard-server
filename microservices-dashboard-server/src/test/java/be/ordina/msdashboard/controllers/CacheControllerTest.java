@@ -15,15 +15,18 @@
  */
 package be.ordina.msdashboard.controllers;
 
-import be.ordina.msdashboard.cache.CacheProperties;
-import be.ordina.msdashboard.cache.NodeCache;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
+import be.ordina.msdashboard.cache.CacheProperties;
+import be.ordina.msdashboard.cache.NodeCache;
 
 /**
  * Tests for {@link CacheController}
@@ -50,8 +53,19 @@ public class CacheControllerTest {
     }
 
     @Test
-    public void shouldNotEvictCache() {
+    public void shouldNotEvictCacheWhenEvictFalse() {
         doReturn(false).when(cacheProperties).isEvict();
+
+        cacheController.evictCache();
+
+        verifyZeroInteractions(nodeCache);
+    }
+    
+    @Test
+    public void shouldNotEvictCacheWhenCacheNull() {
+    	cacheController = new CacheController(cacheProperties, null);
+    	
+        doReturn(true).when(cacheProperties).isEvict();
 
         cacheController.evictCache();
 
