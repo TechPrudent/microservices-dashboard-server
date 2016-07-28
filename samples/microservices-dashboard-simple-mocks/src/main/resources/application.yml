@@ -22,8 +22,11 @@ spring:
 eureka:
   client:
     enabled: true
+    healthcheck:
+      enabled: false
     serviceUrl:
       defaultZone: http://localhost:8089/eureka/
+    register-with-eureka: false
 
 pact-broker:
   url: http://localhost:8089
