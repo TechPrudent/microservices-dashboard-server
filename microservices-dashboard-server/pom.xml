@@ -22,29 +22,46 @@
     </properties>
     
     <scm>
-        <connection>scm:git:http://el2604.bc:8585/ms-toolbox/dependencies.git</connection>
-        <developerConnection>scm:git:ssh://el2604.bc/ms-toolbox/dependencies.git</developerConnection>
-        <url>http://el2604.bc:8585/ms-toolbox/dependencies.git/</url>
-        <tag>dependencies-1.5.0</tag>
+        <connection>scm:git:https://github.com/ordina-jworks/microservices-dashboard-server.git</connection>
+        <developerConnection>scm:git:git://github.com/ordina-jworks/microservices-dashboard-server.git</developerConnection>
+        <url>https://github.com/ordina-jworks/microservices-dashboard-server.git/</url>
+        <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <!--<repository>
-            <id>bintray-ordina-jworks-microservices-dashboard-server</id>
-            <name>ordina-jworks-microservices-dashboard-server</name>
-            <url>https://api.bintray.com/maven/ordina-jworks/microservices-dashboard-server/microservices-dashboard-server/;publish=1</url>
-        </repository>-->
-        <repository>
-            <id>central</id>
-            <name>oss-jfrog-artifactory-releases</name>
-            <url>https://oss.jfrog.org/artifactory/oss-release-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>oss-jfrog-artifactory-snapshots</name>
-            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>bintray</id>
+            <distributionManagement>
+                <repository>
+                    <id>bintray-ordina-jworks-microservices-dashboard-server</id>
+                    <name>ordina-jworks-microservices-dashboard-server</name>
+                    <url>https://api.bintray.com/maven/ordina-jworks/microservices-dashboard-server/microservices-dashboard/;publish=1</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>ojo</id>
+            <distributionManagement>
+                <repository>
+                    <id>central</id>
+                    <name>oss-jfrog-artifactory-releases</name>
+                    <url>https://oss.jfrog.org/artifactory/oss-release-local</url>
+                </repository>
+                <snapshotRepository>
+                    <id>snapshots</id>
+                    <name>oss-jfrog-artifactory-snapshots</name>
+                    <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>gpg</id>
+            <properties>
+                <gpg.executable>gpg2</gpg.executable>
+                <gpg.passphrase>${GPG_PASSPHRASE}</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -240,6 +257,28 @@
     </dependencies>
 
     <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>libs-release</name>
+            <url>https://oss.jfrog.org/artifactory/libs-release</url>
+        </repository>
+        <repository>
+            <snapshots/>
+            <id>snapshots</id>
+            <name>libs-snapshot</name>
+            <url>https://oss.jfrog.org/artifactory/libs-snapshot</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>bintray-ordina-jworks-microservices-dashboard-server</id>
+            <name>bintray</name>
+            <url>http://dl.bintray.com/ordina-jworks/microservices-dashboard-server</url>
+        </repository>
         <repository>
             <id>spring-milestones</id>
             <name>Spring Milestones</name>
