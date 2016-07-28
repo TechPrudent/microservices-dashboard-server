@@ -67,7 +67,7 @@ public class RedisConfiguration {
     private CacheProperties cacheProperties;
 
     @Bean
-    public RedisStore redisStore(final RedisConnectionFactory factory) {
+    public RedisStore nodeStore(final RedisConnectionFactory factory) {
         return new RedisStore(redisTemplate(factory), factory);
     }
 
