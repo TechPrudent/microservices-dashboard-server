@@ -53,7 +53,7 @@ public class SimpleStore implements NodeStore {
 
     @Override
     public void deleteNode(String nodeId) {
-        map.remove(nodeId);
+        map.remove(KEY_PREFIX + nodeId);
     }
 
     @Override
