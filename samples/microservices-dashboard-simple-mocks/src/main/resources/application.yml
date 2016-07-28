@@ -39,3 +39,5 @@ msdashboard:
     request-headers:
       test-header1: test-value1
       test-header2: test-value2
+  mappings.enabled: false
+  index.enabled: true
