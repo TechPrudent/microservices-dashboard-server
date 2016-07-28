@@ -15,25 +15,27 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.index;
 
-import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.model.NodeEvent;
-import be.ordina.msdashboard.nodes.model.SystemEvent;
-import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
+
 import rx.Observable;
 import rx.schedulers.Schedulers;
-
-import java.util.List;
-import java.util.Map;
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.model.NodeEvent;
+import be.ordina.msdashboard.nodes.model.SystemEvent;
+import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 
 /**
  * @author Tim Ysewyn
@@ -118,6 +120,7 @@ public class IndexesAggregator implements NodeAggregator {
         return caller.retrieveJsonFromRequest(serviceId, request)
                 .map(JSONObject::new)
                 .concatMap(source -> indexToNodeConverter.convert(serviceInstance.getServiceId().toLowerCase(), url, source))
+                .filter(node -> !properties.getFilteredServices().contains(node.getId()))
                 .doOnNext(el -> logger.info("Index node {} discovered in url: {}", el.getId(), url))
                 .doOnError(e -> logger.error("Error while fetching node: ", e))
                 .doOnCompleted(() -> logger.info("Completed emissions of an index node observable for url: " + url))

@@ -15,6 +15,24 @@
  */
 package be.ordina.msdashboard.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
+import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
 import be.ordina.msdashboard.cache.CacheProperties;
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.controllers.CacheController;
@@ -26,6 +44,7 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
@@ -39,20 +58,6 @@ import be.ordina.msdashboard.nodes.stores.SimpleStore;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Auto-configuration for the main functionality of the microservices dashboard.
@@ -139,7 +144,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Configuration
-    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    @Conditional(IndexEnabledCondition.class)
     public static class IndexConfiguration {
 
         @Autowired
@@ -180,8 +185,14 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
         @Bean
         @ConditionalOnMissingBean
+        public HealthToNodeConverter healthToNodeConverter() {
+            return new HealthToNodeConverter(healthProperties());
+        }
+        
+        @Bean
+        @ConditionalOnMissingBean
         public HealthIndicatorsAggregator healthIndicatorsAggregator() {
-            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), caller, errorHandler);
+            return new HealthIndicatorsAggregator(discoveryClient, uriResolver(), healthProperties(), caller, errorHandler, healthToNodeConverter());
         }
 
         @ConfigurationProperties("msdashboard.health")
@@ -199,7 +210,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Configuration
-    @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+    @Conditional(MappingsEnabledCondition.class)
     public static class MappingsConfiguration {
 
         @Autowired
@@ -265,4 +276,31 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         return new DefaultUriResolver();
     }
 
+    static class MappingsEnabledCondition extends AllNestedConditions {
+
+    	MappingsEnabledCondition() {
+            super(ConfigurationPhase.PARSE_CONFIGURATION);
+        }
+
+        @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+        static class eurekaDefaultZone {}
+
+        @ConditionalOnProperty(value = "msdashboard.mappings.enabled", matchIfMissing = true)
+        static class mappingsEnabled {}
+
+    }
+    
+    static class IndexEnabledCondition extends AllNestedConditions {
+
+    	IndexEnabledCondition() {
+            super(ConfigurationPhase.PARSE_CONFIGURATION);
+        }
+
+        @ConditionalOnProperty("eureka.client.serviceUrl.defaultZone")
+        static class eurekaDefaultZone {}
+
+        @ConditionalOnProperty(value = "msdashboard.index.enabled", matchIfMissing = false)
+        static class indexEnabled {}
+
+    }
 }

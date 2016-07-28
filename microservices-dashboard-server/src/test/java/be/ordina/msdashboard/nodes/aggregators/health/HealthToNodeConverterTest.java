@@ -15,37 +15,57 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import be.ordina.msdashboard.nodes.model.Node;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import org.junit.Test;
-import rx.Observable;
-import rx.observers.TestSubscriber;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 import static be.ordina.msdashboard.config.Constants.CONFIGSERVER;
 import static be.ordina.msdashboard.config.Constants.DISCOVERY;
 import static be.ordina.msdashboard.config.Constants.DISK_SPACE;
 import static be.ordina.msdashboard.config.Constants.HYSTRIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import rx.Observable;
+import rx.observers.TestSubscriber;
+import be.ordina.msdashboard.nodes.model.Node;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.common.collect.Lists;
 
 /**
  * Tests for {@link HealthToNodeConverter}
  *
  * @author Andreas Evers
  */
+@RunWith(PowerMockRunner.class)
 public class HealthToNodeConverterTest {
 
+	@InjectMocks
+	private HealthToNodeConverter converter;
+	@Mock
+	private HealthProperties properties;
+	
     private static final ObjectReader OBJECT_READER = new ObjectMapper().reader();
 
+    @Before
+    public void before(){
+    	when(properties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIGSERVER));
+    }
+    
     @Test
     public void shouldConvertMostBasicNode() throws IOException {
         Map<String, Object> source = OBJECT_READER.forType(Map.class).readValue("{\"status\":\"UP\"}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);
@@ -59,7 +79,7 @@ public class HealthToNodeConverterTest {
     public void shouldThrowExceptionWhenStatusMissing() throws IOException {
         Map<String, Object> source = OBJECT_READER.forType(Map.class).readValue("{\"test\":\"test\"}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);
@@ -72,7 +92,7 @@ public class HealthToNodeConverterTest {
                         "\"svc2\": {\"status\": \"DOWN\", \"version\": \"1.0.0\", " +
                         "\"type\": \"SOAP\", \"group\": \"test\"}}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);
@@ -99,7 +119,7 @@ public class HealthToNodeConverterTest {
                         "\"" + CONFIGSERVER + "\": {\"status\": \"DOWN\", \"version\": \"1.0.0\", " +
                         "\"type\": \"SOAP\", \"group\": \"test\"}}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);
@@ -116,7 +136,7 @@ public class HealthToNodeConverterTest {
                         "\"random\": {\"version\": \"1.0.0\", " +
                         "\"type\": \"SOAP\", \"group\": \"test\"}}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);
@@ -131,7 +151,7 @@ public class HealthToNodeConverterTest {
         Map<String, Object> source = OBJECT_READER.forType(Map.class)
                 .readValue("{\"status\":\"UP\", \"foo\":\"bar\"}");
 
-        Observable<Node> observable = HealthToNodeConverter.convertToNodes("svc1", source);
+        Observable<Node> observable = converter.convertToNodes("svc1", source);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         observable.toBlocking().subscribe(testSubscriber);

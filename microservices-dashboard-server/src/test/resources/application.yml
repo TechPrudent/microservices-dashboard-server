@@ -19,6 +19,16 @@ spring:
 
 redis.mock: true
 
+msdashboard:
+  index:
+    enabled: true
+  health:
+    filteredServices:
+      - hystrix
+      - diskSpace
+      - discovery
+      - configServer
+
 # Microservices platform integration
 admin:
   url: http://localhost:8085

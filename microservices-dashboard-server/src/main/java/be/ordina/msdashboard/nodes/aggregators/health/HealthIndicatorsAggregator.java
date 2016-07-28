@@ -15,25 +15,26 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
-import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import static be.ordina.msdashboard.config.Constants.ZUUL_ID;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+
 import rx.Observable;
 import rx.schedulers.Schedulers;
-
-import java.util.List;
-import java.util.Map.Entry;
-
-import static be.ordina.msdashboard.config.Constants.*;
+import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 
 /**
  * Aggregates nodes from health information exposed by Spring Boot's Actuator.
@@ -73,15 +74,17 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	private HealthProperties properties;
 	private NettyServiceCaller caller;
 	private ErrorHandler errorHandler;
+	private HealthToNodeConverter healthToNodeConverter;
 
 	public HealthIndicatorsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
 									  final HealthProperties properties, final NettyServiceCaller caller,
-									  final ErrorHandler errorHandler) {
+									  final ErrorHandler errorHandler, final HealthToNodeConverter healthToNodeConverter) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
 		this.caller = caller;
 		this.errorHandler = errorHandler;
+		this.healthToNodeConverter = healthToNodeConverter;
 	}
 
 	@Override
@@ -125,10 +128,9 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 		return caller.retrieveJsonFromRequest(serviceId, request)
-				.map(source -> HealthToNodeConverter.convertToNodes(serviceId, source))
+				.map(source -> healthToNodeConverter.convertToNodes(serviceId, source))
 				.flatMap(el -> el)
-				.filter(node -> !HYSTRIX.equals(node.getId()) && !DISK_SPACE.equals(node.getId())
-						&& !DISCOVERY.equals(node.getId()) && !CONFIGSERVER.equals(node.getId()))
+				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
 				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
 				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))

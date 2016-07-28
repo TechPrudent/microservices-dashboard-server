@@ -15,6 +15,11 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.index;
 
+import static be.ordina.msdashboard.config.Constants.CONFIGSERVER;
+import static be.ordina.msdashboard.config.Constants.DISCOVERY;
+import static be.ordina.msdashboard.config.Constants.DISK_SPACE;
+import static be.ordina.msdashboard.config.Constants.HYSTRIX;
+import static be.ordina.msdashboard.nodes.model.NodeBuilder.node;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -41,8 +46,9 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.model.NodeBuilder;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
+
+import com.google.common.collect.Lists;
 
 /**
  * Tests for {@link IndexesAggregator}
@@ -67,6 +73,8 @@ public class IndexesAggregatorTest {
         caller = mock(NettyServiceCaller.class);
         publisher = mock(ApplicationEventPublisher.class);
         indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller);
+    
+    	when(indexProperties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIGSERVER));
     }
 
     @Test
@@ -86,8 +94,9 @@ public class IndexesAggregatorTest {
         Map<String, Object> indexCallResult = Collections.singletonMap("", "");
         when(caller.retrieveJsonFromRequest(eq("service"), any(HttpClientRequest.class))).thenReturn(Observable.just(indexCallResult));
 
-        Node node = new NodeBuilder().withId("service").build();
-        when(indexToNodeConverter.convert(eq("service"), eq("http://localhost:8089/service"), any(JSONObject.class))).thenReturn(Observable.just(node));
+        Node node = node().withId("service").build();
+        Node hystrix = node().withId(HYSTRIX).build();
+        when(indexToNodeConverter.convert(eq("service"), eq("http://localhost:8089/service"), any(JSONObject.class))).thenReturn(Observable.just(node, hystrix));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         indexesAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);

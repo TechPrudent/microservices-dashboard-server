@@ -17,7 +17,6 @@ public class IndexProperties {
         return requestHeaders;
     }
 
-    //TODO: Apply this
     public List<String> getFilteredServices() {
         return filteredServices;
     }

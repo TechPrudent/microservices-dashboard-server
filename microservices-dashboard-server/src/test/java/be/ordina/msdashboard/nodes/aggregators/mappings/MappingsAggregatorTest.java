@@ -15,6 +15,10 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
+import static be.ordina.msdashboard.config.Constants.CONFIGSERVER;
+import static be.ordina.msdashboard.config.Constants.DISCOVERY;
+import static be.ordina.msdashboard.config.Constants.DISK_SPACE;
+import static be.ordina.msdashboard.config.Constants.HYSTRIX;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -39,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -58,6 +63,8 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+
+import com.google.common.collect.Lists;
 
 /**
  * Tests for {@link MappingsAggregator}
@@ -85,11 +92,15 @@ public class MappingsAggregatorTest {
 	@Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
     
+    @Before
+    public void before(){
+    	when(properties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIGSERVER));
+    }
+    
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	@Test
     public void shouldGetMappingNodesFromService() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
-        //when(discoveryClient.getServices()).thenReturn(Lists.newArrayList("testService"));
         Map retrievedMap = new HashMap();
         Observable retrievedMapObservable = Observable.just(retrievedMap);
         when(caller.retrieveJsonFromRequest(anyString(), any(HttpClientRequest.class)))
@@ -295,7 +306,8 @@ public class MappingsAggregatorTest {
     }
     
     private Node[] correctNodes() {
-        return new Node[] { new Node("Node1"), new Node("Node2") };
+        return new Node[] { new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
+                new Node(DISCOVERY), new Node(CONFIGSERVER), new Node("Node2") };
     }
     
     private Comparator<Map.Entry<String, String>> stringEntryComparator() {

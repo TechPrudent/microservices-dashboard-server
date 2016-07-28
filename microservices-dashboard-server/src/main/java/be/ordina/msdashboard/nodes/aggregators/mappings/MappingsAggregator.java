@@ -15,25 +15,26 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
-import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import static be.ordina.msdashboard.config.Constants.ZUUL_ID;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+
 import rx.Observable;
 import rx.schedulers.Schedulers;
-
-import java.util.List;
-import java.util.Map;
-
-import static be.ordina.msdashboard.config.Constants.ZUUL_ID;
+import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 
 /**
  * Aggregates nodes from mappings information exposed by Spring Boot's Actuator.
@@ -124,6 +125,7 @@ public class MappingsAggregator implements NodeAggregator {
         return caller.retrieveJsonFromRequest(serviceId, request)
                 .map(source -> MappingsToNodeConverter.convertToNodes(serviceId, source))
                 .flatMap(el -> el)
+                .filter(node -> !properties.getFilteredServices().contains(node.getId()))
                 .doOnNext(el -> logger.info("Mapping node {} discovered in url: {}", el.getId(), url))
                 .doOnError(e -> logger.error("Error during mapping node fetching: ", e))
                 .doOnCompleted(() -> logger.info("Completed emission of a mapping node observable from url: " + url))

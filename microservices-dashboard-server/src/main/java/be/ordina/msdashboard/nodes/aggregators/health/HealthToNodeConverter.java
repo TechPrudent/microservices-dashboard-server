@@ -15,14 +15,15 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import be.ordina.msdashboard.nodes.model.Node;
-import rx.Observable;
+import static be.ordina.msdashboard.config.Constants.MICROSERVICE;
+import static be.ordina.msdashboard.config.Constants.TYPE;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static be.ordina.msdashboard.config.Constants.*;
+import rx.Observable;
+import be.ordina.msdashboard.nodes.model.Node;
 
 /**
  * @author Andreas Evers
@@ -31,7 +32,13 @@ public class HealthToNodeConverter {
 
 	private static final String STATUS = "status";
 
-	public static Observable<Node> convertToNodes(final String serviceId, final Map<String, Object> source) {
+	private HealthProperties properties;
+	
+	public HealthToNodeConverter(final HealthProperties properties){
+		this.properties = properties;
+	}
+	
+	public Observable<Node> convertToNodes(final String serviceId, final Map<String, Object> source) {
 		if (!source.containsKey(STATUS)) {
 			throw new IllegalStateException("Health deserialization fails because no status was found at the root");
 		}
@@ -42,9 +49,7 @@ public class HealthToNodeConverter {
 		ownDetails.put(TYPE, MICROSERVICE);
 		nodes.add(topLevelNode);
 		for (String key : source.keySet()) {
-			// TODO: externalize common nodes
-			if (!STATUS.equals(key) && !HYSTRIX.equals(key) && !DISK_SPACE.equals(key)
-					&& !DISCOVERY.equals(key) && !CONFIGSERVER.equals(key)) {
+			if (!STATUS.equals(key) && !properties.getFilteredServices().contains(key)) {
 				Object nested = source.get(key);
 				if (nested instanceof Map && ((Map) nested).containsKey(STATUS)) {
 					Node nestedNode = new Node(key);
