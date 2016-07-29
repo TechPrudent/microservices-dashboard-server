@@ -23,7 +23,7 @@
     
     <scm>
         <connection>scm:git:https://github.com/ordina-jworks/microservices-dashboard-server.git</connection>
-        <developerConnection>scm:git:git://github.com/ordina-jworks/microservices-dashboard-server.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:ordina-jworks/microservices-dashboard-server.git</developerConnection>
         <url>https://github.com/ordina-jworks/microservices-dashboard-server.git/</url>
         <tag>HEAD</tag>
     </scm>
@@ -35,7 +35,7 @@
                 <repository>
                     <id>bintray-ordina-jworks-microservices-dashboard-server</id>
                     <name>ordina-jworks-microservices-dashboard-server</name>
-                    <url>https://api.bintray.com/maven/ordina-jworks/microservices-dashboard-server/microservices-dashboard/;publish=1</url>
+                    <url>https://api.bintray.com/maven/ordina-jworks/microservices-dashboard-server/microservices-dashboard-server/;publish=1</url>
                 </repository>
             </distributionManagement>
         </profile>
@@ -76,10 +76,10 @@
     </dependencyManagement>
     <dependencies>
         <dependency>
-			<groupId>be.ordina</groupId>
-			<artifactId>microservices-dashboard-ui</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
-		</dependency>
+		<groupId>be.ordina</groupId>
+		<artifactId>microservices-dashboard-ui</artifactId>
+		<version>0.1.0-SNAPSHOT</version>
+	</dependency>
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
