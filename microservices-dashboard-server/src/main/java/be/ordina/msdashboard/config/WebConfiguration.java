@@ -70,6 +70,13 @@ import java.util.List;
 @AutoConfigureAfter({ RedisConfiguration.class })
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
+    @ConditionalOnMissingBean
+    @ConfigurationProperties("spring.cache")
+    @Bean
+    public CacheProperties cacheProperties() {
+        return new CacheProperties();
+    }
+
     @Configuration
     public static class CacheConfiguration {
 
@@ -82,8 +89,8 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         @Bean
         @ConditionalOnMissingBean
         public CacheController cacheController() {
-            return new CacheController(cacheProperties, nodeCache);
-        }
+                return new CacheController(cacheProperties, nodeCache);
+            }
     }
 
     @Configuration
