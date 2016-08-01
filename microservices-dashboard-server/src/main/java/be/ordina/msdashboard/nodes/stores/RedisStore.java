@@ -16,7 +16,6 @@
 package be.ordina.msdashboard.nodes.stores;
 
 import be.ordina.msdashboard.cache.NodeCache;
-import be.ordina.msdashboard.config.Constants;
 import be.ordina.msdashboard.nodes.model.Node;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import static be.ordina.msdashboard.graph.GraphRetriever.GRAPH_CACHE_NAME;
 
 /**
  * {@link NodeStore} and {@link NodeCache} implemented by Redis.
@@ -104,7 +105,7 @@ public class RedisStore implements NodeCache, NodeStore {
 	}
 
 	@Override
-	@CacheEvict(value = Constants.GRAPH_CACHE_NAME, allEntries = true)
+	@CacheEvict(value = GRAPH_CACHE_NAME, allEntries = true)
 	public void evictGraphCache() {
 		// Intentionally left empty
 	}

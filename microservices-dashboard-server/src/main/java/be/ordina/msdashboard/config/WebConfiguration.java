@@ -15,29 +15,12 @@
  */
 package be.ordina.msdashboard.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
-import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
 import be.ordina.msdashboard.cache.CacheProperties;
 import be.ordina.msdashboard.cache.NodeCache;
 import be.ordina.msdashboard.controllers.CacheController;
 import be.ordina.msdashboard.controllers.EventsController;
 import be.ordina.msdashboard.controllers.GraphController;
+import be.ordina.msdashboard.graph.GraphProperties;
 import be.ordina.msdashboard.graph.GraphRetriever;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
@@ -45,6 +28,7 @@ import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
+import be.ordina.msdashboard.nodes.aggregators.health.MicroserviceGrouper;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
@@ -58,6 +42,22 @@ import be.ordina.msdashboard.nodes.stores.SimpleStore;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Auto-configuration for the main functionality of the microservices dashboard.
@@ -69,12 +69,6 @@ import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 @EnableConfigurationProperties
 @AutoConfigureAfter({ RedisConfiguration.class })
 public class WebConfiguration extends WebMvcConfigurerAdapter {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Labels labels() {
-        return new Labels();
-    }
 
     @Configuration
     public static class CacheConfiguration {
@@ -105,13 +99,19 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         @Bean
         @ConditionalOnMissingBean
         public GraphRetriever graphRetriever() {
-            return new GraphRetriever(aggregators, nodeStore);
+            return new GraphRetriever(aggregators, nodeStore, graphProperties());
         }
 
         @Bean
         @ConditionalOnMissingBean
         public GraphController graphController() {
             return new GraphController(graphRetriever(), nodeStore);
+        }
+
+        @ConfigurationProperties("msdashboard.graph")
+        @Bean
+        public GraphProperties graphProperties() {
+            return new GraphProperties();
         }
     }
 
@@ -206,6 +206,12 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
         @ConditionalOnMissingBean
         public UriResolver uriResolver() {
             return new EurekaUriResolver();
+        }
+
+        @ConfigurationProperties("msdashboard.health.toolbox")
+        @Bean
+        public MicroserviceGrouper springCloudEnricher() {
+            return new MicroserviceGrouper();
         }
     }
 

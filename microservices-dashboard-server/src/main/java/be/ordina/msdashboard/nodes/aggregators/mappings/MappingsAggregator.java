@@ -15,7 +15,7 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import static be.ordina.msdashboard.config.Constants.ZUUL_ID;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 
@@ -111,7 +111,7 @@ public class MappingsAggregator implements NodeAggregator {
         logger.info("Discovering services for mappings");
         return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
                 .map(id -> id.toLowerCase())
-                .filter(id -> !id.equals(ZUUL_ID))
+                .filter(id -> !id.equals(ZUUL))
                 .doOnNext(s -> logger.debug("Service discovered: " + s))
                 .doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
                 .retry();

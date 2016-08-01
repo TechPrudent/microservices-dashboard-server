@@ -15,26 +15,25 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import static be.ordina.msdashboard.config.Constants.ZUUL_ID;
-import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
-import java.util.List;
-import java.util.Map.Entry;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import rx.Observable;
-import rx.schedulers.Schedulers;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import rx.Observable;
+import rx.schedulers.Schedulers;
+
+import java.util.List;
+import java.util.Map.Entry;
+
+import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
 
 /**
  * Aggregates nodes from health information exposed by Spring Boot's Actuator.
@@ -47,7 +46,7 @@ import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
  * {
  *   "status": "UP",
  *   "foo": "bar",
- *   "serviceWhichThisServiceCalls": {
+ *   "aServiceWhichThisServiceCalls": {
  *     "status": "UNKNOWN",
  *     "type": "SOAP",
  *     "group": "SVCGROUP"
@@ -116,7 +115,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 		logger.info("Discovering services for health");
 		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
 				.map(id -> id.toLowerCase())
-				.filter(id -> !id.equals(ZUUL_ID))
+				.filter(id -> !id.equals(ZUUL))
 				.doOnNext(s -> logger.debug("Service discovered: " + s))
 				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.retry();
@@ -131,7 +130,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.map(source -> healthToNodeConverter.convertToNodes(serviceId, source))
 				.flatMap(el -> el)
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
-				//TODO: .map(node -> toolBoxDependenciesModifier.modify(node))
+				//TODO: .map(node -> springCloudEnricher.enrich(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
 				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))
 				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))

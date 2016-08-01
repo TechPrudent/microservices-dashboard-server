@@ -21,6 +21,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import be.ordina.msdashboard.nodes.model.NodeTypes;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -46,7 +48,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
-import be.ordina.msdashboard.config.Constants;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 
@@ -152,14 +153,14 @@ public class PactsAggregatorTest {
 		assertThat(nodes.get(0).getLane()).isEqualTo(0);
 		assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider1");
 		assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0");
-		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
+		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
 		assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
 		
 		assertThat(nodes.get(1).getId()).isEqualTo("consumer2");
 		assertThat(nodes.get(1).getLane()).isEqualTo(0);
 		assertThat(nodes.get(1).getLinkedToNodeIds()).contains("pn:provider2");
 		assertThat(nodes.get(1).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
-		assertThat(nodes.get(1).getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
+		assertThat(nodes.get(1).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
 		assertThat(nodes.get(1).getDetails().get("status")).isEqualTo("UP");
     }
     
@@ -194,7 +195,7 @@ public class PactsAggregatorTest {
  		assertThat(nodes.get(0).getLane()).isEqualTo(0);
  		assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider2");
  		assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
- 		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
+ 		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
  		assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
      }
     

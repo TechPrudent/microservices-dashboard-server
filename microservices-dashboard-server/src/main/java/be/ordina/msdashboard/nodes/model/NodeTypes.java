@@ -13,29 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard.nodes.aggregators.health;
-
-import be.ordina.msdashboard.nodes.model.Node;
-
-import java.util.Collection;
-import java.util.HashSet;
-
-import static be.ordina.msdashboard.config.Constants.*;
+package be.ordina.msdashboard.nodes.model;
 
 /**
+ * Global constants.
+ *
  * @author Andreas Evers
  */
-public class ToolBoxDependenciesModifier {
+public class NodeTypes {
 
-	public Collection<Node> modify(final Collection<Node> source) {
-		Collection<Node> modified = new HashSet<>();
-		for (Node node : source) {
-			if (DISCOVERY.equals(node.getId()) || CONFIGSERVER.equals(node.getId())) {
-				node.getDetails().put(TYPE, MICROSERVICE);
-				node.getDetails().put(GROUP, TOOLBOX);
-			}
-			modified.add(node);
-		}
-		return modified;
-	}
+	public static final String BACKEND = "BACKEND";
+	public static final String MICROSERVICE = "MICROSERVICE";
+	public static final String RESOURCE = "RESOURCE";
+	public static final String UI_COMPONENT = "UI_COMPONENT";
+
 }

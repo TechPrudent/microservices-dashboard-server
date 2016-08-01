@@ -22,7 +22,12 @@ import rx.functions.Func1;
 
 import java.util.*;
 
-import static be.ordina.msdashboard.config.Constants.*;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.*;
+import static be.ordina.msdashboard.graph.GraphRetriever.LINKS;
+import static be.ordina.msdashboard.graph.GraphRetriever.NODES;
+import static be.ordina.msdashboard.nodes.model.Node.DETAILS;
+import static be.ordina.msdashboard.nodes.model.Node.ID;
+import static be.ordina.msdashboard.nodes.model.Node.LANE;
 
 /**
  * @author Tim Ysewyn
@@ -97,7 +102,7 @@ public class GraphMapper {
     }
 
     private static Integer determineLane(Map<String, Object> details) {
-        String type = (String) details.get(TYPE);
+        String type = (String) details.get(Node.TYPE);
         if (type == null) {
             return new Integer("3");
         }

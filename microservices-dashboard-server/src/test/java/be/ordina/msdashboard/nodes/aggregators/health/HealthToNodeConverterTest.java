@@ -15,31 +15,29 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import static be.ordina.msdashboard.config.Constants.CONFIGSERVER;
-import static be.ordina.msdashboard.config.Constants.DISCOVERY;
-import static be.ordina.msdashboard.config.Constants.DISK_SPACE;
-import static be.ordina.msdashboard.config.Constants.HYSTRIX;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
+import be.ordina.msdashboard.nodes.model.Node;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import rx.Observable;
 import rx.observers.TestSubscriber;
-import be.ordina.msdashboard.nodes.model.Node;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
+import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link HealthToNodeConverter}
@@ -58,7 +56,7 @@ public class HealthToNodeConverterTest {
 
     @Before
     public void before(){
-    	when(properties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIGSERVER));
+    	when(properties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
     }
     
     @Test
@@ -116,7 +114,7 @@ public class HealthToNodeConverterTest {
                         "\"type\": \"SOAP\", \"group\": \"test\"}, " +
                         "\"" + DISCOVERY + "\": {\"status\": \"DOWN\", \"version\": \"1.0.0\", " +
                         "\"type\": \"SOAP\", \"group\": \"test\"}, " +
-                        "\"" + CONFIGSERVER + "\": {\"status\": \"DOWN\", \"version\": \"1.0.0\", " +
+                        "\"" + CONFIG_SERVER + "\": {\"status\": \"DOWN\", \"version\": \"1.0.0\", " +
                         "\"type\": \"SOAP\", \"group\": \"test\"}}");
 
         Observable<Node> observable = converter.convertToNodes("svc1", source);

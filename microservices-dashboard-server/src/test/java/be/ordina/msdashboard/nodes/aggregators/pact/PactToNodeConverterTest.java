@@ -18,9 +18,9 @@ package be.ordina.msdashboard.nodes.aggregators.pact;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import be.ordina.msdashboard.nodes.model.NodeTypes;
 import org.junit.Test;
 
-import be.ordina.msdashboard.config.Constants;
 import be.ordina.msdashboard.nodes.model.Node;
 
 /**
@@ -50,7 +50,7 @@ public class PactToNodeConverterTest {
 		assertThat(node.getLane()).isEqualTo(0);
 		assertThat(node.getLinkedToNodeIds()).contains("pn:providerNode");
 		assertThat(node.getDetails().get("url")).isEqualTo("http://someServer.be:7000");
-		assertThat(node.getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
+		assertThat(node.getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
 		assertThat(node.getDetails().get("status")).isEqualTo("UP");
 	}
 	
@@ -72,7 +72,7 @@ public class PactToNodeConverterTest {
 		assertThat(node.getLane()).isEqualTo(0);
 		assertThat(node.getLinkedToNodeIds()).contains("http://someotherserver.be:7000/somepath/someobject");
 		assertThat(node.getDetails().get("url")).isEqualTo("http://someServer.be:7000");
-		assertThat(node.getDetails().get("type")).isEqualTo(Constants.UI_COMPONENT);
+		assertThat(node.getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
 		assertThat(node.getDetails().get("status")).isEqualTo("UP");
 	}
 }

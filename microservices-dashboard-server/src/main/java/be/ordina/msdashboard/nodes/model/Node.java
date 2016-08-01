@@ -24,10 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static be.ordina.msdashboard.config.Constants.DETAILS;
-import static be.ordina.msdashboard.config.Constants.ID;
-import static be.ordina.msdashboard.config.Constants.LANE;
-import static be.ordina.msdashboard.config.Constants.STATUS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
@@ -39,6 +35,14 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(NON_EMPTY)
 public class Node {
+
+	public static final String ID = "id";
+	public static final String STATUS = "status";
+	public static final String TYPE = "type";
+	public static final String DETAILS = "details";
+	public static final String LANE = "lane";
+	// TODO: Implement this field in the aggregators
+	public static final String VERSION = "version";
 
 	@JsonProperty(ID)
 	private String id;

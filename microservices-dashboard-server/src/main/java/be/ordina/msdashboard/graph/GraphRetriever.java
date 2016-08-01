@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static be.ordina.msdashboard.config.Constants.*;
+import static be.ordina.msdashboard.nodes.model.Node.LANE;
 import static com.google.common.collect.Maps.newHashMap;
 
 /**
@@ -41,12 +41,25 @@ public class GraphRetriever {
 
 	private static final Logger logger = LoggerFactory.getLogger(GraphRetriever.class);
 
+	public static final String GRAPH_CACHE_NAME = "graph";
+
+	public static final String DIRECTED = "directed";
+	public static final String MULTIGRAPH = "multigraph";
+	public static final String GRAPH = "graph";
+	public static final String LANES = "lanes";
+	public static final String TYPES = "types";
+	public static final String NODES = "nodes";
+	public static final String LINKS = "links";
+	
 	private final List<NodeAggregator> aggregators;
 	private final NodeStore redisService;
+	private GraphProperties graphProperties;
 
-	public GraphRetriever(List<NodeAggregator> aggregators, NodeStore redisService) {
+	public GraphRetriever(List<NodeAggregator> aggregators, NodeStore redisService,
+						  GraphProperties graphProperties) {
 		this.aggregators = aggregators;
 		this.redisService = redisService;
+		this.graphProperties = graphProperties;
 	}
 
 	@Cacheable(value = GRAPH_CACHE_NAME, keyGenerator = "simpleKeyGenerator")
@@ -60,7 +73,7 @@ public class GraphRetriever {
 		graph.put(MULTIGRAPH, false);
 		graph.put(GRAPH, new String[0]);
 		graph.put(LANES, constructLanes());
-		graph.put(TYPES, constructTypes());
+		graph.put(TYPES, graphProperties.getTypes());
 
         Map<String, Object> nodesAndLinks = Observable.mergeDelayError(observables)
 					.doOnError(throwable -> logger.error("An error occurred during merging aggregators:", throwable))
@@ -86,28 +99,19 @@ public class GraphRetriever {
 
 	private List<Map<Object, Object>> constructLanes() {
 		List<Map<Object, Object>> lanes = new ArrayList<>();
-		lanes.add(constructLane(0, UI));
-		lanes.add(constructLane(1, RESOURCES));
-		lanes.add(constructLane(2, MICROSERVICES));
-		lanes.add(constructLane(3, BACKEND));
+		lanes.add(constructLane(0, graphProperties.getUi()));
+		lanes.add(constructLane(1, graphProperties.getResources()));
+		lanes.add(constructLane(2, graphProperties.getMicroservices()));
+		lanes.add(constructLane(3, graphProperties.getBackends()));
 		return lanes;
-	}
-
-	private List<String> constructTypes() {
-		List<String> types = new ArrayList<>();
-		types.add(DB);
-		types.add(MICROSERVICE);
-		types.add(REST);
-		types.add(SOAP);
-		types.add(JMS);
-		types.add(RESOURCE);
-		return types;
 	}
 
 	private Map<Object, Object> constructLane(final int lane, final String type) {
 		Map<Object, Object> laneMap = newHashMap();
 		laneMap.put(LANE, lane);
-		laneMap.put(TYPE, type);
+		laneMap.put(Node.TYPE, type);
 		return laneMap;
 	}
+
+
 }

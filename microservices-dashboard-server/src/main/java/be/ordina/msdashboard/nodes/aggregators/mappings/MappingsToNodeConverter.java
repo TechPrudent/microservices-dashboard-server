@@ -25,10 +25,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static be.ordina.msdashboard.config.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.config.Constants.RESOURCE;
-import static be.ordina.msdashboard.config.Constants.STATUS;
-import static be.ordina.msdashboard.config.Constants.TYPE;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.MICROSERVICE;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.RESOURCE;
+import static be.ordina.msdashboard.nodes.model.Node.TYPE;
+import static be.ordina.msdashboard.nodes.model.Node.STATUS;
 
 /**
  * @author Andreas Evers

@@ -15,34 +15,12 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import static be.ordina.msdashboard.config.Constants.CONFIGSERVER;
-import static be.ordina.msdashboard.config.Constants.DISCOVERY;
-import static be.ordina.msdashboard.config.Constants.DISK_SPACE;
-import static be.ordina.msdashboard.config.Constants.HYSTRIX;
-import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.startsWith;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import com.google.common.collect.Lists;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,16 +33,25 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-
 import rx.Observable;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
-import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
-import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
 
-import com.google.common.collect.Lists;
+import java.util.*;
+
+import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
+import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.startsWith;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Tests for {@link MappingsAggregator}
@@ -94,7 +81,8 @@ public class MappingsAggregatorTest {
     
     @Before
     public void before(){
-    	when(properties.getFilteredServices()).thenReturn(Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIGSERVER));
+    	when(properties.getFilteredServices()).thenReturn(
+    	        Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
     }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -307,7 +295,7 @@ public class MappingsAggregatorTest {
     
     private Node[] correctNodes() {
         return new Node[] { new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
-                new Node(DISCOVERY), new Node(CONFIGSERVER), new Node("Node2") };
+                new Node(DISCOVERY), new Node(CONFIG_SERVER), new Node("Node2") };
     }
     
     private Comparator<Map.Entry<String, String>> stringEntryComparator() {

@@ -15,8 +15,8 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.health;
 
-import static be.ordina.msdashboard.config.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.config.Constants.TYPE;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.MICROSERVICE;
+import static be.ordina.msdashboard.nodes.model.Node.TYPE;
 
 import java.util.HashSet;
 import java.util.Map;

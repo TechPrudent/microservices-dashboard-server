@@ -15,7 +15,7 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.pact;
 
-import be.ordina.msdashboard.config.Constants;
+import be.ordina.msdashboard.nodes.model.NodeTypes;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeBuilder;
 import com.jayway.jsonpath.JsonPath;
@@ -52,7 +52,7 @@ public class PactToNodeConverter {
 		Map<String, Object> details = new HashMap<>();
 		details.put("url", pactUrl);
 		//details.put("docs", pactUrl);
-		details.put("type", Constants.UI_COMPONENT);
+		details.put("type", NodeTypes.UI_COMPONENT);
 		details.put("status", UP);
 		node.havingDetails(details);
 

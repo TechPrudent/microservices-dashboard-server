@@ -33,7 +33,7 @@ public class NodeMerger {
     public static Func2<List<Node>, Node, List<Node>> merge() {
         return (mergedNodes, node) -> {
 
-            // TODO: we should be able to modify nodes in a general way before merging, eg. convert all service names to lowercase
+            // TODO: we should be able to enrich nodes in a general way before merging, eg. convert all service names to lowercase
             // Aggregator specific logic should not come here, eg. removing the Eureka description
 
             Optional<Integer> nodeIndex = mergedNodes.stream()

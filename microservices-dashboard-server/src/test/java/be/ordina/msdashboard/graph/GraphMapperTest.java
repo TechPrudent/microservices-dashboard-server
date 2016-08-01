@@ -15,27 +15,22 @@
  */
 package be.ordina.msdashboard.graph;
 
-import static be.ordina.msdashboard.config.Constants.BACKEND;
-import static be.ordina.msdashboard.config.Constants.DETAILS;
-import static be.ordina.msdashboard.config.Constants.ID;
-import static be.ordina.msdashboard.config.Constants.LANE;
-import static be.ordina.msdashboard.config.Constants.LINKS;
-import static be.ordina.msdashboard.config.Constants.MICROSERVICE;
-import static be.ordina.msdashboard.config.Constants.NODES;
-import static be.ordina.msdashboard.config.Constants.RESOURCE;
-import static be.ordina.msdashboard.config.Constants.TYPE;
-import static be.ordina.msdashboard.config.Constants.UI_COMPONENT;
-import static org.assertj.core.api.Assertions.assertThat;
+import be.ordina.msdashboard.nodes.model.Node;
+import be.ordina.msdashboard.nodes.model.NodeBuilder;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
-
-import be.ordina.msdashboard.nodes.model.Node;
-import be.ordina.msdashboard.nodes.model.NodeBuilder;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.*;
+import static be.ordina.msdashboard.graph.GraphRetriever.LINKS;
+import static be.ordina.msdashboard.graph.GraphRetriever.NODES;
+import static be.ordina.msdashboard.nodes.model.Node.DETAILS;
+import static be.ordina.msdashboard.nodes.model.Node.ID;
+import static be.ordina.msdashboard.nodes.model.Node.LANE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link GraphMapper}
@@ -47,10 +42,10 @@ public class GraphMapperTest {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldReturnGraphMap() {
-        Node uiComponentNode = new NodeBuilder().withId("ui").withDetail(TYPE, UI_COMPONENT).withLinkedToNodeId("resource").build();
-        Node resourceNode = new NodeBuilder().withId("resource").withDetail(TYPE, RESOURCE).withLinkedToNodeId("microservice").build();
-        Node microserviceNode = new NodeBuilder().withId("microservice").withDetail(TYPE, MICROSERVICE).withLinkedToNodeId("unknown node").withLinkedToNodeId("backend").build();
-        Node backendNode = new NodeBuilder().withId("backend").withDetail(TYPE, BACKEND).withLinkedFromNodeId("unknown node").build();
+        Node uiComponentNode = new NodeBuilder().withId("ui").withDetail(Node.TYPE, UI_COMPONENT).withLinkedToNodeId("resource").build();
+        Node resourceNode = new NodeBuilder().withId("resource").withDetail(Node.TYPE, RESOURCE).withLinkedToNodeId("microservice").build();
+        Node microserviceNode = new NodeBuilder().withId("microservice").withDetail(Node.TYPE, MICROSERVICE).withLinkedToNodeId("unknown node").withLinkedToNodeId("backend").build();
+        Node backendNode = new NodeBuilder().withId("backend").withDetail(Node.TYPE, BACKEND).withLinkedFromNodeId("unknown node").build();
         Node unknownNode = new NodeBuilder().withId("virtual node").withLinkedFromNodeId("microservice").build();
 
         Map<String, Object> graph = GraphMapper.toGraph().call(Arrays.asList(uiComponentNode, resourceNode, microserviceNode, backendNode, unknownNode));
@@ -90,8 +85,8 @@ public class GraphMapperTest {
         assertThat(nodeData).containsKey(DETAILS);
 
         Map<String, Object> details = (Map<String, Object>)nodeData.get(DETAILS);
-        assertThat(details).containsKey(TYPE);
-        assertThat(details.get(TYPE)).isEqualTo(type);
+        assertThat(details).containsKey(Node.TYPE);
+        assertThat(details.get(Node.TYPE)).isEqualTo(type);
     }
 
     private void checkLink(Set<Map<String, Integer>> links, int source, int target) {
