@@ -20,7 +20,7 @@
         <powermock.version>1.6.5</powermock.version>
         <spring.boot.version>${project.parent.version}</spring.boot.version>
     </properties>
-    
+
     <scm>
         <connection>scm:git:https://github.com/ordina-jworks/microservices-dashboard-server.git</connection>
         <developerConnection>scm:git:git@github.com:ordina-jworks/microservices-dashboard-server.git</developerConnection>
@@ -78,7 +78,7 @@
         <dependency>
 		<groupId>be.ordina</groupId>
 		<artifactId>microservices-dashboard-ui</artifactId>
-		<version>0.9.7</version>
+		<version>1.0.0</version>
 	</dependency>
         <!-- SPRING -->
         <dependency>
