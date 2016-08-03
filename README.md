@@ -18,7 +18,7 @@ This response can be queried by the microservices-dashboard UI application.
 
 ## Reference documentation
 
-To learn everything there is to know about the Microservices Dashboard, please consult the [reference documentation](http://ordina-jworks.github.io/microservices-dashboard/0.2.0-SNAPSHOT/).
+To learn everything there is to know about the Microservices Dashboard, please consult the [reference documentation](http://ordina-jworks.github.io/microservices-dashboard/1.0.0).
 
 ## Setting up the server
 
