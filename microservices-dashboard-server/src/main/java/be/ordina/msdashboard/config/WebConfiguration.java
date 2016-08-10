@@ -71,7 +71,7 @@ import java.util.List;
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 
     @ConditionalOnMissingBean
-    @ConfigurationProperties("spring.cache")
+    @ConfigurationProperties("msdashboard.cache")
     @Bean
     public CacheProperties cacheProperties() {
         return new CacheProperties();
