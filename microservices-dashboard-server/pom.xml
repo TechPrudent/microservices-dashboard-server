@@ -102,12 +102,12 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    <dependencies>
-        <dependency>
-		<groupId>be.ordina</groupId>
-		<artifactId>microservices-dashboard-ui</artifactId>
-		<version>1.0.0</version>
-	</dependency>
+        <dependencies>
+            <dependency>
+            <groupId>be.ordina</groupId>
+            <artifactId>microservices-dashboard-ui</artifactId>
+            <version>1.0.1</version>
+        </dependency>
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
