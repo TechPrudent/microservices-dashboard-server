@@ -216,10 +216,9 @@ public class ObservableTests {
     @Test
     public void testingObserveOn() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            logger.info(notification.toString());
+            //logger.info(notification.toString());
         }).take(10);
-        observable1.observeOn(Schedulers.computation());
-        observable1.toBlocking().subscribe(s -> {
+        observable1.observeOn(Schedulers.computation()).toBlocking().subscribe(s -> {
             logger.info("Got {}", s);
         }, e -> logger.error(e.getMessage(), e), () -> logger.info("Completed"));
     }
@@ -227,10 +226,9 @@ public class ObservableTests {
     @Test
     public void testingSubscribeOn() throws InterruptedException {
         Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).doOnEach(notification -> {
-            logger.info(notification.toString());
+            //logger.info(notification.toString());
         }).take(10);
-        observable1.subscribeOn(Schedulers.computation());
-        observable1.toBlocking().subscribe(s -> {
+        observable1.subscribeOn(Schedulers.computation()).toBlocking().subscribe(s -> {
             logger.info("Got {}", s);
         }, e -> logger.error(e.getMessage(), e), () -> logger.info("Completed"));
     }

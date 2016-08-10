@@ -127,8 +127,7 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 		return caller.retrieveJsonFromRequest(serviceId, request)
-				.map(source -> healthToNodeConverter.convertToNodes(serviceId, source))
-				.flatMap(el -> el)
+				.flatMap(el -> healthToNodeConverter.convertToNodes(serviceId, el))
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
 				//TODO: .map(node -> springCloudEnricher.enrich(node))
 				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
