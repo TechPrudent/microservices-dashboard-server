@@ -2,22 +2,11 @@ redis:
   mock: true
 
 spring:
-  jackson:
-    mapper:
-      DEFAULT_VIEW_INCLUSION: true
-    serialization:
-      WRITE_NULL_MAP_VALUES: false
-  aop:
-    proxyTargetClass: true
   redis:
-      host: localhost
-      port: 6379
-      pool:
-        max-wait: 10000
-  cache:
-      default-expiration: 30
-      redis-cache-prefix: graph
-      evict: true
+    host: localhost
+    port: 6379
+    pool:
+      max-wait: 10000
 
 eureka:
   client:
@@ -33,7 +22,6 @@ pact-broker:
   latest-url: /pacts/latest
   self-href-jsonPath: $.pacts[*]._links.self[0].href
 
-
 msdashboard:
   health:
     request-headers:
@@ -41,3 +29,7 @@ msdashboard:
       test-header2: test-value2
   mappings.enabled: false
   index.enabled: true
+  cache:
+      default-expiration: 30
+      redis-cache-prefix: graph
+      evict: true
