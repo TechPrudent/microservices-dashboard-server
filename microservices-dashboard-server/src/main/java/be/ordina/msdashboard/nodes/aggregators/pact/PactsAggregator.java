@@ -15,12 +15,15 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.pact;
 
+import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 import com.jayway.jsonpath.JsonPath;
 import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.client.RxClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,8 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
+import static io.reactivex.netty.client.MaxConnectionsBasedStrategy.DEFAULT_MAX_CONNECTIONS;
+
 /**
  * @author Andreas Evers
  */
@@ -43,6 +48,7 @@ public class PactsAggregator implements NodeAggregator {
 	private final PactProperties properties;
 	private final ApplicationEventPublisher publisher;
 	private final PactToNodeConverter pactToNodeConverter;
+	private final CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
 
 	@Value("${pact-broker.url:'http://localhost:8089'}")
 	protected String pactBrokerUrl;
@@ -52,11 +58,23 @@ public class PactsAggregator implements NodeAggregator {
 	@Value("${pact-broker.self-href-jsonPath:'$.pacts[*]._links.self[0].href'}")
 	protected String selfHrefJsonPath;
 
+	@Deprecated
 	public PactsAggregator(final PactToNodeConverter pactToNodeConverter,
-			final PactProperties properties, final ApplicationEventPublisher publisher) {
+						   final PactProperties properties, final ApplicationEventPublisher publisher) {
 		this.properties = properties;
 		this.publisher = publisher;
 		this.pactToNodeConverter = pactToNodeConverter;
+		this.rxClient = new CompositeHttpClientBuilder<ByteBuf, ByteBuf>()
+				.withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
+	}
+
+	public PactsAggregator(final PactToNodeConverter pactToNodeConverter,
+						   final PactProperties properties, final ApplicationEventPublisher publisher,
+						   final CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+		this.properties = properties;
+		this.publisher = publisher;
+		this.pactToNodeConverter = pactToNodeConverter;
+		this.rxClient = rxClient;
 	}
 
 	@Override
@@ -75,13 +93,16 @@ public class PactsAggregator implements NodeAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 
-		return RxNetty.createHttpRequest(request)
+		RxClient.ServerInfo serverInfo = NettyServiceCaller.getServerInfoFromRequestOrClient(request, rxClient);
+
+		return rxClient.submit(serverInfo, request)
 				.doOnError(el -> {
 					String error = MessageFormat.format("Error retrieving pacts in url {0} with headers {1}: {2}",
 							request.getUri(), request.getHeaders().entries(), el);
 					logger.error(error);
 					publisher.publishEvent(new SystemEvent(error, el));
 				})
+				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
@@ -94,7 +115,13 @@ public class PactsAggregator implements NodeAggregator {
 				})
 				.flatMap(response -> response.getContent())
 				.map(data -> data.toString(Charset.defaultCharset()))
-				.onErrorReturn(Throwable::toString)
+				.doOnError(el -> {
+					String error = MessageFormat.format("Could not convert ByteBuf to String for call {0}: {1}",
+							request.getUri(), el);
+					logger.error(error);
+					publisher.publishEvent(new SystemEvent(error, el));
+				})
+				.onErrorResumeNext(Observable.empty())
 				.map(response -> JsonPath.<List<String>> read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> (Observable<String>) el.map(obj -> (String) obj))
@@ -107,13 +134,16 @@ public class PactsAggregator implements NodeAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 
-		return RxNetty.createHttpRequest(request)
+		RxClient.ServerInfo serverInfo = NettyServiceCaller.getServerInfoFromRequestOrClient(request, rxClient);
+
+		return rxClient.submit(serverInfo, request)
 				.doOnError(el -> {
 					String error = MessageFormat.format("Error retrieving pacts in url {0} with headers {1}: {2}",
 							request.getUri(), request.getHeaders().entries(), el);
 					logger.error(error);
 					publisher.publishEvent(new SystemEvent(error, el));
 				})
+				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
@@ -126,7 +156,13 @@ public class PactsAggregator implements NodeAggregator {
 				})
 				.flatMap(response -> response.getContent())
 				.map(data -> data.toString(Charset.defaultCharset()))
-				.onErrorReturn(Throwable::toString)
+				.doOnError(el -> {
+					String error = MessageFormat.format("Could not convert ByteBuf to String for call {0}: {1}",
+							request.getUri(), el);
+					logger.error(error);
+					publisher.publishEvent(new SystemEvent(error, el));
+				})
+				.onErrorResumeNext(Observable.empty())
 				.map(response -> pactToNodeConverter.convert(response, url))
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
 				.doOnNext(node -> logger.info("Pact node discovered in url: " + url));

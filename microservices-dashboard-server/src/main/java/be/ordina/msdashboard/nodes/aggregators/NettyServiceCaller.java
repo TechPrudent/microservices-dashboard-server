@@ -15,20 +15,23 @@
  */
 package be.ordina.msdashboard.nodes.aggregators;
 
-import static java.text.MessageFormat.format;
 import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.client.RxClient;
+import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
-import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
-import java.nio.charset.Charset;
-import java.util.Map;
-
+import io.reactivex.netty.protocol.http.client.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
-
 import rx.Observable;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.util.Map;
+
+import static io.reactivex.netty.client.MaxConnectionsBasedStrategy.DEFAULT_MAX_CONNECTIONS;
+import static java.text.MessageFormat.format;
 
 /**
  * Convenience class for retrieving JSON using
@@ -40,10 +43,18 @@ public class NettyServiceCaller {
 
     private static final Logger logger = LoggerFactory.getLogger(NettyServiceCaller.class);
 
-    private ErrorHandler errorHandler;
+    private final CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
+    private final ErrorHandler errorHandler;
 
+    @Deprecated
     public NettyServiceCaller(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
+        this.rxClient = new CompositeHttpClientBuilder<ByteBuf, ByteBuf>().withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
+    }
+
+    public NettyServiceCaller(ErrorHandler errorHandler, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+        this.errorHandler = errorHandler;
+        this.rxClient = rxClient;
     }
 
     /**
@@ -57,7 +68,9 @@ public class NettyServiceCaller {
      * and Object values.
      */
     public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
-        return RxNetty.createHttpRequest(request)
+        RxClient.ServerInfo serverInfo = getServerInfoFromRequestOrClient(request, rxClient);
+
+        return rxClient.submit(serverInfo, request)
                 .publish().autoConnect()
                 .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {0} with headers {1}: {2}",
                         request.getUri(), request.getHeaders().entries(), el), el))
@@ -77,5 +90,34 @@ public class NettyServiceCaller {
                 })
                 .doOnNext(r -> logger.info("Json retrieved from call: {}", r))
                 .onErrorResumeNext(Observable.empty());
+    }
+
+    public static RxClient.ServerInfo getServerInfoFromRequestOrClient(HttpClientRequest<ByteBuf> request,
+                                                                       CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+        RxClient.ServerInfo serverInfo = rxClient.getDefaultServer();
+
+        try {
+            URI uri = new URI(request.getUri());
+
+            final String host = uri.getHost();
+            if (null != host) {
+                int port = uri.getPort();
+                if (port < 0) {
+                    String scheme = uri.getScheme();
+                    if (null != scheme) {
+                        if ("http".equals(scheme)) {
+                            port = 80;
+                        } else if ("https".equals(scheme)) {
+                            port = 443;
+                        }
+                    }
+                }
+                serverInfo = new RxClient.ServerInfo(host, port);
+            }
+        } catch (URISyntaxException e) {
+            logger.error("Could not extract server info from request: {0}", e.getMessage());
+        }
+
+        return serverInfo;
     }
 }
