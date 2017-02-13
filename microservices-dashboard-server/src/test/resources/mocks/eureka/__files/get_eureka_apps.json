@@ -38,9 +38,9 @@
               "@class": "java.util.Collections$EmptyMap"
             },
             "appGroupName": "SERVICE1",
-            "homePageUrl": "http://localhost:8089/service1",
-            "statusPageUrl": "http://localhost:8089/service1/info",
-            "healthCheckUrl": "http://localhost:8089/service1/health",
+            "homePageUrl": "https://localhost:8089/service1",
+            "statusPageUrl": "https://localhost:8089/service1/info",
+            "healthCheckUrl": "https://localhost:8089/service1/health",
             "vipAddress": "service1",
             "isCoordinatingDiscoveryServer": "false",
             "lastUpdatedTimestamp": "1466173255014",
@@ -84,9 +84,9 @@
               "@class": "java.util.Collections$EmptyMap"
             },
             "appGroupName": "SERVICE2",
-            "homePageUrl": "http://localhost:8089/service2",
-            "statusPageUrl": "http://localhost:8089/service2/info",
-            "healthCheckUrl": "http://localhost:8089/service2/health",
+            "homePageUrl": "https://localhost:8089/service2",
+            "statusPageUrl": "https://localhost:8089/service2/info",
+            "healthCheckUrl": "https://localhost:8089/service2/health",
             "vipAddress": "service2",
             "isCoordinatingDiscoveryServer": "false",
             "lastUpdatedTimestamp": "1465800498765",
@@ -129,9 +129,9 @@
             "metadata": {
               "@class": "java.util.Collections$EmptyMap"
             },
-            "homePageUrl": "http://localhost:8089/service3",
-            "statusPageUrl": "http://localhost:8089/service3/info",
-            "healthCheckUrl": "http://localhost:8089/service3/health",
+            "homePageUrl": "https://localhost:8089/service3",
+            "statusPageUrl": "https://localhost:8089/service3/info",
+            "healthCheckUrl": "https://localhost:8089/service3/health",
             "vipAddress": "service3",
             "secureVipAddress": "service3",
             "isCoordinatingDiscoveryServer": "false",
@@ -175,9 +175,9 @@
             "metadata": {
               "@class": "java.util.Collections$EmptyMap"
             },
-            "homePageUrl": "http://localhost:8089/service4",
-            "statusPageUrl": "http://localhost:8089/service4/info",
-            "healthCheckUrl": "http://localhost:8089/service4/health",
+            "homePageUrl": "https://localhost:8089/service4",
+            "statusPageUrl": "https://localhost:8089/service4/info",
+            "healthCheckUrl": "https://localhost:8089/service4/health",
             "vipAddress": "service4",
             "secureVipAddress": "service4",
             "isCoordinatingDiscoveryServer": "false",

@@ -35,7 +35,7 @@
     "lane" : 2
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc1",
+      "docs" : "https://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc3rsc1",
       "status" : "UP"
@@ -44,7 +44,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc2",
+      "docs" : "https://localhost:8089/service3/generated-docs/api-guide.html#resources-svc3rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc3rsc2",
       "status" : "UP"
@@ -53,7 +53,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc1",
+      "docs" : "https://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc1",
       "status" : "UP"
@@ -62,7 +62,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc3",
+      "docs" : "https://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc3",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc3",
       "status" : "UP"
@@ -71,7 +71,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc2",
+      "docs" : "https://localhost:8089/service1/generated-docs/api-guide.html#resources-svc1rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0015.local:8301/svc1rsc2",
       "status" : "UP"
@@ -192,7 +192,7 @@
     "lane" : 1
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc2",
+      "docs" : "https://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc2",
       "type" : "RESOURCE",
       "url" : "http://host0014.local:8281/svc4rsc2",
       "status" : "UP"
@@ -217,7 +217,7 @@
     "lane" : 3
   }, {
     "details" : {
-      "docs" : "http://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc1",
+      "docs" : "https://localhost:8089/service4/generated-docs/api-guide.html#resources-svc4rsc1",
       "type" : "RESOURCE",
       "url" : "http://host0014.local:8281/svc4rsc1",
       "status" : "UP"

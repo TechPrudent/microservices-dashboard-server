@@ -15,8 +15,11 @@
  */
 package be.ordina.msdashboard;
 
-import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.pipeline.ssl.DefaultFactories;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -28,6 +31,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,10 +57,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * Tests for the Microservices Dashboard server application
  *
  * @author Andreas Evers
+ * @author Tim Ysewyn
  */
+
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = { "spring.cloud.config.enabled=false" },
-        classes = { TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class })
+@SpringBootTest(webEnvironment = RANDOM_PORT,
+        properties = { "spring.cloud.config.enabled=false" },
+        classes = { MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class })
 public class MicroservicesDashboardServerApplicationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
@@ -163,6 +170,12 @@ public class MicroservicesDashboardServerApplicationTest {
     public static class TestMicroservicesDashboardServerApplication {
 
         private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
+
+        @Bean
+        public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {
+            return new CompositeHttpClientBuilder<ByteBuf, ByteBuf>()
+                    .withSslEngineFactory(DefaultFactories.trustAll()).build();
+        }
 
         public static void main(String[] args) {
             RxJavaPlugins.getInstance().registerObservableExecutionHook(new DebugHook(new DebugNotificationListener() {
