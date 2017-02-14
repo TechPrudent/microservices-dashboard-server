@@ -96,13 +96,6 @@ public class PactsAggregator implements NodeAggregator {
 		RxClient.ServerInfo serverInfo = NettyServiceCaller.getServerInfoFromRequestOrClient(request, rxClient);
 
 		return rxClient.submit(serverInfo, request)
-				.doOnError(el -> {
-					String error = MessageFormat.format("Error retrieving pacts in url {0} with headers {1}: {2}",
-							request.getUri(), request.getHeaders().entries(), el);
-					logger.error(error);
-					publisher.publishEvent(new SystemEvent(error, el));
-				})
-				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
@@ -121,7 +114,7 @@ public class PactsAggregator implements NodeAggregator {
 					logger.error(error);
 					publisher.publishEvent(new SystemEvent(error, el));
 				})
-				.onErrorResumeNext(Observable.empty())
+				.onErrorReturn(Throwable::toString)
 				.map(response -> JsonPath.<List<String>> read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> (Observable<String>) el.map(obj -> (String) obj))
@@ -137,13 +130,6 @@ public class PactsAggregator implements NodeAggregator {
 		RxClient.ServerInfo serverInfo = NettyServiceCaller.getServerInfoFromRequestOrClient(request, rxClient);
 
 		return rxClient.submit(serverInfo, request)
-				.doOnError(el -> {
-					String error = MessageFormat.format("Error retrieving pacts in url {0} with headers {1}: {2}",
-							request.getUri(), request.getHeaders().entries(), el);
-					logger.error(error);
-					publisher.publishEvent(new SystemEvent(error, el));
-				})
-				.onErrorResumeNext(Observable.empty())
 				.filter(r -> {
 					if (r.getStatus().code() < 400) {
 						return true;
@@ -162,7 +148,7 @@ public class PactsAggregator implements NodeAggregator {
 					logger.error(error);
 					publisher.publishEvent(new SystemEvent(error, el));
 				})
-				.onErrorResumeNext(Observable.empty())
+				.onErrorReturn(Throwable::toString)
 				.map(response -> pactToNodeConverter.convert(response, url))
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
 				.doOnNext(node -> logger.info("Pact node discovered in url: " + url));

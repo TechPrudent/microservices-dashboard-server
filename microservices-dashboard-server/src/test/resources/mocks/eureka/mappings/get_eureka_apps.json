@@ -6,7 +6,7 @@
   "response": {
     "status": 200,
     "fixedDelayMilliseconds": 2000,
-    "bodyFileName": "eureka.json",
+    "bodyFileName": "get_eureka_apps.json",
     "headers": {
       "Content-Type": "application/json"
     }
