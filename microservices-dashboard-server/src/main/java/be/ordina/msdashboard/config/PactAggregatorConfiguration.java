@@ -20,7 +20,6 @@ import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
-import io.reactivex.netty.protocol.http.client.HttpClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;

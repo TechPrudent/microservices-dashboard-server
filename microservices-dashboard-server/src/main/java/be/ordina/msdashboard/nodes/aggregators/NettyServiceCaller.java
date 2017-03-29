@@ -17,9 +17,10 @@ package be.ordina.msdashboard.nodes.aggregators;
 
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.client.RxClient;
-import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.AbstractHttpContentHolder;
-import io.reactivex.netty.protocol.http.client.*;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.json.JacksonJsonParser;
