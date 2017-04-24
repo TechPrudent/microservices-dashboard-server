@@ -23,6 +23,8 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.reactivex.netty.RxNetty;
+import io.reactivex.netty.client.RxClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import io.reactivex.netty.protocol.http.client.HttpClientResponse;
 import io.reactivex.netty.protocol.http.client.HttpResponseHeaders;
@@ -30,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.context.ApplicationEventPublisher;
@@ -45,9 +46,7 @@ import java.util.Map;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link PactsAggregator}
@@ -62,6 +61,8 @@ public class PactsAggregatorTest {
     private PactProperties pactProperties;
     @Mock
     private ApplicationEventPublisher publisher;
+    @Mock
+    private CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
 
 	private PactsAggregator pactsAggregator;
 
@@ -100,11 +101,10 @@ public class PactsAggregatorTest {
     @Before
     public void setUp() {
         when(pactProperties.getRequestHeaders()).thenReturn(requestHeaders());
-        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher);
+        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher, rxClient);
         ReflectionTestUtils.setField(pactsAggregator, "selfHrefJsonPath", "$.pacts[*]._links.self.href");
         ReflectionTestUtils.setField(pactsAggregator, "pactBrokerUrl", "http://localhost:8089");
         ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
-        PowerMockito.mockStatic(RxNetty.class);
     }
 
     private Map<String,String> requestHeaders() {
@@ -136,7 +136,7 @@ public class PactsAggregatorTest {
         when(pactTwoResponse.getContent()).thenReturn(Observable.just(byteBuf3));
         when(pactTwoResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
         	.thenReturn(Observable.just(urlsResponse), Observable.just(pactOneResponse), Observable.just(pactTwoResponse));
 
 
@@ -178,7 +178,7 @@ public class PactsAggregatorTest {
         when(pactTwoResponse.getContent()).thenReturn(Observable.just(byteBuf3));
         when(pactTwoResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
          	.thenReturn(Observable.just(urlsResponse), Observable.just(pactTwoResponse));
 
 
@@ -209,7 +209,8 @@ public class PactsAggregatorTest {
          when(httpResponseHeaders.entries()).thenReturn(newArrayList());
          when(urlsNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
 
-         when(RxNetty.createHttpRequest(any(HttpClientRequest.class))).thenReturn(Observable.just(urlsNotFoundResponse));
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
+                .thenReturn(Observable.just(urlsNotFoundResponse));
 
          TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
          pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -238,7 +239,7 @@ public class PactsAggregatorTest {
         when(httpResponseHeaders.entries()).thenReturn(newArrayList());
         when(pactNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
 
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
          	.thenReturn(Observable.just(urlsResponse), Observable.just(pactNotFoundResponse));
 
 
@@ -255,7 +256,7 @@ public class PactsAggregatorTest {
     @SuppressWarnings("unchecked")
 	@Test
     public void onErrorWhenGettingPactsUrl(){
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
      		.thenReturn(Observable.error(new RuntimeException()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
@@ -274,7 +275,7 @@ public class PactsAggregatorTest {
         when(urlsResponse.getContent()).thenReturn(Observable.just(byteBuf));
         when(urlsResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
-        when(RxNetty.createHttpRequest(any(HttpClientRequest.class)))
+        when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
          	.thenReturn(Observable.just(urlsResponse), Observable.error(new RuntimeException()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();

@@ -18,6 +18,8 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,8 +38,8 @@ public class PactAggregatorConfiguration {
     @Bean
     @ConditionalOnProperty("pact-broker.url")
     @ConditionalOnMissingBean
-    public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher) {
-        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher);
+    public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient);
     }
 
     @Bean

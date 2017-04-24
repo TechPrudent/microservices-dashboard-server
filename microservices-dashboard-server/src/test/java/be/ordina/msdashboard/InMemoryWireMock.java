@@ -17,6 +17,7 @@ package be.ordina.msdashboard;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.common.SingleRootFileSource;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -26,16 +27,26 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 
 public class InMemoryWireMock {
 
-    private WireMockServer wireMockServer;
+    private final static int HTTP_PORT = 8088;
+    private final static int HTTPS_PORT = 8089;
+
+    private WireMockServer eurekaServer;
+    private WireMockServer secureServer;
 
     @PostConstruct
-    public void startWireMock() throws IOException {
-        wireMockServer = new WireMockServer(wireMockConfig().port(8089).fileSource(new SingleRootFileSource("src/test/resources/mocks")));
-        wireMockServer.start();
+    public void startServers() throws IOException {
+        WireMockConfiguration eurekaServerConfig = wireMockConfig().port(HTTP_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka"));
+        eurekaServer = new WireMockServer(eurekaServerConfig);
+        eurekaServer.start();
+
+        WireMockConfiguration secureConfig = wireMockConfig().httpsPort(HTTPS_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/secure"));
+        secureServer = new WireMockServer(secureConfig);
+        secureServer.start();
     }
 
     @PreDestroy
-    public void stopWireMock() {
-        wireMockServer.stop();
+    public void stopServers() {
+        eurekaServer.stop();
+        secureServer.stop();
     }
 }

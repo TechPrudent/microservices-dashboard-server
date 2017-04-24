@@ -37,10 +37,11 @@ eureka:
   client:
     enabled: true
     serviceUrl:
-      defaultZone: http://localhost:8089/eureka/
+      defaultZone: http://localhost:8088/eureka/
+    register-with-eureka: false
 
 pact-broker:
-  url: http://localhost:8089
+  url: https://localhost:8089
   latest-url: /pacts/latest
   self-href-jsonPath: $.pacts[*]._links.self[0].href
 

@@ -30,11 +30,13 @@ import be.ordina.msdashboard.nodes.stores.NodeStore;
 import be.ordina.msdashboard.nodes.stores.SimpleStore;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,6 +46,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.reactivex.netty.client.MaxConnectionsBasedStrategy.DEFAULT_MAX_CONNECTIONS;
 
 /**
  * Auto-configuration for the main functionality of the microservices dashboard.
@@ -132,8 +136,15 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     @ConditionalOnMissingBean
-    public NettyServiceCaller nettyServiceCaller(ApplicationEventPublisher publisher) {
-        return new NettyServiceCaller(errorHandler(publisher));
+    public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {
+        return new CompositeHttpClientBuilder<ByteBuf, ByteBuf>()
+                .withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public NettyServiceCaller nettyServiceCaller(ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+        return new NettyServiceCaller(errorHandler(publisher), rxClient);
     }
 
     @Bean
