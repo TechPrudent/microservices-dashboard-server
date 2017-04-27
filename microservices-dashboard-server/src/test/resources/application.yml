@@ -44,5 +44,11 @@ pact-broker:
   url: https://localhost:8089
   latest-url: /pacts/latest
   self-href-jsonPath: $.pacts[*]._links.self[0].href
+security:
+  user:
+    name: user
+    password: password
+
+
 
 # logging.level.org.springframework.boot.autoconfigure: TRACE

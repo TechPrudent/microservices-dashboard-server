@@ -18,6 +18,10 @@ package be.ordina.msdashboard.nodes.aggregators.pact;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeTypes;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
+import be.ordina.msdashboard.security.strategies.DefaultApplier;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -63,51 +67,58 @@ public class PactsAggregatorTest {
     private ApplicationEventPublisher publisher;
     @Mock
     private CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
+    @Mock
+    private StrategyFactory strategyFactory;
+    @Mock
+    private DefaultApplier defaultApplier;
 
-	private PactsAggregator pactsAggregator;
+    private PactsAggregator pactsAggregator;
 
     String onePactSource = "{\"pacts\": [{\"_links\": {\"self\":"
-			+ " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
-			+ "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
+            + " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
+            + "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
 
-	String twoPactsSource = "{\"pacts\": [{\"_links\": {\"self\": {\"title\": \"Pact\",\"name\": \"Pact between consumer1 (v1.0.0) and provider1\","
-			+ "\"href\": \"http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"}}},{\"_links\": {\"self\":"
-			+ " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
-			+ "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
+    String twoPactsSource = "{\"pacts\": [{\"_links\": {\"self\": {\"title\": \"Pact\",\"name\": \"Pact between consumer1 (v1.0.0) and provider1\","
+            + "\"href\": \"http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"}}},{\"_links\": {\"self\":"
+            + " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
+            + "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
 
-	String pactOne = "{\"provider\":{\"name\":\"provider1\"},\"consumer\":{\"name\":\"consumer1\"},\"interactions\":[{\"description\":"
-			+ "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
-			+ "\"/rel://pn:provider1\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
-			+ "\"application/vnd.pxs.provider1.v1+json;charset=UTF-8\"}},\"response\":"
-			+ "{\"status\":200,\"headers\":{\"Content-Type\":\"application/vnd.pxs.provider1.v1+json;charset=UTF-8\"},\"body\":"
-			+ "{\"currentPoints\":264355,\"_embedded\":{\"pn:provider1\":{\"providerNodeSpecificationId\":\"GLP_ID\"}}}}}],\"metadata\":"
-			+ "{\"pact-specification\":{\"version\":\"3.0.0\"},\"pact-jvm\":{\"version\":\"2.3.3\"}},\"_links\":{\"self\":{\"title\":\"Pact\",\"name\":"
-			+ "\"Pact between provider1 (v1.0.0) and consumer1\",\"href\":"
-			+ "\"http://someServer.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
-			+ "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
+    String pactOne = "{\"provider\":{\"name\":\"provider1\"},\"consumer\":{\"name\":\"consumer1\"},\"interactions\":[{\"description\":"
+            + "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
+            + "\"/rel://pn:provider1\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
+            + "\"application/vnd.pxs.provider1.v1+json;charset=UTF-8\"}},\"response\":"
+            + "{\"status\":200,\"headers\":{\"Content-Type\":\"application/vnd.pxs.provider1.v1+json;charset=UTF-8\"},\"body\":"
+            + "{\"currentPoints\":264355,\"_embedded\":{\"pn:provider1\":{\"providerNodeSpecificationId\":\"GLP_ID\"}}}}}],\"metadata\":"
+            + "{\"pact-specification\":{\"version\":\"3.0.0\"},\"pact-jvm\":{\"version\":\"2.3.3\"}},\"_links\":{\"self\":{\"title\":\"Pact\",\"name\":"
+            + "\"Pact between provider1 (v1.0.0) and consumer1\",\"href\":"
+            + "\"http://someServer.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
+            + "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
 
-	String pactTwo = "{\"provider\":{\"name\":\"provider2\"},\"consumer\":{\"name\":\"consumer2\"},\"interactions\":[{\"description\":"
-			+ "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
-			+ "\"/rel://pn:provider2\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
-			+ "\"application/vnd.pxs.provider2.v1+json;charset=UTF-8\"}},\"response\":"
-			+ "{\"status\":200,\"headers\":{\"Content-Type\":\"application/vnd.pxs.provider2.v1+json;charset=UTF-8\"},\"body\":"
-			+ "{\"currentPoints\":264355,\"_embedded\":{\"pn:provider2\":{\"providerNodeSpecificationId\":\"GLP_ID\"}}}}}],\"metadata\":"
-			+ "{\"pact-specification\":{\"version\":\"3.0.0\"},\"pact-jvm\":{\"version\":\"2.3.3\"}},\"_links\":{\"self\":{\"title\":\"Pact\",\"name\":"
-			+ "\"Pact between provider2 (v1.0.0) and consumer2\",\"href\":"
-			+ "\"http://someServer.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
-			+ "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
+    String pactTwo = "{\"provider\":{\"name\":\"provider2\"},\"consumer\":{\"name\":\"consumer2\"},\"interactions\":[{\"description\":"
+            + "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
+            + "\"/rel://pn:provider2\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
+            + "\"application/vnd.pxs.provider2.v1+json;charset=UTF-8\"}},\"response\":"
+            + "{\"status\":200,\"headers\":{\"Content-Type\":\"application/vnd.pxs.provider2.v1+json;charset=UTF-8\"},\"body\":"
+            + "{\"currentPoints\":264355,\"_embedded\":{\"pn:provider2\":{\"providerNodeSpecificationId\":\"GLP_ID\"}}}}}],\"metadata\":"
+            + "{\"pact-specification\":{\"version\":\"3.0.0\"},\"pact-jvm\":{\"version\":\"2.3.3\"}},\"_links\":{\"self\":{\"title\":\"Pact\",\"name\":"
+            + "\"Pact between provider2 (v1.0.0) and consumer2\",\"href\":"
+            + "\"http://someServer.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
+            + "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
 
 
     @Before
     public void setUp() {
         when(pactProperties.getRequestHeaders()).thenReturn(requestHeaders());
-        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher, rxClient);
+        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher, rxClient, strategyFactory);
         ReflectionTestUtils.setField(pactsAggregator, "selfHrefJsonPath", "$.pacts[*]._links.self.href");
         ReflectionTestUtils.setField(pactsAggregator, "pactBrokerUrl", "http://localhost:8089");
         ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
+        when(pactProperties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
+        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
     }
 
-    private Map<String,String> requestHeaders() {
+    private Map<String, String> requestHeaders() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept", "application/hal+json");
         headers.put("Accept-Language", "en-us,en;q=0.5");
@@ -115,7 +126,7 @@ public class PactsAggregatorTest {
     }
 
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void shouldReturnTwoNodes() throws InterruptedException {
 
         HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
@@ -137,7 +148,7 @@ public class PactsAggregatorTest {
         when(pactTwoResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
-        	.thenReturn(Observable.just(urlsResponse), Observable.just(pactOneResponse), Observable.just(pactTwoResponse));
+                .thenReturn(Observable.just(urlsResponse), Observable.just(pactOneResponse), Observable.just(pactTwoResponse));
 
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
@@ -147,24 +158,24 @@ public class PactsAggregatorTest {
         List<Node> nodes = testSubscriber.getOnNextEvents();
         assertThat(nodes).hasSize(2);
 
-		assertThat(nodes.get(0).getId()).isEqualTo("consumer1");
-		assertThat(nodes.get(0).getLane()).isEqualTo(0);
-		assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider1");
-		assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0");
-		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
-		assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
+        assertThat(nodes.get(0).getId()).isEqualTo("consumer1");
+        assertThat(nodes.get(0).getLane()).isEqualTo(0);
+        assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider1");
+        assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0");
+        assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
+        assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
 
-		assertThat(nodes.get(1).getId()).isEqualTo("consumer2");
-		assertThat(nodes.get(1).getLane()).isEqualTo(0);
-		assertThat(nodes.get(1).getLinkedToNodeIds()).contains("pn:provider2");
-		assertThat(nodes.get(1).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
-		assertThat(nodes.get(1).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
-		assertThat(nodes.get(1).getDetails().get("status")).isEqualTo("UP");
+        assertThat(nodes.get(1).getId()).isEqualTo("consumer2");
+        assertThat(nodes.get(1).getLane()).isEqualTo(0);
+        assertThat(nodes.get(1).getLinkedToNodeIds()).contains("pn:provider2");
+        assertThat(nodes.get(1).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
+        assertThat(nodes.get(1).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
+        assertThat(nodes.get(1).getDetails().get("status")).isEqualTo("UP");
     }
 
     @SuppressWarnings("unchecked")
- 	@Test
-     public void shouldReturnOneNode() throws InterruptedException {
+    @Test
+    public void shouldReturnOneNode() throws InterruptedException {
 
         HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
         ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
@@ -179,7 +190,7 @@ public class PactsAggregatorTest {
         when(pactTwoResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
-         	.thenReturn(Observable.just(urlsResponse), Observable.just(pactTwoResponse));
+                .thenReturn(Observable.just(urlsResponse), Observable.just(pactTwoResponse));
 
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
@@ -189,42 +200,42 @@ public class PactsAggregatorTest {
         List<Node> nodes = testSubscriber.getOnNextEvents();
         assertThat(nodes).hasSize(1);
 
- 		assertThat(nodes.get(0).getId()).isEqualTo("consumer2");
- 		assertThat(nodes.get(0).getLane()).isEqualTo(0);
- 		assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider2");
- 		assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
- 		assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
- 		assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
-     }
+        assertThat(nodes.get(0).getId()).isEqualTo("consumer2");
+        assertThat(nodes.get(0).getLane()).isEqualTo(0);
+        assertThat(nodes.get(0).getLinkedToNodeIds()).contains("pn:provider2");
+        assertThat(nodes.get(0).getDetails().get("url")).isEqualTo("http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0");
+        assertThat(nodes.get(0).getDetails().get("type")).isEqualTo(NodeTypes.UI_COMPONENT);
+        assertThat(nodes.get(0).getDetails().get("status")).isEqualTo("UP");
+    }
 
 
     @SuppressWarnings("unchecked")
-  	@Test
+    @Test
     public void getPactUrlsNotFound() throws InterruptedException {
 
-         HttpClientResponse<ByteBuf> urlsNotFoundResponse = mock(HttpClientResponse.class);
-         when(urlsNotFoundResponse.getContent()).thenReturn(null);
-         when(urlsNotFoundResponse.getStatus()).thenReturn(HttpResponseStatus.NOT_FOUND);
-         HttpResponseHeaders httpResponseHeaders = mock(HttpResponseHeaders.class);
-         when(httpResponseHeaders.entries()).thenReturn(newArrayList());
-         when(urlsNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
+        HttpClientResponse<ByteBuf> urlsNotFoundResponse = mock(HttpClientResponse.class);
+        when(urlsNotFoundResponse.getContent()).thenReturn(null);
+        when(urlsNotFoundResponse.getStatus()).thenReturn(HttpResponseStatus.NOT_FOUND);
+        HttpResponseHeaders httpResponseHeaders = mock(HttpResponseHeaders.class);
+        when(httpResponseHeaders.entries()).thenReturn(newArrayList());
+        when(urlsNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
 
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
                 .thenReturn(Observable.just(urlsNotFoundResponse));
 
-         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-         pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
-         testSubscriber.assertNoErrors();
+        TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
+        pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
+        testSubscriber.assertNoErrors();
 
-         List<Node> nodes = testSubscriber.getOnNextEvents();
-         assertThat(nodes).isEmpty();
+        List<Node> nodes = testSubscriber.getOnNextEvents();
+        assertThat(nodes).isEmpty();
 
-         verify(publisher).publishEvent(any(SystemEvent.class));
+        verify(publisher).publishEvent(any(SystemEvent.class));
     }
 
     @SuppressWarnings("unchecked")
- 	@Test
-     public void nodeOneNotFound() throws InterruptedException {
+    @Test
+    public void nodeOneNotFound() throws InterruptedException {
 
         HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
         ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
@@ -240,7 +251,7 @@ public class PactsAggregatorTest {
         when(pactNotFoundResponse.getHeaders()).thenReturn(httpResponseHeaders);
 
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
-         	.thenReturn(Observable.just(urlsResponse), Observable.just(pactNotFoundResponse));
+                .thenReturn(Observable.just(urlsResponse), Observable.just(pactNotFoundResponse));
 
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
@@ -251,13 +262,13 @@ public class PactsAggregatorTest {
         assertThat(nodes).isEmpty();
 
         verify(publisher).publishEvent(any(SystemEvent.class));
-     }
+    }
 
     @SuppressWarnings("unchecked")
-	@Test
-    public void onErrorWhenGettingPactsUrl(){
+    @Test
+    public void onErrorWhenGettingPactsUrl() {
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
-     		.thenReturn(Observable.error(new RuntimeException()));
+                .thenReturn(Observable.error(new RuntimeException()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -267,8 +278,8 @@ public class PactsAggregatorTest {
     }
 
     @SuppressWarnings("unchecked")
-	@Test
-    public void onErrorWhenGettingNodeOne(){
+    @Test
+    public void onErrorWhenGettingNodeOne() {
         HttpClientResponse<ByteBuf> urlsResponse = mock(HttpClientResponse.class);
         ByteBuf byteBuf = (new PooledByteBufAllocator()).directBuffer();
         ByteBufUtil.writeUtf8(byteBuf, onePactSource);
@@ -276,7 +287,7 @@ public class PactsAggregatorTest {
         when(urlsResponse.getStatus()).thenReturn(HttpResponseStatus.OK);
 
         when(rxClient.submit(any(RxClient.ServerInfo.class), any(HttpClientRequest.class)))
-         	.thenReturn(Observable.just(urlsResponse), Observable.error(new RuntimeException()));
+                .thenReturn(Observable.just(urlsResponse), Observable.error(new RuntimeException()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         pactsAggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);

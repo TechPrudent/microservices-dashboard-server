@@ -5,16 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.TURBINE;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
 
 /**
  * Properties for health aggregation.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 public class HealthProperties {
 
@@ -24,6 +21,16 @@ public class HealthProperties {
 
     private List<String> filteredServices = Arrays.asList(HYSTRIX, TURBINE,
             DISK_SPACE, CONFIG_SERVER, DISCOVERY, ZUUL);
+
+    private String security = "none";
+
+    public void setSecurity(String security) {
+        this.security = security;
+    }
+
+    public String getSecurity() {
+        return security;
+    }
 
     public Map<String, String> getRequestHeaders() {
         return requestHeaders;

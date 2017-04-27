@@ -13,9 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard;
+package be.ordina.msdashboard.security;
 
+import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
+import be.ordina.msdashboard.InMemoryMockedConfiguration;
+import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
+import be.ordina.msdashboard.security.filter.AuthHealthFilter;
+import be.ordina.msdashboard.security.filter.AuthIndexFilter;
+import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
+import be.ordina.msdashboard.security.filter.AuthPactFilter;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
@@ -59,15 +67,17 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * Tests for the Microservices Dashboard server application
  *
- * @author Andreas Evers
- * @author Tim Ysewyn
  * @author Kevin Van houtte
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT,
-        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false"},
+        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=true",
+                "msdashboard.health.security=basic",
+                "msdashboard.index.enabled=true", "msdashboard.index.security=basic",
+                "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=basic",
+                "msdashboard.pact.security=basic"},
         classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
-public class MicroservicesDashboardServerApplicationTest {
+public class MsDashboardServerBasicSecurityIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
 
@@ -75,16 +85,11 @@ public class MicroservicesDashboardServerApplicationTest {
     private int port = 0;
 
     @Test
-    public void contextLoads() {
-        // Intentionally left empty
-    }
-
-    @Test
     public void exposesGraph() throws IOException, InterruptedException {
 
         long startTime = System.currentTimeMillis();
         @SuppressWarnings("rawtypes")
-        ResponseEntity<String> graph = new TestRestTemplate()
+        ResponseEntity<String> graph = new TestRestTemplate("user", "password")
                 .getForEntity("http://localhost:" + port + "/graph", String.class);
         long totalTime = System.currentTimeMillis() - startTime;
         assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
@@ -127,7 +132,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertLinkBetweenIds(r, "service4", "db");
         assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(27);
 
-        ResponseEntity<String> errors = new TestRestTemplate()
+        ResponseEntity<String> errors = new TestRestTemplate("user", "password")
                 .getForEntity("http://localhost:" + port + "/events", String.class);
 
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
@@ -181,6 +186,25 @@ public class MicroservicesDashboardServerApplicationTest {
             return new StrategyFactory(applicationContext);
         }
 
+        @Bean
+        public AuthHealthFilter authHealthFilter() {
+            return new AuthHealthFilter(SecurityProtocol.BASIC.name());
+        }
+
+        @Bean
+        public AuthMappingsFilter authMappingsFilter() {
+            return new AuthMappingsFilter(SecurityProtocol.BASIC.name());
+        }
+
+        @Bean
+        public AuthIndexFilter authIndexFilter() {
+            return new AuthIndexFilter(SecurityProtocol.BASIC.name());
+        }
+
+        @Bean
+        public AuthPactFilter authPactFilter() {
+            return new AuthPactFilter(SecurityProtocol.BASIC.name());
+        }
 
         private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
 

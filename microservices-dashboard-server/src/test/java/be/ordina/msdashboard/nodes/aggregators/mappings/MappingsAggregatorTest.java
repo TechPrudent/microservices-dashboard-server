@@ -19,6 +19,10 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.strategies.DefaultApplier;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import com.google.common.collect.Lists;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.junit.Before;
@@ -39,9 +43,7 @@ import rx.schedulers.Schedulers;
 
 import java.util.*;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
-import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
 import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,18 +77,25 @@ public class MappingsAggregatorTest {
     private NettyServiceCaller caller;
     @Mock
     private ErrorHandler errorHandler;
+    @Mock
+    private StrategyFactory strategyFactory;
+    @Mock
+    private DefaultApplier defaultApplier;
     @SuppressWarnings("rawtypes")
-	@Captor
+    @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
-    
+
     @Before
-    public void before(){
-    	when(properties.getFilteredServices()).thenReturn(
-    	        Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+    public void before() {
+        when(properties.getFilteredServices()).thenReturn(
+                Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+        when(properties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
+        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
     }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test
     public void shouldGetMappingNodesFromService() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         Map retrievedMap = new HashMap();
@@ -98,7 +107,7 @@ public class MappingsAggregatorTest {
                 .thenReturn(Observable.from(correctNodes()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getMappingNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getMappingNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         List<Node> nodes = testSubscriber.getOnNextEvents();
 
         verify(caller, times(1)).retrieveJsonFromRequest(eq("testService"), requestCaptor.capture());
@@ -106,22 +115,22 @@ public class MappingsAggregatorTest {
                 .containsExactlyElementsOf(requestHeaders().entrySet());
         assertThat(nodes).containsOnly(new Node("Node1"), new Node("Node2"));
     }
-    
+
     @SuppressWarnings("unchecked")
-	@Test(expected = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void shouldFailEntireMappingNodeRetrievalChainOnGlobalRuntimeExceptions() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         when(caller.retrieveJsonFromRequest(anyString(), any(HttpClientRequest.class)))
                 .thenThrow(new RuntimeException());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getMappingNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getMappingNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertCompleted();
     }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test
     public void shouldReturnEmptyObservableOnEmptySourceObservable() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         Observable retrievedMapObservable = Observable.empty();
@@ -129,7 +138,7 @@ public class MappingsAggregatorTest {
                 .thenReturn(retrievedMapObservable);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getMappingNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getMappingNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
 
@@ -137,9 +146,9 @@ public class MappingsAggregatorTest {
         assertThat(requestCaptor.getValue().getHeaders().entries()).usingElementComparator(stringEntryComparator())
                 .containsExactlyElementsOf(requestHeaders().entrySet());
     }
-    
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	@Test
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Test
     public void shouldReturnEmptyObservableOnErroneousConversion() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         Map retrievedMap = new HashMap();
@@ -151,7 +160,7 @@ public class MappingsAggregatorTest {
                 .thenThrow(new RuntimeException("Error1"));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getMappingNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getMappingNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
@@ -160,10 +169,10 @@ public class MappingsAggregatorTest {
         assertThat(requestCaptor.getValue().getHeaders().entries()).usingElementComparator(stringEntryComparator())
                 .containsExactlyElementsOf(requestHeaders().entrySet());
     }
-    
+
     @Test
     public void shouldGetServiceIdsFromDiscoveryClient() {
-        when(discoveryClient.getServices()).thenReturn(asList("svc1","SVC2","zuul","svc3"));
+        when(discoveryClient.getServices()).thenReturn(asList("svc1", "SVC2", "zuul", "svc3"));
 
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
         aggregator.getServiceIdsFromDiscoveryClient().toBlocking().subscribe(testSubscriber);
@@ -171,7 +180,7 @@ public class MappingsAggregatorTest {
         testSubscriber.assertNoErrors();
         testSubscriber.assertCompleted();
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void shouldFailEntireServiceDiscoveryChainOnGlobalRuntimeExceptions() {
         when(discoveryClient.getServices()).thenThrow(new RuntimeException());
@@ -179,10 +188,10 @@ public class MappingsAggregatorTest {
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
         aggregator.getServiceIdsFromDiscoveryClient().toBlocking().subscribe(testSubscriber);
     }
-    
+
     @Test
     public void shouldReturnValidServicesOnErroneousDiscovery() {
-        when(discoveryClient.getServices()).thenReturn(asList("svc1",null,"zuul","svc3"));
+        when(discoveryClient.getServices()).thenReturn(asList("svc1", null, "zuul", "svc3"));
 
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
         aggregator.getServiceIdsFromDiscoveryClient().toBlocking().subscribe(testSubscriber);
@@ -191,13 +200,13 @@ public class MappingsAggregatorTest {
 
         verify(errorHandler, times(1)).handleSystemError(anyString(), any(Throwable.class));
     }
-    
-    @SuppressWarnings("rawtypes")
-	@Test
-    public void shouldAggregateNodes() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"));
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldAggregateNodes() {
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(anyString())).then(i -> {
             ServiceInstance serviceInstance = mock(ServiceInstance.class);
@@ -205,20 +214,20 @@ public class MappingsAggregatorTest {
             return asList(serviceInstance);
         });
         when(uriResolver.resolveMappingsUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getMappingNodesFromService(anyString(), anyString());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getMappingNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
         assertThat(testSubscriber.getOnNextEvents()).extracting("id").containsExactly("svc1", null, "zuul", "svc3");
         testSubscriber.assertCompleted();
     }
-    
-    @SuppressWarnings("rawtypes")
-	@Test
-    public void shouldEmitErrorOnClassCastException() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"));
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldEmitErrorOnClassCastException() {
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(anyString())).then(i -> {
             ServiceInstance serviceInstance = mock(ServiceInstance.class);
@@ -226,7 +235,7 @@ public class MappingsAggregatorTest {
             return asList(serviceInstance);
         });
         when(uriResolver.resolveMappingsUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getMappingNodesFromService(anyString(), anyString()); // will give classcastexception
+        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getMappingNodesFromService(anyString(), anyString(), any()); // will give classcastexception
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -234,13 +243,13 @@ public class MappingsAggregatorTest {
         testSubscriber.assertNoValues();
         testSubscriber.assertError(ClassCastException.class);
     }
-    
-    @SuppressWarnings("rawtypes")
-	@Test
-    public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
 
-        Observable observable = Observable.from(asList("svc1","error","svc3"))
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+
+        Observable observable = Observable.from(asList("svc1", "error", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
@@ -252,7 +261,7 @@ public class MappingsAggregatorTest {
         when(uriResolver.resolveMappingsUrl(any(ServiceInstance.class)))
                 .then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
         doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class)))))
-                .when(aggregator).getMappingNodesFromService(anyString(), anyString());
+                .when(aggregator).getMappingNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -261,13 +270,13 @@ public class MappingsAggregatorTest {
         testSubscriber.assertNoErrors();
         verify(errorHandler, times(1)).handleSystemError(anyString(), any(Throwable.class));
     }
-    
-    @SuppressWarnings("rawtypes")
-	@Test
-    public void shouldAggregateAllValidNodesOnNullInput() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"))
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void shouldAggregateAllValidNodesOnNullInput() {
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
@@ -277,7 +286,7 @@ public class MappingsAggregatorTest {
         });
         doThrow(new RuntimeException()).when(discoveryClient).getInstances(startsWith("zuul"));
         when(uriResolver.resolveMappingsUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getMappingNodesFromService(anyString(), anyString());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getMappingNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -285,19 +294,19 @@ public class MappingsAggregatorTest {
         assertThat(nodes).extracting("id").containsExactly("svc1", "svc3");
         verify(errorHandler, times(2)).handleSystemError(anyString(), any(Throwable.class));
     }
-    
-    private Map<String,String> requestHeaders() {
+
+    private Map<String, String> requestHeaders() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept", "application/hal+json");
         headers.put("Accept-Language", "en-us,en;q=0.5");
         return headers;
     }
-    
+
     private Node[] correctNodes() {
-        return new Node[] { new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
-                new Node(DISCOVERY), new Node(CONFIG_SERVER), new Node("Node2") };
+        return new Node[]{new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
+                new Node(DISCOVERY), new Node(CONFIG_SERVER), new Node("Node2")};
     }
-    
+
     private Comparator<Map.Entry<String, String>> stringEntryComparator() {
         return (Comparator<Map.Entry<String, String>>) (o1, o2) ->
                 (o1.getKey() + "|" + o1.getValue()).compareTo(o2.getKey() + "|" + o2.getValue());

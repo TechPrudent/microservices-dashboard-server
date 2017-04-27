@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 package be.ordina.msdashboard.config;
 
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
-import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -31,16 +32,19 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the index aggregator.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 @Configuration
 @ConditionalOnSingleCandidate(DiscoveryClient.class)
 @ConditionalOnProperty(value = "msdashboard.index.enabled", matchIfMissing = false)
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
+@Import(SecurityConfiguration.class)
 public class IndexAggregatorConfiguration {
     @Autowired
     private DiscoveryClient discoveryClient;
@@ -48,11 +52,13 @@ public class IndexAggregatorConfiguration {
     private NettyServiceCaller caller;
     @Autowired
     private UriResolver uriResolver;
+    @Autowired
+    private StrategyFactory strategyFactory;
 
     @Bean
     @ConditionalOnMissingBean
     public IndexesAggregator indexesAggregator(IndexToNodeConverter indexToNodeConverter, ApplicationEventPublisher publisher) {
-        return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(), publisher, caller);
+        return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(), publisher, caller,strategyFactory);
     }
 
     @Bean

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,30 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
-import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import rx.Observable;
-import rx.schedulers.Schedulers;
 import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import rx.Observable;
+import rx.schedulers.Schedulers;
+
+import java.util.List;
+import java.util.Map;
+
+import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
 
 /**
  * Aggregates nodes from mappings information exposed by Spring Boot's Actuator.
@@ -42,7 +46,7 @@ import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
  * In case Spring Boot is not used for a microservice, your service must comply to
  * the mappings format exposed by Spring Boot under the <code>/mappings</code> endpoint.
  * Example of a mappings response:
- *
+ * <p>
  * <pre>
  * {
  *   "{[/endpoint1],methods=[GET],produces=[application/json]}" : {
@@ -55,12 +59,13 @@ import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * Any endpoint with a method signature containing <code>org.springframework</code> will be ignored.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  * @see <a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">
- *     Spring Boot Actuator</a>
+ * Spring Boot Actuator</a>
  */
 public class MappingsAggregator implements NodeAggregator {
 
@@ -71,23 +76,26 @@ public class MappingsAggregator implements NodeAggregator {
     private MappingsProperties properties;
     private NettyServiceCaller caller;
     private ErrorHandler errorHandler;
+    private StrategyFactory strategyFactory;
 
     public MappingsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
-                                      final MappingsProperties properties, final NettyServiceCaller caller,
-                                      final ErrorHandler errorHandler) {
+                              final MappingsProperties properties, final NettyServiceCaller caller,
+                              final ErrorHandler errorHandler, final StrategyFactory strategyFactory) {
         this.discoveryClient = discoveryClient;
         this.uriResolver = uriResolver;
         this.properties = properties;
         this.caller = caller;
         this.errorHandler = errorHandler;
+        this.strategyFactory = strategyFactory;
     }
 
     @Override
     public Observable<Node> aggregateNodes() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
                 .map(id -> new ImmutablePair<>(id, resolveMappingsUrl(id)))
                 .doOnNext(pair -> logger.info("Creating mappings observable: " + pair))
-                .map(pair -> getMappingNodesFromService(pair.getLeft(), pair.getRight()))
+                .map(pair -> getMappingNodesFromService(pair.getLeft(), pair.getRight(), auth))
                 .doOnNext(el -> logger.debug("Unmerged mappings observable: " + el))
                 .doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
                 .doOnCompleted(() -> logger.info("Completed getting all mappings observables"))
@@ -117,8 +125,11 @@ public class MappingsAggregator implements NodeAggregator {
                 .retry();
     }
 
-    protected Observable<Node> getMappingNodesFromService(String serviceId, String url) {
+    protected Observable<Node> getMappingNodesFromService(String serviceId, String url, Authentication authentication) {
         HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
+        strategyFactory.getStrategy(SecurityProtocolApplier.class, securityProtocol).apply(request);
         for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
             request.withHeader(header.getKey(), header.getValue());
         }

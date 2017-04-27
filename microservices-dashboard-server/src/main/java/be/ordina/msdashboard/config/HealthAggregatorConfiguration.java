@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,26 @@ import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator
 import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.health.MicroserviceGrouper;
-import be.ordina.msdashboard.nodes.uriresolvers.EurekaUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the health aggregator.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 @Configuration
+@Import(SecurityConfiguration.class)
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
 public class HealthAggregatorConfiguration {
 
@@ -50,11 +52,13 @@ public class HealthAggregatorConfiguration {
     private ErrorHandler errorHandler;
     @Autowired
     private UriResolver uriResolver;
+    @Autowired
+    private StrategyFactory strategyFactory;
 
     @Bean
     @ConditionalOnMissingBean
     public HealthIndicatorsAggregator healthIndicatorsAggregator(HealthToNodeConverter healthToNodeConverter) {
-        return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(), caller, errorHandler, healthToNodeConverter);
+        return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(), caller, errorHandler, healthToNodeConverter, strategyFactory);
     }
 
     @Bean
@@ -75,4 +79,5 @@ public class HealthAggregatorConfiguration {
     public MicroserviceGrouper springCloudEnricher() {
         return new MicroserviceGrouper();
     }
+
 }

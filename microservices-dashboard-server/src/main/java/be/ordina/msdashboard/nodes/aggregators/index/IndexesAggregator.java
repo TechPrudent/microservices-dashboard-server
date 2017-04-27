@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,35 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.index;
 
-import io.netty.buffer.ByteBuf;
-import io.reactivex.netty.protocol.http.client.HttpClientRequest;
-
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationEventPublisher;
-
-import rx.Observable;
-import rx.schedulers.Schedulers;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeEvent;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import io.netty.buffer.ByteBuf;
+import io.reactivex.netty.protocol.http.client.HttpClientRequest;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import rx.Observable;
+import rx.schedulers.Schedulers;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tim Ysewyn
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 public class IndexesAggregator implements NodeAggregator {
 
@@ -51,23 +55,26 @@ public class IndexesAggregator implements NodeAggregator {
     private final IndexProperties properties;
     private final UriResolver uriResolver;
     private final NettyServiceCaller caller;
+    private final StrategyFactory strategyFactory;
 
     public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient,
                              UriResolver uriResolver, IndexProperties properties,
-                             ApplicationEventPublisher publisher, NettyServiceCaller caller) {
+                             ApplicationEventPublisher publisher, NettyServiceCaller caller, StrategyFactory strategyFactory) {
         this.indexToNodeConverter = indexToNodeConverter;
         this.discoveryClient = discoveryClient;
         this.uriResolver = uriResolver;
         this.properties = properties;
         this.publisher = publisher;
         this.caller = caller;
+        this.strategyFactory = strategyFactory;
     }
 
     @Override
     public Observable<Node> aggregateNodes() {
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return getServicesFromDiscoveryClient()
                 .flatMap(this::getFirstInstanceForService)
-                .flatMap(this::getIndexFromServiceInstance)
+                .flatMap((ServiceInstance serviceInstance) -> getIndexFromServiceInstance(serviceInstance, auth))
                 .doOnNext(el -> logger.debug("Emitting node with id '{}'", el.getId()))
                 .doOnError(e -> {
                     String error = "Error while emitting a node: " + e.getMessage();
@@ -109,10 +116,13 @@ public class IndexesAggregator implements NodeAggregator {
         return observableServiceInstance;
     }
 
-    private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
+    private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance, Authentication authentication) {
         final String url = uriResolver.resolveHomePageUrl(serviceInstance);
         final String serviceId = serviceInstance.getServiceId().toLowerCase();
         HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
+        strategyFactory.getStrategy(SecurityProtocolApplier.class, securityProtocol).apply(request);
         for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
             request.withHeader(header.getKey(), header.getValue());
         }

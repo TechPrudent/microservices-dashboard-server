@@ -1,26 +1,22 @@
-/*
- * Copyright 2012-2016 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package be.ordina.msdashboard;
+package be.ordina.msdashboard.security;
 
+import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
+import be.ordina.msdashboard.InMemoryMockedConfiguration;
+import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
+import be.ordina.msdashboard.security.filter.AuthHealthFilter;
+import be.ordina.msdashboard.security.filter.AuthIndexFilter;
+import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
+import be.ordina.msdashboard.security.filter.AuthPactFilter;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.common.SingleRootFileSource;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -31,20 +27,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 import rx.plugins.DebugHook;
 import rx.plugins.DebugNotification;
 import rx.plugins.DebugNotificationListener;
 import rx.plugins.RxJavaPlugins;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,41 +51,56 @@ import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
 import static be.ordina.msdashboard.graph.GraphRetriever.LINKS;
 import static be.ordina.msdashboard.graph.GraphRetriever.NODES;
 import static be.ordina.msdashboard.nodes.model.Node.ID;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
- * Tests for the Microservices Dashboard server application
+ * Tests for the Microservices Dashboard server application with JWT enabled
  *
- * @author Andreas Evers
- * @author Tim Ysewyn
- * @author Kevin Van houtte
+ * @author Kevin Van Houtte
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT,
-        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false"},
-        classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
-public class MicroservicesDashboardServerApplicationTest {
-
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false",
+        "msdashboard.health.security=jwt",
+        "msdashboard.index.enabled=true", "msdashboard.index.security=jwt",
+        "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=jwt",
+        "msdashboard.pact.security=jwt"},
+        classes = {MsDashboardServerJWTSecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class})
+public class MsDashboardServerJWTSecurityIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
+
 
     @Value("${local.server.port}")
     private int port = 0;
 
-    @Test
-    public void contextLoads() {
-        // Intentionally left empty
-    }
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8087).fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka")));
+
+    @Rule
+    public WireMockRule wireMockSecureRule = new WireMockRule(wireMockConfig().httpsPort(8086).fileSource(new SingleRootFileSource("src/test/resources/mocks/secure")));
+
+
 
     @Test
     public void exposesGraph() throws IOException, InterruptedException {
 
-        long startTime = System.currentTimeMillis();
+        wireMockRule.start();
+        wireMockSecureRule.start();
+        List<ClientHttpRequestInterceptor> clientHttpRequestInterceptors = new ArrayList<>();
+        clientHttpRequestInterceptors.add(new JWTAuthenticationInitializerInterceptor());
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setInterceptors(clientHttpRequestInterceptors);
+
         @SuppressWarnings("rawtypes")
-        ResponseEntity<String> graph = new TestRestTemplate()
+        ResponseEntity<String> graph = restTemplate
                 .getForEntity("http://localhost:" + port + "/graph", String.class);
+
+
+        long startTime = System.currentTimeMillis();
+
         long totalTime = System.currentTimeMillis() - startTime;
-        assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
+        assertThat(graph.getStatusCode()).isEqualTo(HttpStatus.OK);
         String body = removeBlankNodes(graph.getBody());
         // logger.info("BODY: " + body);
         logger.info("Time spent waiting for /graph: " + totalTime);
@@ -127,9 +140,9 @@ public class MicroservicesDashboardServerApplicationTest {
         assertLinkBetweenIds(r, "service4", "db");
         assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(27);
 
-        ResponseEntity<String> errors = new TestRestTemplate()
-                .getForEntity("http://localhost:" + port + "/events", String.class);
 
+        ResponseEntity<String> errors = restTemplate
+                .getForEntity("http://localhost:" + port + "/events", String.class);
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
@@ -167,6 +180,7 @@ public class MicroservicesDashboardServerApplicationTest {
         assertThat(links.stream().anyMatch(link -> link.get("source") == s && link.get("target") == t)).isTrue();
     }
 
+
     @Configuration
     @EnableDiscoveryClient
     @EnableAutoConfiguration
@@ -181,14 +195,34 @@ public class MicroservicesDashboardServerApplicationTest {
             return new StrategyFactory(applicationContext);
         }
 
-
-        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
-
         @Bean
         public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {
             return new CompositeHttpClientBuilder<ByteBuf, ByteBuf>()
                     .withSslEngineFactory(DefaultFactories.trustAll()).build();
         }
+
+        @Bean
+        public AuthHealthFilter authHealthFilter() {
+            return new AuthHealthFilter(SecurityProtocol.JWT.name());
+        }
+
+        @Bean
+        public AuthMappingsFilter authMappingsFilter() {
+            return new AuthMappingsFilter(SecurityProtocol.JWT.name());
+        }
+
+        @Bean
+        public AuthIndexFilter authIndexFilter() {
+            return new AuthIndexFilter(SecurityProtocol.JWT.name());
+        }
+
+        @Bean
+        public AuthPactFilter authPactFilter() {
+            return new AuthPactFilter(SecurityProtocol.JWT.name());
+        }
+
+
+        private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class);
 
         public static void main(String[] args) {
             RxJavaPlugins.getInstance().registerObservableExecutionHook(new DebugHook(new DebugNotificationListener() {

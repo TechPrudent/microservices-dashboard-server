@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +18,37 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the pact aggregator.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 @Configuration
+@Import(SecurityConfiguration.class)
 public class PactAggregatorConfiguration {
+
+    @Autowired
+    private StrategyFactory strategyFactory;
 
     @Bean
     @ConditionalOnProperty("pact-broker.url")
     @ConditionalOnMissingBean
     public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient);
+        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient, strategyFactory);
     }
 
     @Bean
