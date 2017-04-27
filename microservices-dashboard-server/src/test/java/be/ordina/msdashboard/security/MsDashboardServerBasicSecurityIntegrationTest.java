@@ -71,7 +71,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT,
-        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=true",
+        properties = {"spring.cloud.config.enabled=false",
+                "security.basic.enabled=true",
                 "msdashboard.health.security=basic",
                 "msdashboard.index.enabled=true", "msdashboard.index.security=basic",
                 "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=basic",
@@ -79,7 +80,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
                 "eureka.client.serviceUrl.defaultZone=http://localhost:7068/eureka/",
                 "pact-broker.url=https://localhost:7069",
                 "spring.redis.port=6371"},
-        classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
+        classes = {MsDashboardServerBasicSecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
 public class MsDashboardServerBasicSecurityIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
