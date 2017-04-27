@@ -73,13 +73,10 @@ public class HealthIndicatorsAggregatorTest {
     private ErrorHandler errorHandler;
     @Mock
     private HealthToNodeConverter converter;
-
     @Mock
     private StrategyFactory strategyFactory;
-
     @Mock
     private DefaultApplier defaultApplier;
-
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
 
@@ -89,23 +86,8 @@ public class HealthIndicatorsAggregatorTest {
         when(properties.getFilteredServices()).thenReturn(
                 newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
         when(properties.getSecurity()).thenReturn("none");
-
-//        Authentication user = new UsernamePasswordAuthenticationToken("user", "password");
-//        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
-//        authorizationRequest.setClientId("client");
-//        OAuth2Request request = authorizationRequest.createOAuth2Request();
-//        auth = new OAuth2Authentication(request, user);
-//        httpRequest.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_TYPE, "bearer");
-//        httpRequest.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, "FOO");
-//        auth.setDetails(new OAuth2AuthenticationDetails(httpRequest));
-//        Map<String, Object> annotatedBeans = new HashedMap();
-//        annotatedBeans.put("oauth2",new OAuth2Applier());
-//      //  annotatedBeans.put("jwt",new JWTApplier());
-//        when(applicationContext.getBeansWithAnnotation(SecurityStrategy.class)).thenReturn(annotatedBeans);
-//        strategyFactory.init();
         doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
         doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
-
     }
 
     @Test

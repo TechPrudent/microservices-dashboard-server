@@ -1,7 +1,6 @@
 package be.ordina.msdashboard.security;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
-import be.ordina.msdashboard.InMemoryMockedConfiguration;
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
 import be.ordina.msdashboard.security.filter.AuthHealthFilter;
 import be.ordina.msdashboard.security.filter.AuthIndexFilter;
@@ -9,6 +8,7 @@ import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
 import be.ordina.msdashboard.security.filter.AuthPactFilter;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
@@ -59,7 +59,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         "msdashboard.health.security=oauth2",
         "msdashboard.index.enabled=true", "msdashboard.index.security=oauth2",
         "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=oauth2",
-        "msdashboard.pact.security=oauth2"},
+        "msdashboard.pact.security=oauth2",
+        "eureka.client.serviceUrl.defaultZone=http://localhost:5085/eureka/",
+        "pact-broker.url=https://localhost:5086",
+        "spring.redis.port=6373"},
         classes = {MsDashboardServerOAuth2SecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class, OAuth2SecurityTestConfig.class})
 public class MsDashboardServerOAuth2SecurityIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
@@ -83,7 +86,7 @@ public class MsDashboardServerOAuth2SecurityIntegrationTest {
         // logger.info("BODY: " + body);
         logger.info("Time spent waiting for /graph: " + totalTime);
 
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MsDashboardServerOAuth2SecurityIntegrationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
@@ -124,7 +127,7 @@ public class MsDashboardServerOAuth2SecurityIntegrationTest {
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
         logger.info("BODY: " + body);
-        JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
+        JSONAssert.assertEquals(load("src/test/resources/MsDashboardServerOAuth2SecurityIntegrationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }
 

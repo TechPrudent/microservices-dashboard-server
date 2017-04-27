@@ -13,7 +13,6 @@ spring:
     admin.url: http://localhost:8085
   redis:
     host: localhost
-    port: 6379
     pool:
       max-wait: 10000
 
@@ -36,12 +35,9 @@ admin:
 eureka:
   client:
     enabled: true
-    serviceUrl:
-      defaultZone: http://localhost:8088/eureka/
     register-with-eureka: false
 
 pact-broker:
-  url: https://localhost:8089
   latest-url: /pacts/latest
   self-href-jsonPath: $.pacts[*]._links.self[0].href
 security:

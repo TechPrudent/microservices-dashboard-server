@@ -16,7 +16,6 @@
 package be.ordina.msdashboard.security;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
-import be.ordina.msdashboard.InMemoryMockedConfiguration;
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
 import be.ordina.msdashboard.security.filter.AuthHealthFilter;
 import be.ordina.msdashboard.security.filter.AuthIndexFilter;
@@ -24,6 +23,7 @@ import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
 import be.ordina.msdashboard.security.filter.AuthPactFilter;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
@@ -75,7 +75,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
                 "msdashboard.health.security=basic",
                 "msdashboard.index.enabled=true", "msdashboard.index.security=basic",
                 "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=basic",
-                "msdashboard.pact.security=basic"},
+                "msdashboard.pact.security=basic",
+                "eureka.client.serviceUrl.defaultZone=http://localhost:7068/eureka/",
+                "pact-broker.url=https://localhost:7069",
+                "spring.redis.port=6371"},
         classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
 public class MsDashboardServerBasicSecurityIntegrationTest {
 
@@ -83,6 +86,7 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
 
     @Value("${local.server.port}")
     private int port = 0;
+
 
     @Test
     public void exposesGraph() throws IOException, InterruptedException {
@@ -97,7 +101,7 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
         // logger.info("BODY: " + body);
         logger.info("Time spent waiting for /graph: " + totalTime);
 
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MsDashboardServerBasicSecurityIntegrationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
@@ -139,7 +143,7 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
         logger.info("BODY: " + body);
-        JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
+        JSONAssert.assertEquals(load("src/test/resources/MsDashboardServerBasicSecurityIntegrationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }
 

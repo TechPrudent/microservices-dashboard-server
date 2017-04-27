@@ -1,7 +1,6 @@
 package be.ordina.msdashboard.security;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
-import be.ordina.msdashboard.InMemoryMockedConfiguration;
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
 import be.ordina.msdashboard.security.filter.AuthHealthFilter;
 import be.ordina.msdashboard.security.filter.AuthIndexFilter;
@@ -9,6 +8,7 @@ import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
 import be.ordina.msdashboard.security.filter.AuthPactFilter;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.SingleRootFileSource;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -65,8 +65,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         "msdashboard.health.security=jwt",
         "msdashboard.index.enabled=true", "msdashboard.index.security=jwt",
         "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=jwt",
-        "msdashboard.pact.security=jwt"},
-        classes = {MsDashboardServerJWTSecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class})
+        "msdashboard.pact.security=jwt",
+        "eureka.client.serviceUrl.defaultZone=http://localhost:6088/eureka/",
+        "pact-broker.url=https://localhost:6089",
+        "spring.redis.port=6372"
+},
+        classes = {MsDashboardServerJWTSecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
 public class MsDashboardServerJWTSecurityIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
 
@@ -74,19 +78,9 @@ public class MsDashboardServerJWTSecurityIntegrationTest {
     @Value("${local.server.port}")
     private int port = 0;
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8087).fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka")));
-
-    @Rule
-    public WireMockRule wireMockSecureRule = new WireMockRule(wireMockConfig().httpsPort(8086).fileSource(new SingleRootFileSource("src/test/resources/mocks/secure")));
-
-
-
     @Test
     public void exposesGraph() throws IOException, InterruptedException {
 
-        wireMockRule.start();
-        wireMockSecureRule.start();
         List<ClientHttpRequestInterceptor> clientHttpRequestInterceptors = new ArrayList<>();
         clientHttpRequestInterceptors.add(new JWTAuthenticationInitializerInterceptor());
         RestTemplate restTemplate = new RestTemplate();
@@ -105,7 +99,7 @@ public class MsDashboardServerJWTSecurityIntegrationTest {
         // logger.info("BODY: " + body);
         logger.info("Time spent waiting for /graph: " + totalTime);
 
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MicroservicesDashboardServerApplicationTestGraphResponse.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MsDashboardServerJWTSecurityIntegrationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
@@ -147,7 +141,7 @@ public class MsDashboardServerJWTSecurityIntegrationTest {
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
         logger.info("BODY: " + body);
-        JSONAssert.assertEquals(load("src/test/resources/MicroservicesDashboardServerApplicationTestEventsResponse.json"),
+        JSONAssert.assertEquals(load("src/test/resources/MsDashboardServerJWTSecurityIntegrationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
     }
 

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package be.ordina.msdashboard;
+package be.ordina.msdashboard.wiremock;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,7 +23,28 @@ import org.springframework.context.annotation.Configuration;
 public class InMemoryMockedConfiguration {
 
     @Bean
+    @ConditionalOnProperty(value = "pact-broker.url", havingValue = "https://localhost:8089")
     protected InMemoryWireMock inMemoryWireMock() {
         return new InMemoryWireMock();
     }
+
+    @Bean
+    @ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "basic")
+    protected InMemoryBasicWireMock inMemoryBasicWireMock() {
+        return new InMemoryBasicWireMock();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "jwt")
+    protected InMemoryJWTWireMock inMemoryJWTWireMock() {
+        return new InMemoryJWTWireMock();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "oauth2")
+    protected InMemoryOAuth2WireMock inMemoryOAuth2WireMock() {
+        return new InMemoryOAuth2WireMock();
+    }
+
+
 }

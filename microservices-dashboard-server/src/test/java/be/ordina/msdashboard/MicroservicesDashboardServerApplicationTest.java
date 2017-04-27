@@ -16,6 +16,7 @@
 package be.ordina.msdashboard;
 
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
@@ -65,7 +66,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT,
-        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false"},
+        properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false",
+                "eureka.client.serviceUrl.defaultZone=http://localhost:8088/eureka/",
+                "pact-broker.url=https://localhost:8089",
+                "spring.redis.port=6379"},
         classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
 public class MicroservicesDashboardServerApplicationTest {
 
@@ -73,11 +77,6 @@ public class MicroservicesDashboardServerApplicationTest {
 
     @Value("${local.server.port}")
     private int port = 0;
-
-    @Test
-    public void contextLoads() {
-        // Intentionally left empty
-    }
 
     @Test
     public void exposesGraph() throws IOException, InterruptedException {
