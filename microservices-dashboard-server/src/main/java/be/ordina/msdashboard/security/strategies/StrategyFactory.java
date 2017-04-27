@@ -66,7 +66,7 @@ public class StrategyFactory {
                     Object target = ((Advised) bean).getTargetSource().getTarget();
                     securityStrategyAnnotation = AnnotationUtils.findAnnotation(target.getClass(), SecurityStrategy.class);
                 } catch (Exception e) {
-
+                    throw new IllegalArgumentException("Can't get a target");
                 }
             }
             strategyCache.put(bean.getClass(), securityStrategyAnnotation);
@@ -80,7 +80,7 @@ public class StrategyFactory {
 
     private void ifNotExistAdd(Class type, String profile, Set<String> usedStrategies) {
         if (usedStrategies.contains(createKey(type, profile))) {
-            throw new RuntimeException("There can only be a single strategy for each type, found multiple for type '" + type + "' and profile '" + profile + "'");
+            throw new IllegalArgumentException("There can only be a single strategy for each type, found multiple for type '" + type + "' and profile '" + profile + "'");
         }
         usedStrategies.add(createKey(type, profile));
     }
@@ -107,7 +107,7 @@ public class StrategyFactory {
 
         Object profileStrategy = findStrategyMatchingProfile(strategyBeans, securityProtocol);
         if (profileStrategy == null) {
-            throw new RuntimeException("No strategy found for type '" + strategyType + "'");
+            throw new IllegalArgumentException("No strategy found for type '" + strategyType + "'");
         }
         //noinspection unchecked
         return (T) profileStrategy;

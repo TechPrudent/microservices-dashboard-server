@@ -182,8 +182,10 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
     @EnableMicroservicesDashboardServer
     public static class TestMicroservicesDashboardServerApplication {
 
+        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
+
         @Autowired
-        ApplicationContext applicationContext;
+        private ApplicationContext applicationContext;
 
         @Bean
         public StrategyFactory strategyFactory() {
@@ -210,7 +212,6 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
             return new AuthPactFilter(SecurityProtocol.BASIC.name());
         }
 
-        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
 
         @Bean
         public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {

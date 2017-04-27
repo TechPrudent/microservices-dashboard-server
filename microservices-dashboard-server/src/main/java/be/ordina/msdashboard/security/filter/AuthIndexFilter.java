@@ -30,7 +30,7 @@ public class AuthIndexFilter extends AuthFilter {
     private String securityProtocol = SecurityProtocol.NONE.name();
 
     public AuthIndexFilter(String securityProtocol) {
-        super("Index filter" + securityProtocol);
+        super(securityProtocol);
     }
 
 

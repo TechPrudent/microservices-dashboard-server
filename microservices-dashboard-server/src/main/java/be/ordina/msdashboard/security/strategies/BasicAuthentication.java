@@ -87,18 +87,8 @@ public class BasicAuthentication extends AbstractAuthenticationToken {
                     } else if (that.userAuthentication == null) {
                         break label33;
                     }
-
                     return false;
                 }
-
-                if (this.getDetails() != null) {
-                    if (!this.getDetails().equals(that.getDetails())) {
-                        ;
-                    }
-                } else if (that.getDetails() != null) {
-                    ;
-                }
-
                 return true;
             }
         }

@@ -30,7 +30,7 @@ public class AuthMappingsFilter extends AuthFilter {
     private String securityProtocol = SecurityProtocol.NONE.name();
 
     public AuthMappingsFilter(String securityProtocol) {
-        super("Mappings filter" + securityProtocol);
+        super(securityProtocol);
     }
 }
 

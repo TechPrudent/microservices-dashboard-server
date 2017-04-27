@@ -30,7 +30,7 @@ class HeaderTokenExtractor {
     private final static String HEADER_BASIC_PREFIX = "Basic ";
 
 
-    static String extractBearer(String header) {
+    public static String extractBearer(String header) {
         if (StringUtils.isBlank(header)) {
             throw new AuthenticationServiceException("Authorization header cannot be blank!");
         }
@@ -40,7 +40,7 @@ class HeaderTokenExtractor {
         return header.substring(HEADER_BEARER_PREFIX.length(), header.length());
     }
 
-    static String extractBasic(String header) {
+    public static String extractBasic(String header) {
         if (StringUtils.isBlank(header)) {
             throw new AuthenticationServiceException("Authorization header cannot be blank!");
         }

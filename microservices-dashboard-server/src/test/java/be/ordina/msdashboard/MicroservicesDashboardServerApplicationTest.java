@@ -172,16 +172,15 @@ public class MicroservicesDashboardServerApplicationTest {
     @EnableMicroservicesDashboardServer
     public static class TestMicroservicesDashboardServerApplication {
 
+        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
+
         @Autowired
-        ApplicationContext applicationContext;
+        private ApplicationContext applicationContext;
 
         @Bean
         public StrategyFactory strategyFactory() {
             return new StrategyFactory(applicationContext);
         }
-
-
-        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
 
         @Bean
         public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {

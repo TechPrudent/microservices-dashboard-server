@@ -85,15 +85,6 @@ public class JWTAuthentication extends AbstractAuthenticationToken {
 
                     return false;
                 }
-
-                if (this.getDetails() != null) {
-                    if (!this.getDetails().equals(that.getDetails())) {
-                        ;
-                    }
-                } else if (that.getDetails() != null) {
-                    ;
-                }
-
                 return true;
             }
         }

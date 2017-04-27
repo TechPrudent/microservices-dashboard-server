@@ -29,6 +29,10 @@ import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 @SecurityStrategy(type = SecurityProtocolApplier.class, protocol = SecurityProtocol.NONE)
 public class DefaultApplier implements SecurityProtocolApplier {
 
+    /**
+     * Does not apply any security headers to the request
+     * @param request
+     */
     @Override
     public void apply(HttpClientRequest<ByteBuf> request) {
     }
