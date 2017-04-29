@@ -2,7 +2,6 @@ microservices-dashboard-server/.settings
 microservices-dashboard-server/.classpath
 microservices-dashboard-server/.project
 microservices-dashboard-server/target/
-microservices-dashboard-server-sample/target/
 *.iml
 .idea/
 .ssh/
