@@ -35,5 +35,6 @@ public class DefaultApplier implements SecurityProtocolApplier {
      */
     @Override
     public void apply(HttpClientRequest<ByteBuf> request) {
+        // intentionally left empty
     }
 }

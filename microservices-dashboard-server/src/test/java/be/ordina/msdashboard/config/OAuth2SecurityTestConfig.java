@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.security;
+package be.ordina.msdashboard.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

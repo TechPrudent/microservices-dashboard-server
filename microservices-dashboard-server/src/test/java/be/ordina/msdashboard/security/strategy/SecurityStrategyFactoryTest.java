@@ -15,8 +15,9 @@
  *
  */
 
-package be.ordina.msdashboard.security.strategies;
+package be.ordina.msdashboard.security.strategy;
 
+import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import be.ordina.msdashboard.security.strategy.SecurityStrategy;
 import org.junit.Before;

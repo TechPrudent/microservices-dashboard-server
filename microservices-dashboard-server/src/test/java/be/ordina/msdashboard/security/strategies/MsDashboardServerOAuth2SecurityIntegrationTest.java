@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,16 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-package be.ordina.msdashboard.security;
+
+package be.ordina.msdashboard.security.strategies;
 
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
+import be.ordina.msdashboard.config.OAuth2SecurityTestConfig;
 import be.ordina.msdashboard.security.filter.AuthHealthFilter;
 import be.ordina.msdashboard.security.filter.AuthIndexFilter;
 import be.ordina.msdashboard.security.filter.AuthMappingsFilter;
 import be.ordina.msdashboard.security.filter.AuthPactFilter;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,44 +67,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
- * Tests for the Microservices Dashboard server application
+ * Tests for the Microservices Dashboard server application with oauth2 enabled
  *
- * @author Kevin Van houtte
+ * @author Kevin Van Houtte
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = RANDOM_PORT,
-        properties = {"spring.cloud.config.enabled=false",
-                "security.basic.enabled=true",
-                "msdashboard.health.security=basic",
-                "msdashboard.index.enabled=true", "msdashboard.index.security=basic",
-                "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=basic",
-                "msdashboard.pact.security=basic",
-                "eureka.client.serviceUrl.defaultZone=http://localhost:7068/eureka/",
-                "pact-broker.url=https://localhost:7069",
-                "spring.redis.port=6371"},
-        classes = {MsDashboardServerBasicSecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
-public class MsDashboardServerBasicSecurityIntegrationTest {
-
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {"spring.cloud.config.enabled=false", "security.basic.enabled=false",
+        "msdashboard.health.security=oauth2",
+        "msdashboard.index.enabled=true", "msdashboard.index.security=oauth2",
+        "msdashboard.mappings.enabled=true", "msdashboard.mappings.security=oauth2",
+        "msdashboard.pact.security=oauth2",
+        "eureka.client.serviceUrl.defaultZone=http://localhost:5085/eureka/",
+        "pact-broker.url=https://localhost:5086",
+        "spring.redis.port=6373"},
+        classes = {MsDashboardServerOAuth2SecurityIntegrationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class, OAuth2SecurityTestConfig.class})
+public class MsDashboardServerOAuth2SecurityIntegrationTest {
     private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
+
 
     @Value("${local.server.port}")
     private int port = 0;
 
-
     @Test
     public void exposesGraph() throws IOException, InterruptedException {
+        @SuppressWarnings("rawtypes")
+        ResponseEntity<String> graph = new TestRestTemplate()
+                .getForEntity("http://localhost:" + port + "/graph", String.class);
+
 
         long startTime = System.currentTimeMillis();
-        @SuppressWarnings("rawtypes")
-        ResponseEntity<String> graph = new TestRestTemplate("user", "password")
-                .getForEntity("http://localhost:" + port + "/graph", String.class);
+
         long totalTime = System.currentTimeMillis() - startTime;
-        assertThat(HttpStatus.OK).isEqualTo(graph.getStatusCode());
+        assertThat(graph.getStatusCode()).isEqualTo(HttpStatus.OK);
         String body = removeBlankNodes(graph.getBody());
         // logger.info("BODY: " + body);
         logger.info("Time spent waiting for /graph: " + totalTime);
 
-        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MsDashboardServerBasicSecurityIntegrationTestGraphResponse.json")),
+        JSONAssert.assertEquals(removeBlankNodes(load("src/test/resources/MsDashboardServerOAuth2SecurityIntegrationTestGraphResponse.json")),
                 body, JSONCompareMode.LENIENT);
 
         ObjectMapper m = new ObjectMapper();
@@ -137,27 +138,14 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
         assertLinkBetweenIds(r, "service4", "db");
         assertThat(((List<Map>) r.get(LINKS)).size()).isEqualTo(27);
 
-        ResponseEntity<String> errors = new TestRestTemplate("user", "password")
+        ResponseEntity<String> errors = new TestRestTemplate()
                 .getForEntity("http://localhost:" + port + "/events", String.class);
-
         assertThat(HttpStatus.OK).isEqualTo(errors.getStatusCode());
         body = errors.getBody();
         body = body.replaceAll(", [c,C]ontent-[l,L]ength=[0-9]*", "");
         logger.info("BODY: " + body);
-        JSONAssert.assertEquals(load("src/test/resources/MsDashboardServerBasicSecurityIntegrationTestEventsResponse.json"),
+        JSONAssert.assertEquals(load("src/test/resources/MsDashboardServerOAuth2SecurityIntegrationTestEventsResponse.json"),
                 body, JSONCompareMode.LENIENT);
-    }
-
-    private void printLinks(Map<String, List> r) {
-        List<Object> nodes = (List<Object>) r.get(NODES);
-        List<Map<String, Integer>> links = (List<Map<String, Integer>>) r.get(LINKS);
-        for (Map<String, Integer> link : links) {
-            int sourceIndex = link.get("source");
-            int targetIndex = link.get("target");
-            String sourceNodeId = (String) ((Map) nodes.get(sourceIndex)).get(ID);
-            String targetNodeId = (String) ((Map) nodes.get(targetIndex)).get(ID);
-            logger.info("Graph contains links between: " + sourceNodeId + " and " + targetNodeId);
-        }
     }
 
     private static void assertLinkBetweenIds(Map<String, List> r, String source, String target) throws IOException {
@@ -177,13 +165,14 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
         assertThat(links.stream().anyMatch(link -> link.get("source") == s && link.get("target") == t)).isTrue();
     }
 
+
     @Configuration
     @EnableDiscoveryClient
     @EnableAutoConfiguration
     @EnableMicroservicesDashboardServer
     public static class TestMicroservicesDashboardServerApplication {
 
-        private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
+        private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class);
 
         @Autowired
         private ApplicationContext applicationContext;
@@ -194,25 +183,24 @@ public class MsDashboardServerBasicSecurityIntegrationTest {
         }
 
         @Bean
-        public AuthHealthFilter authHealthFilter() {
-            return new AuthHealthFilter(SecurityProtocol.BASIC.name());
+        public AuthMappingsFilter authMappingsFilter() {
+            return new AuthMappingsFilter(SecurityProtocol.OAUTH2.name());
         }
 
         @Bean
-        public AuthMappingsFilter authMappingsFilter() {
-            return new AuthMappingsFilter(SecurityProtocol.BASIC.name());
+        public AuthHealthFilter authHealthFilter() {
+            return new AuthHealthFilter(SecurityProtocol.OAUTH2.name());
         }
 
         @Bean
         public AuthIndexFilter authIndexFilter() {
-            return new AuthIndexFilter(SecurityProtocol.BASIC.name());
+            return new AuthIndexFilter(SecurityProtocol.OAUTH2.name());
         }
 
         @Bean
         public AuthPactFilter authPactFilter() {
-            return new AuthPactFilter(SecurityProtocol.BASIC.name());
+            return new AuthPactFilter(SecurityProtocol.OAUTH2.name());
         }
-
 
         @Bean
         public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {

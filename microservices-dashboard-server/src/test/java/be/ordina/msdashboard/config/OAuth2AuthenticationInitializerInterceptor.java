@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.security;
+package be.ordina.msdashboard.config;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

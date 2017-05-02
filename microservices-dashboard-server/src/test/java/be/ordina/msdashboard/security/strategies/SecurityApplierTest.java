@@ -43,7 +43,7 @@ import static org.mockito.Matchers.anyString;
 
 
 @RunWith(PowerMockRunner.class)
-public class BasicApplierTest {
+public class SecurityApplierTest {
 
     private final BasicAuthApplier basicAuthApplier = new BasicAuthApplier();
 

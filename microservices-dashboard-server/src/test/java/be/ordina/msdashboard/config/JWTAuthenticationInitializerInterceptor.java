@@ -1,4 +1,4 @@
-package be.ordina.msdashboard.security;
+package be.ordina.msdashboard.config;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
