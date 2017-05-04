@@ -20,7 +20,8 @@ import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
+import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -44,32 +45,32 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnSingleCandidate(DiscoveryClient.class)
 @ConditionalOnProperty(value = "msdashboard.index.enabled", matchIfMissing = false)
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
-@Import(SecurityConfiguration.class)
+@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 public class IndexAggregatorConfiguration {
-    @Autowired
-    private DiscoveryClient discoveryClient;
-    @Autowired
-    private NettyServiceCaller caller;
-    @Autowired
-    private UriResolver uriResolver;
-    @Autowired
-    private StrategyFactory strategyFactory;
+	@Autowired
+	private DiscoveryClient discoveryClient;
+	@Autowired
+	private NettyServiceCaller caller;
+	@Autowired
+	private UriResolver uriResolver;
+	@Autowired
+	private StrategyFactory strategyFactory;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public IndexesAggregator indexesAggregator(IndexToNodeConverter indexToNodeConverter, ApplicationEventPublisher publisher) {
-        return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(), publisher, caller,strategyFactory);
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public IndexesAggregator indexesAggregator(IndexToNodeConverter indexToNodeConverter, ApplicationEventPublisher publisher) {
+		return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(), publisher, caller, strategyFactory);
+	}
 
-    @Bean
-    @ConditionalOnMissingBean
-    public IndexToNodeConverter indexToNodeConverter() {
-        return new IndexToNodeConverter(indexProperties());
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public IndexToNodeConverter indexToNodeConverter() {
+		return new IndexToNodeConverter(indexProperties());
+	}
 
-    @ConfigurationProperties("msdashboard.index")
-    @Bean
-    public IndexProperties indexProperties() {
-        return new IndexProperties();
-    }
+	@ConfigurationProperties("msdashboard.index")
+	@Bean
+	public IndexProperties indexProperties() {
+		return new IndexProperties();
+	}
 }

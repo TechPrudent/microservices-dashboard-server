@@ -23,22 +23,22 @@ package be.ordina.msdashboard.security.strategy;
  */
 public enum SecurityProtocol {
 
-    OAUTH2("oauth2"),
-    JWT("jwt"),
-    BASIC("basic"),
-    NONE("none");
+	OAUTH2("oauth2"),
+	JWT("jwt"),
+	BASIC("basic"),
+	NONE("none");
 
-    private final String name;
+	private final String name;
 
-    SecurityProtocol(String s) {
-        name = s;
-    }
+	SecurityProtocol(String s) {
+		name = s;
+	}
 
-    public boolean equalsName(String otherName) {
-        return name.equals(otherName);
-    }
+	public boolean equalsName(String otherName) {
+		return name.equals(otherName);
+	}
 
-    public String toString() {
-        return this.name;
-    }
+	public String toString() {
+		return this.name;
+	}
 }

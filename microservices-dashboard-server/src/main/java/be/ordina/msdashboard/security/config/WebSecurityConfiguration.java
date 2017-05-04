@@ -29,9 +29,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().disable();
-    }
+	@Override
+	public void configure(HttpSecurity http) throws Exception {
+		http.httpBasic().disable();
+	}
 
 }

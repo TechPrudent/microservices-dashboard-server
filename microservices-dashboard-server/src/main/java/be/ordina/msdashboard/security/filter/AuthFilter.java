@@ -24,7 +24,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
@@ -34,41 +37,42 @@ import java.io.IOException;
  *
  * @author Kevin van Houtte
  */
-public abstract class AuthFilter extends GenericFilterBean{
+public abstract class AuthFilter extends GenericFilterBean {
 
-    private String securityProtocol = SecurityProtocol.NONE.name();
-    private final static String PASSTHRU =  "passthru";
+	private String securityProtocol = SecurityProtocol.NONE.name();
 
-    public AuthFilter(String securityProtocol) {
-        this.securityProtocol = securityProtocol;
-    }
+	private static final String PASSTHRU = "passthru";
 
-    @Override
-    public void doFilter(final ServletRequest req,
-                         final ServletResponse res,
-                         final FilterChain chain) throws IOException, ServletException {
-        final HttpServletRequest request = (HttpServletRequest) req;
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
-            if (securityProtocol.equals(SecurityProtocol.JWT.name())) {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(PASSTHRU, PASSTHRU);
-                String token = HeaderTokenExtractor.extractBearer(authHeader);
-                JWTAuthentication jwtAuthentication = new JWTAuthentication(request, authentication);
-                request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_TYPE, "Bearer");
-                request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_VALUE, token);
-                jwtAuthentication.setDetails(new AuthenticationDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
-            }
-            else if(securityProtocol.equals(SecurityProtocol.BASIC.name())){
-                Authentication authentication = new UsernamePasswordAuthenticationToken(PASSTHRU, PASSTHRU);
-                String token = HeaderTokenExtractor.extractBasic(authHeader);
-                BasicAuthentication basicAuthentication = new BasicAuthentication(request, authentication);
-                request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_TYPE, "Basic");
-                request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_VALUE, token);
-                basicAuthentication.setDetails(new AuthenticationDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(basicAuthentication);
-            }
-        }
-        chain.doFilter(req, res);
-    }
+	@Override
+	public void doFilter(final ServletRequest req,
+						 final ServletResponse res,
+						 final FilterChain chain) throws IOException, ServletException {
+		final HttpServletRequest request = (HttpServletRequest) req;
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader != null) {
+			if (securityProtocol.equalsIgnoreCase(SecurityProtocol.JWT.name())) {
+				Authentication authentication = new UsernamePasswordAuthenticationToken(PASSTHRU, PASSTHRU);
+				String token = HeaderTokenExtractor.extractBearer(authHeader);
+				JWTAuthentication jwtAuthentication = new JWTAuthentication(request, authentication);
+				request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_TYPE, "Bearer");
+				request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_VALUE, token);
+				jwtAuthentication.setDetails(new AuthenticationDetails(request));
+				SecurityContextHolder.getContext().setAuthentication(jwtAuthentication);
+			} else if (securityProtocol.equalsIgnoreCase(SecurityProtocol.BASIC.name())) {
+				Authentication authentication = new UsernamePasswordAuthenticationToken(PASSTHRU, PASSTHRU);
+				String token = HeaderTokenExtractor.extractBasic(authHeader);
+				BasicAuthentication basicAuthentication = new BasicAuthentication(request, authentication);
+				request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_TYPE, "Basic");
+				request.setAttribute(AuthenticationDetails.ACCESS_TOKEN_VALUE, token);
+				basicAuthentication.setDetails(new AuthenticationDetails(request));
+				SecurityContextHolder.getContext().setAuthentication(basicAuthentication);
+			}
+		}
+		chain.doFilter(req, res);
+	}
+
+	protected void setSecurityProtocol(String protocol) {
+		this.securityProtocol = protocol;
+	}
+
 }

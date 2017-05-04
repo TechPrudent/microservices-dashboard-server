@@ -30,48 +30,48 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 
 public class InMemoryJWTWireMock {
 
-    private final static int HTTP_PORT = 6088;
-    private final static int HTTPS_HTTP_PORT = 6087;
-    private final static int HTTPS_PORT = 6089;
+	private final static int HTTP_PORT = 6088;
+	private final static int HTTPS_HTTP_PORT = 6087;
+	private final static int HTTPS_PORT = 6089;
 
-    private WireMockServer eurekaServer;
-    private WireMockServer secureServer;
+	private WireMockServer eurekaServer;
+	private WireMockServer secureServer;
 
-    @PostConstruct
-    public void startServers() throws IOException {
-        WireMockConfiguration eurekaServerConfig = wireMockConfig().port(HTTP_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka"));
-        eurekaServer = new WireMockServer(eurekaServerConfig);
-        stubEureka();
-        eurekaServer.start();
+	@PostConstruct
+	public void startServers() throws IOException {
+		WireMockConfiguration eurekaServerConfig = wireMockConfig().port(HTTP_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka"));
+		eurekaServer = new WireMockServer(eurekaServerConfig);
+		stubEureka();
+		eurekaServer.start();
 
 
-        WireMockConfiguration secureConfig = wireMockConfig().port(HTTPS_HTTP_PORT).httpsPort(HTTPS_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/secure"));
-        secureServer = new WireMockServer(secureConfig);
-        stubPact();
-        secureServer.start();
-    }
+		WireMockConfiguration secureConfig = wireMockConfig().port(HTTPS_HTTP_PORT).httpsPort(HTTPS_PORT).fileSource(new SingleRootFileSource("src/test/resources/mocks/secure"));
+		secureServer = new WireMockServer(secureConfig);
+		stubPact();
+		secureServer.start();
+	}
 
-    @PreDestroy
-    public void stopServers() {
-        eurekaServer.stop();
-        secureServer.stop();
-    }
+	@PreDestroy
+	public void stopServers() {
+		eurekaServer.stop();
+		secureServer.stop();
+	}
 
-    public void stubPact() {
-        secureServer.stubFor(WireMock.get(urlPathMatching("/pacts/latest"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withFixedDelay(2000)
-                        .withBodyFile("pacts-latest-jwt.json")
-                        .withHeader("Content-Type", "application/json")));
-    }
+	public void stubPact() {
+		secureServer.stubFor(WireMock.get(urlPathMatching("/pacts/latest"))
+				.willReturn(aResponse()
+						.withStatus(200)
+						.withFixedDelay(2000)
+						.withBodyFile("pacts-latest-jwt.json")
+						.withHeader("Content-Type", "application/json")));
+	}
 
-    public void stubEureka() {
-        eurekaServer.stubFor(WireMock.get(urlPathMatching("/eureka/apps/"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withFixedDelay(2000)
-                        .withBodyFile("get_eureka_apps_jwt.json")
-                        .withHeader("Content-Type", "application/json")));
-    }
+	public void stubEureka() {
+		eurekaServer.stubFor(WireMock.get(urlPathMatching("/eureka/apps/"))
+				.willReturn(aResponse()
+						.withStatus(200)
+						.withFixedDelay(2000)
+						.withBodyFile("get_eureka_apps_jwt.json")
+						.withHeader("Content-Type", "application/json")));
+	}
 }

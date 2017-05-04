@@ -36,23 +36,23 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RedisConfigurationTest {
 
-    @InjectMocks
-    private RedisConfiguration cachingConfig;
+	@InjectMocks
+	private RedisConfiguration cachingConfig;
 
-    @Mock
-    private CacheProperties cacheProperties;
+	@Mock
+	private CacheProperties cacheProperties;
 
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldReturnARedisCacheManager() {
-        RedisTemplate<String, Object> redisTemplate = mock(RedisTemplate.class);
+	@Test
+	@SuppressWarnings("unchecked")
+	public void shouldReturnARedisCacheManager() {
+		RedisTemplate<String, Object> redisTemplate = mock(RedisTemplate.class);
 
-        when(cacheProperties.getDefaultExpiration()).thenReturn(30L);
-        when(cacheProperties.getRedisCachePrefix()).thenReturn("prefix");
+		when(cacheProperties.getDefaultExpiration()).thenReturn(30L);
+		when(cacheProperties.getRedisCachePrefix()).thenReturn("prefix");
 
-        RedisCacheManager redisCacheManager = cachingConfig.cacheManager(redisTemplate);
+		RedisCacheManager redisCacheManager = cachingConfig.cacheManager(redisTemplate);
 
-        assertThat(redisCacheManager).isNotNull();
-    }
+		assertThat(redisCacheManager).isNotNull();
+	}
 
 }

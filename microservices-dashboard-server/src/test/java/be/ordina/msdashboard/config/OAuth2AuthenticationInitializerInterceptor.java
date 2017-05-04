@@ -20,18 +20,18 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class OAuth2AuthenticationInitializerInterceptor extends HandlerInterceptorAdapter {
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Authentication user = new UsernamePasswordAuthenticationToken("user", "password");
-        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
-        authorizationRequest.setClientId("client");
-        OAuth2Request oAuth2Request = authorizationRequest.createOAuth2Request();
-        OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(oAuth2Request, user);
-        request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_TYPE, "Bearer");
-        request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ");
-        oAuth2Authentication.setDetails(new OAuth2AuthenticationDetails(request));
-        SecurityContext securityContextHolder = SecurityContextHolder.getContext();
-        securityContextHolder.setAuthentication(oAuth2Authentication);
-        return true;
-    }
+	@Override
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+		Authentication user = new UsernamePasswordAuthenticationToken("user", "password");
+		AuthorizationRequest authorizationRequest = new AuthorizationRequest();
+		authorizationRequest.setClientId("client");
+		OAuth2Request oAuth2Request = authorizationRequest.createOAuth2Request();
+		OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(oAuth2Request, user);
+		request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_TYPE, "Bearer");
+		request.setAttribute(OAuth2AuthenticationDetails.ACCESS_TOKEN_VALUE, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ");
+		oAuth2Authentication.setDetails(new OAuth2AuthenticationDetails(request));
+		SecurityContext securityContextHolder = SecurityContextHolder.getContext();
+		securityContextHolder.setAuthentication(oAuth2Authentication);
+		return true;
+	}
 }

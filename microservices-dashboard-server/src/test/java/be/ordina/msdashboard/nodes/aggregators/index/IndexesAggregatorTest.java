@@ -18,8 +18,8 @@ package be.ordina.msdashboard.nodes.aggregators.index;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultApplier;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.DefaultStrategy;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import com.google.common.collect.Lists;
@@ -72,14 +72,14 @@ public class IndexesAggregatorTest {
         caller = mock(NettyServiceCaller.class);
         publisher = mock(ApplicationEventPublisher.class);
         StrategyFactory strategyFactory = mock(StrategyFactory.class);
-        DefaultApplier defaultApplier = mock(DefaultApplier.class);
+        DefaultStrategy defaultApplier = mock(DefaultStrategy.class);
         indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller, strategyFactory);
 
         when(indexProperties.getFilteredServices()).thenReturn(
                 Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
         when(indexProperties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
         doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
 
     }
 

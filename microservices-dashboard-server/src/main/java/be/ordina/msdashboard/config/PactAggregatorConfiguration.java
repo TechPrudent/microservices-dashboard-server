@@ -18,7 +18,8 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
+import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
@@ -38,28 +39,28 @@ import org.springframework.context.annotation.Import;
  * @author Kevin van Houtte
  */
 @Configuration
-@Import(SecurityConfiguration.class)
+@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 public class PactAggregatorConfiguration {
 
-    @Autowired
-    private StrategyFactory strategyFactory;
+	@Autowired
+	private StrategyFactory strategyFactory;
 
-    @Bean
-    @ConditionalOnProperty("pact-broker.url")
-    @ConditionalOnMissingBean
-    public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient, strategyFactory);
-    }
+	@Bean
+	@ConditionalOnProperty("pact-broker.url")
+	@ConditionalOnMissingBean
+	public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+		return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient, strategyFactory);
+	}
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PactToNodeConverter pactToNodeConverter() {
-        return new PactToNodeConverter();
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public PactToNodeConverter pactToNodeConverter() {
+		return new PactToNodeConverter();
+	}
 
-    @ConfigurationProperties("msdashboard.pact")
-    @Bean
-    public PactProperties pactProperties() {
-        return new PactProperties();
-    }
+	@ConfigurationProperties("msdashboard.pact")
+	@Bean
+	public PactProperties pactProperties() {
+		return new PactProperties();
+	}
 }

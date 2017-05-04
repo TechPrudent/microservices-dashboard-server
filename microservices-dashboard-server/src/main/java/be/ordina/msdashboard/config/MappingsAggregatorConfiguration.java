@@ -20,7 +20,8 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsProperties;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
+import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -43,29 +44,29 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnSingleCandidate(DiscoveryClient.class)
 @ConditionalOnProperty(value = "msdashboard.mappings.enabled", matchIfMissing = true)
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
-@Import(SecurityConfiguration.class)
+@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 public class MappingsAggregatorConfiguration {
 
-    @Autowired
-    private DiscoveryClient discoveryClient;
-    @Autowired
-    private NettyServiceCaller caller;
-    @Autowired
-    private ErrorHandler errorHandler;
-    @Autowired
-    private UriResolver uriResolver;
-    @Autowired
-    private StrategyFactory strategyFactory;
+	@Autowired
+	private DiscoveryClient discoveryClient;
+	@Autowired
+	private NettyServiceCaller caller;
+	@Autowired
+	private ErrorHandler errorHandler;
+	@Autowired
+	private UriResolver uriResolver;
+	@Autowired
+	private StrategyFactory strategyFactory;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public MappingsAggregator mappingsAggregator() {
-        return new MappingsAggregator(discoveryClient, uriResolver, mappingsProperties(), caller, errorHandler, strategyFactory);
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public MappingsAggregator mappingsAggregator() {
+		return new MappingsAggregator(discoveryClient, uriResolver, mappingsProperties(), caller, errorHandler, strategyFactory);
+	}
 
-    @ConfigurationProperties("msdashboard.mappings")
-    @Bean
-    public MappingsProperties mappingsProperties() {
-        return new MappingsProperties();
-    }
+	@ConfigurationProperties("msdashboard.mappings")
+	@Bean
+	public MappingsProperties mappingsProperties() {
+		return new MappingsProperties();
+	}
 }

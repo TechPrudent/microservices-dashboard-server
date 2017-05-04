@@ -22,7 +22,7 @@ import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 /**
  * @author Kevin Van Houtte
  */
-public interface SecurityProtocolApplier {
+public interface SecurityProtocolStrategy {
 
-    void apply(HttpClientRequest<ByteBuf> request);
+	void apply(HttpClientRequest<ByteBuf> request);
 }

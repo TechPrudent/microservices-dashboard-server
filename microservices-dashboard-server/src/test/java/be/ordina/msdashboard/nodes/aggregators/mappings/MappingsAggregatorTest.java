@@ -19,8 +19,8 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultApplier;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.DefaultStrategy;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import com.google.common.collect.Lists;
@@ -80,7 +80,7 @@ public class MappingsAggregatorTest {
     @Mock
     private StrategyFactory strategyFactory;
     @Mock
-    private DefaultApplier defaultApplier;
+    private DefaultStrategy defaultApplier;
     @SuppressWarnings("rawtypes")
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
@@ -91,7 +91,7 @@ public class MappingsAggregatorTest {
                 Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
         when(properties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
         doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

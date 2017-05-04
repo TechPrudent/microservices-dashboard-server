@@ -22,7 +22,8 @@ import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.health.MicroserviceGrouper;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.config.SecurityConfiguration;
+import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
+import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -40,44 +41,44 @@ import org.springframework.context.annotation.Import;
  * @author Kevin van Houtte
  */
 @Configuration
-@Import(SecurityConfiguration.class)
+@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
 public class HealthAggregatorConfiguration {
 
-    @Autowired
-    private DiscoveryClient discoveryClient;
-    @Autowired
-    private NettyServiceCaller caller;
-    @Autowired
-    private ErrorHandler errorHandler;
-    @Autowired
-    private UriResolver uriResolver;
-    @Autowired
-    private StrategyFactory strategyFactory;
+	@Autowired
+	private DiscoveryClient discoveryClient;
+	@Autowired
+	private NettyServiceCaller caller;
+	@Autowired
+	private ErrorHandler errorHandler;
+	@Autowired
+	private UriResolver uriResolver;
+	@Autowired
+	private StrategyFactory strategyFactory;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public HealthIndicatorsAggregator healthIndicatorsAggregator(HealthToNodeConverter healthToNodeConverter) {
-        return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(), caller, errorHandler, healthToNodeConverter, strategyFactory);
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public HealthIndicatorsAggregator healthIndicatorsAggregator(HealthToNodeConverter healthToNodeConverter) {
+		return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(), caller, errorHandler, healthToNodeConverter, strategyFactory);
+	}
 
-    @Bean
-    @ConditionalOnMissingBean
-    public HealthToNodeConverter healthToNodeConverter() {
-        return new HealthToNodeConverter(healthProperties());
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public HealthToNodeConverter healthToNodeConverter() {
+		return new HealthToNodeConverter(healthProperties());
+	}
 
-    @ConfigurationProperties("msdashboard.health")
-    @Bean
-    public HealthProperties healthProperties() {
-        return new HealthProperties();
-    }
+	@ConfigurationProperties("msdashboard.health")
+	@Bean
+	public HealthProperties healthProperties() {
+		return new HealthProperties();
+	}
 
-    // TODO: Incorporate this
-    @ConfigurationProperties("msdashboard.health.toolbox")
-    @Bean
-    public MicroserviceGrouper springCloudEnricher() {
-        return new MicroserviceGrouper();
-    }
+	// TODO: Incorporate this
+	@ConfigurationProperties("msdashboard.health.toolbox")
+	@Bean
+	public MicroserviceGrouper springCloudEnricher() {
+		return new MicroserviceGrouper();
+	}
 
 }

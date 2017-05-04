@@ -20,8 +20,8 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultApplier;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.DefaultStrategy;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
@@ -76,7 +76,7 @@ public class HealthIndicatorsAggregatorTest {
     @Mock
     private StrategyFactory strategyFactory;
     @Mock
-    private DefaultApplier defaultApplier;
+    private DefaultStrategy defaultApplier;
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
 
@@ -87,7 +87,7 @@ public class HealthIndicatorsAggregatorTest {
                 newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
         when(properties.getSecurity()).thenReturn("none");
         doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
     }
 
     @Test

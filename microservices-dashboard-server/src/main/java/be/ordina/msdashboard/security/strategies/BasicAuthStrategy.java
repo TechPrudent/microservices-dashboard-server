@@ -25,24 +25,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Applies JWT Bearer auth headers to the outgoing aggregator requests if jwt security is configured
+ * Applies Basic auth headers to the outgoing aggregator requests if basic security is configured
  *
  * @author Kevin van Houtte
  */
-@SecurityStrategy(type = SecurityProtocolApplier.class, protocol = SecurityProtocol.JWT)
-public class JWTApplier implements SecurityProtocolApplier {
+@SecurityStrategy(type = SecurityProtocolStrategy.class, protocol = SecurityProtocol.BASIC)
+public class BasicAuthStrategy implements SecurityProtocolStrategy {
 
-    @Override
-    public void apply(HttpClientRequest<ByteBuf> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof JWTAuthentication) {
-            Object details = authentication.getDetails();
-            if (details instanceof AuthenticationDetails) {
-                AuthenticationDetails auth = (AuthenticationDetails) details;
-                String accessToken = auth.getTokenValue();
-                String tokenType = auth.getTokenType() == null ? "Bearer" : auth.getTokenType();
-                request.withHeader("Authorization", tokenType + " " + accessToken);
-            }
-        }
-    }
+	@Override
+	public void apply(HttpClientRequest<ByteBuf> request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication instanceof BasicAuthentication) {
+			Object details = authentication.getDetails();
+			if (details instanceof AuthenticationDetails) {
+				AuthenticationDetails auth = (AuthenticationDetails) details;
+				String accessToken = auth.getTokenValue();
+				String tokenType = auth.getTokenType() == null ? "Basic" : auth.getTokenType();
+				request.withHeader("Authorization", tokenType + " " + accessToken);
+			}
+		}
+	}
 }

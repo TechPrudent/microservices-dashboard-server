@@ -28,33 +28,33 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 
 public class InMemoryWireMock {
 
-    private final static int HTTP_PORT = 8088;
-    private final static int HTTPS_PORT = 8089;
+	private final static int HTTP_PORT = 8088;
+	private final static int HTTPS_PORT = 8089;
 
-    private WireMockServer eurekaServer;
-    private WireMockServer secureServer;
+	private WireMockServer eurekaServer;
+	private WireMockServer secureServer;
 
-    @PostConstruct
-    public void startServers() throws IOException {
-        WireMockConfiguration eurekaServerConfig = wireMockConfig()
-                .notifier(new ConsoleNotifier(true))
-                .port(HTTP_PORT)
-                .fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka"));
-        eurekaServer = new WireMockServer(eurekaServerConfig);
-        eurekaServer.start();
+	@PostConstruct
+	public void startServers() throws IOException {
+		WireMockConfiguration eurekaServerConfig = wireMockConfig()
+				.notifier(new ConsoleNotifier(true))
+				.port(HTTP_PORT)
+				.fileSource(new SingleRootFileSource("src/test/resources/mocks/eureka"));
+		eurekaServer = new WireMockServer(eurekaServerConfig);
+		eurekaServer.start();
 
-        WireMockConfiguration secureConfig = wireMockConfig()
-                .notifier(new ConsoleNotifier(true))
-                .httpsPort(HTTPS_PORT)
-                .fileSource(new SingleRootFileSource("src/test/resources/mocks/secure"));
-        secureServer = new WireMockServer(secureConfig);
-        secureServer.start();
+		WireMockConfiguration secureConfig = wireMockConfig()
+				.notifier(new ConsoleNotifier(true))
+				.httpsPort(HTTPS_PORT)
+				.fileSource(new SingleRootFileSource("src/test/resources/mocks/secure"));
+		secureServer = new WireMockServer(secureConfig);
+		secureServer.start();
 
-    }
+	}
 
-    @PreDestroy
-    public void stopServers() {
-        eurekaServer.stop();
-        secureServer.stop();
-    }
+	@PreDestroy
+	public void stopServers() {
+		eurekaServer.stop();
+		secureServer.stop();
+	}
 }

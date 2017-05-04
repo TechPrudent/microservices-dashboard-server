@@ -26,27 +26,27 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
  */
 class HeaderTokenExtractor {
 
-    private final static String HEADER_BEARER_PREFIX = "Bearer ";
-    private final static String HEADER_BASIC_PREFIX = "Basic ";
+	private final static String HEADER_BEARER_PREFIX = "Bearer ";
+	private final static String HEADER_BASIC_PREFIX = "Basic ";
 
 
-    public static String extractBearer(String header) {
-        if (StringUtils.isBlank(header)) {
-            throw new AuthenticationServiceException("Authorization header cannot be blank!");
-        }
-        if (header.length() < HEADER_BEARER_PREFIX.length() || !header.startsWith(HEADER_BEARER_PREFIX)) {
-            throw new AuthenticationServiceException("Invalid authorization header size.");
-        }
-        return header.substring(HEADER_BEARER_PREFIX.length(), header.length());
-    }
+	public static String extractBearer(String header) {
+		if (StringUtils.isBlank(header)) {
+			throw new AuthenticationServiceException("Authorization header cannot be blank!");
+		}
+		if (header.length() < HEADER_BEARER_PREFIX.length() || !header.startsWith(HEADER_BEARER_PREFIX)) {
+			throw new AuthenticationServiceException("Invalid authorization header size.");
+		}
+		return header.substring(HEADER_BEARER_PREFIX.length(), header.length());
+	}
 
-    public static String extractBasic(String header) {
-        if (StringUtils.isBlank(header)) {
-            throw new AuthenticationServiceException("Authorization header cannot be blank!");
-        }
-        if (header.length() < HEADER_BASIC_PREFIX.length() || !header.startsWith(HEADER_BASIC_PREFIX)) {
-            throw new AuthenticationServiceException("Invalid authorization header size.");
-        }
-        return header.substring(HEADER_BASIC_PREFIX.length(), header.length());
-    }
+	public static String extractBasic(String header) {
+		if (StringUtils.isBlank(header)) {
+			throw new AuthenticationServiceException("Authorization header cannot be blank!");
+		}
+		if (header.length() < HEADER_BASIC_PREFIX.length() || !header.startsWith(HEADER_BASIC_PREFIX)) {
+			throw new AuthenticationServiceException("Invalid authorization header size.");
+		}
+		return header.substring(HEADER_BASIC_PREFIX.length(), header.length());
+	}
 }

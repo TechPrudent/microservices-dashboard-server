@@ -25,7 +25,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Factory class to create SecurityStrategy annotated classes
@@ -35,92 +42,92 @@ import java.util.*;
 @Repository
 public class StrategyFactory {
 
-    private ApplicationContext applicationContext;
+	private ApplicationContext applicationContext;
 
-    private Map<Class, List<Object>> annotatedTypes = new HashMap<>();
-    private Map<Class, SecurityStrategy> strategyCache = new HashMap<>();
+	private Map<Class, List<Object>> annotatedTypes = new HashMap<>();
+	private Map<Class, SecurityStrategy> strategyCache = new HashMap<>();
 
-    public StrategyFactory(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+	public StrategyFactory(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
-    @PostConstruct
-    public void init() {
-        Map<String, Object> annotatedBeanClasses = applicationContext.getBeansWithAnnotation(SecurityStrategy.class);
+	@PostConstruct
+	public void init() {
+		Map<String, Object> annotatedBeanClasses = applicationContext.getBeansWithAnnotation(SecurityStrategy.class);
 
-        sanityCheck(annotatedBeanClasses.values());
+		sanityCheck(annotatedBeanClasses.values());
 
-        for (Object bean : annotatedBeanClasses.values()) {
-            SecurityStrategy securityStrategyAnnotation = strategyCache.get(bean.getClass());
-            getBeansWithSameType(securityStrategyAnnotation).add(bean);
-        }
-    }
+		for (Object bean : annotatedBeanClasses.values()) {
+			SecurityStrategy securityStrategyAnnotation = strategyCache.get(bean.getClass());
+			getBeansWithSameType(securityStrategyAnnotation).add(bean);
+		}
+	}
 
-    private void sanityCheck(Collection<Object> annotatedBeanClasses) {
-        Set<String> usedStrategies = new HashSet<>();
+	private void sanityCheck(Collection<Object> annotatedBeanClasses) {
+		Set<String> usedStrategies = new HashSet<>();
 
-        for (Object bean : annotatedBeanClasses) {
-            SecurityStrategy securityStrategyAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), SecurityStrategy.class);
-            if (securityStrategyAnnotation == null) {
-                try {
-                    Object target = ((Advised) bean).getTargetSource().getTarget();
-                    securityStrategyAnnotation = AnnotationUtils.findAnnotation(target.getClass(), SecurityStrategy.class);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Can't get a target");
-                }
-            }
-            strategyCache.put(bean.getClass(), securityStrategyAnnotation);
-            ifNotExistAdd(securityStrategyAnnotation.type(), strategyCache.get(bean.getClass()).protocol(), usedStrategies);
-        }
-    }
+		for (Object bean : annotatedBeanClasses) {
+			SecurityStrategy securityStrategyAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), SecurityStrategy.class);
+			if (securityStrategyAnnotation == null) {
+				try {
+					Object target = ((Advised) bean).getTargetSource().getTarget();
+					securityStrategyAnnotation = AnnotationUtils.findAnnotation(target.getClass(), SecurityStrategy.class);
+				} catch (Exception e) {
+					throw new IllegalArgumentException("Can't get a target");
+				}
+			}
+			strategyCache.put(bean.getClass(), securityStrategyAnnotation);
+			ifNotExistAdd(securityStrategyAnnotation.type(), strategyCache.get(bean.getClass()).protocol(), usedStrategies);
+		}
+	}
 
-    private void ifNotExistAdd(Class type, SecurityProtocol profile, Set<String> usedStrategies) {
-        ifNotExistAdd(type, profile.name(), usedStrategies);
-    }
+	private void ifNotExistAdd(Class type, SecurityProtocol profile, Set<String> usedStrategies) {
+		ifNotExistAdd(type, profile.name(), usedStrategies);
+	}
 
-    private void ifNotExistAdd(Class type, String profile, Set<String> usedStrategies) {
-        if (usedStrategies.contains(createKey(type, profile))) {
-            throw new IllegalArgumentException("There can only be a single strategy for each type, found multiple for type '" + type + "' and profile '" + profile + "'");
-        }
-        usedStrategies.add(createKey(type, profile));
-    }
+	private void ifNotExistAdd(Class type, String profile, Set<String> usedStrategies) {
+		if (usedStrategies.contains(createKey(type, profile))) {
+			throw new IllegalArgumentException("There can only be a single strategy for each type, found multiple for type '" + type + "' and profile '" + profile + "'");
+		}
+		usedStrategies.add(createKey(type, profile));
+	}
 
-    private String createKey(Class type, String profile) {
-        return (type + "_" + profile).toLowerCase();
-    }
+	private String createKey(Class type, String profile) {
+		return (type + "_" + profile).toLowerCase();
+	}
 
-    private List<Object> getBeansWithSameType(SecurityStrategy securityStrategyAnnotation) {
-        List<Object> beansWithSameType = annotatedTypes.get(securityStrategyAnnotation.type());
-        if (beansWithSameType != null) {
-            return beansWithSameType;
-        } else {
-            List<Object> newBeansList = new ArrayList<>();
-            annotatedTypes.put(securityStrategyAnnotation.type(), newBeansList);
-            return newBeansList;
-        }
-    }
+	private List<Object> getBeansWithSameType(SecurityStrategy securityStrategyAnnotation) {
+		List<Object> beansWithSameType = annotatedTypes.get(securityStrategyAnnotation.type());
+		if (beansWithSameType != null) {
+			return beansWithSameType;
+		} else {
+			List<Object> newBeansList = new ArrayList<>();
+			annotatedTypes.put(securityStrategyAnnotation.type(), newBeansList);
+			return newBeansList;
+		}
+	}
 
 
-    public <T> T getStrategy(Class<T> strategyType, SecurityProtocol securityProtocol) {
-        List<Object> strategyBeans = annotatedTypes.get(strategyType);
-        Assert.notEmpty(strategyBeans, "No strategies found of type '" + strategyType.getName() + "', are the strategies marked with @SecurityStrategy?");
+	public <T> T getStrategy(Class<T> strategyType, SecurityProtocol securityProtocol) {
+		List<Object> strategyBeans = annotatedTypes.get(strategyType);
+		Assert.notEmpty(strategyBeans, "No strategies found of type '" + strategyType.getName() + "', are the strategies marked with @SecurityStrategy?");
 
-        Object profileStrategy = findStrategyMatchingProfile(strategyBeans, securityProtocol);
-        if (profileStrategy == null) {
-            throw new IllegalArgumentException("No strategy found for type '" + strategyType + "'");
-        }
-        //noinspection unchecked
-        return (T) profileStrategy;
-    }
+		Object profileStrategy = findStrategyMatchingProfile(strategyBeans, securityProtocol);
+		if (profileStrategy == null) {
+			throw new IllegalArgumentException("No strategy found for type '" + strategyType + "'");
+		}
+		//noinspection unchecked
+		return (T) profileStrategy;
+	}
 
-    private Object findStrategyMatchingProfile(List<Object> strategyBeans, SecurityProtocol securityProtocol) {
-        Object defaultStrategy = null;
-        for (Object bean : strategyBeans) {
-            SecurityStrategy securityStrategyAnnotation = strategyCache.get(bean.getClass());
-            if (Objects.equals(securityStrategyAnnotation.protocol(),securityProtocol)) {
-                return bean;
-            }
-        }
-        return defaultStrategy;
-    }
+	private Object findStrategyMatchingProfile(List<Object> strategyBeans, SecurityProtocol securityProtocol) {
+		Object defaultStrategy = null;
+		for (Object bean : strategyBeans) {
+			SecurityStrategy securityStrategyAnnotation = strategyCache.get(bean.getClass());
+			if (Objects.equals(securityStrategyAnnotation.protocol(), securityProtocol)) {
+				return bean;
+			}
+		}
+		return defaultStrategy;
+	}
 }

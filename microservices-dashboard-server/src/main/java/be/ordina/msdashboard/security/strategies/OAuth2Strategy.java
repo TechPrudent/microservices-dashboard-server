@@ -30,20 +30,20 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
  *
  * @author Kevin van Houtte
  */
-@SecurityStrategy(type = SecurityProtocolApplier.class, protocol = SecurityProtocol.OAUTH2)
-public class OAuth2Applier implements SecurityProtocolApplier {
+@SecurityStrategy(type = SecurityProtocolStrategy.class, protocol = SecurityProtocol.OAUTH2)
+public class OAuth2Strategy implements SecurityProtocolStrategy {
 
-    @Override
-    public void apply(HttpClientRequest<ByteBuf> request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof OAuth2Authentication) {
-            Object details = authentication.getDetails();
-            if (details instanceof OAuth2AuthenticationDetails) {
-                OAuth2AuthenticationDetails oauth = (OAuth2AuthenticationDetails) details;
-                String accessToken = oauth.getTokenValue();
-                String tokenType = oauth.getTokenType() == null ? "Bearer" : oauth.getTokenType();
-                request.withHeader("Authorization", tokenType + " " + accessToken);
-            }
-        }
-    }
+	@Override
+	public void apply(HttpClientRequest<ByteBuf> request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication instanceof OAuth2Authentication) {
+			Object details = authentication.getDetails();
+			if (details instanceof OAuth2AuthenticationDetails) {
+				OAuth2AuthenticationDetails oauth = (OAuth2AuthenticationDetails) details;
+				String accessToken = oauth.getTokenValue();
+				String tokenType = oauth.getTokenType() == null ? "Bearer" : oauth.getTokenType();
+				request.withHeader("Authorization", tokenType + " " + accessToken);
+			}
+		}
+	}
 }

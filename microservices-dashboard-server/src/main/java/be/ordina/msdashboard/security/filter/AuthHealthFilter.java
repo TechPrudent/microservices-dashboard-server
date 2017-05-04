@@ -16,22 +16,21 @@
 
 package be.ordina.msdashboard.security.filter;
 
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Kevin van Houtte
  */
+
 @Component
 public class AuthHealthFilter extends AuthFilter {
 
-    @Value("${msdashboard.health.security}")
-    private String securityProtocol = SecurityProtocol.NONE.name();
-
-    public AuthHealthFilter(String securityProtocol) {
-        super(securityProtocol);
-    }
+	@Override
+	@Value("${msdashboard.health.security}")
+	protected void setSecurityProtocol(String protocol) {
+		super.setSecurityProtocol(protocol);
+	}
 }
 
 

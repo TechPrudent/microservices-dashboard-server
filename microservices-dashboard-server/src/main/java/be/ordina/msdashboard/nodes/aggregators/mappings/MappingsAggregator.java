@@ -20,7 +20,7 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import io.netty.buffer.ByteBuf;
@@ -69,77 +69,77 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
  */
 public class MappingsAggregator implements NodeAggregator {
 
-    private static final Logger logger = LoggerFactory.getLogger(MappingsAggregator.class);
+	private static final Logger logger = LoggerFactory.getLogger(MappingsAggregator.class);
 
-    private DiscoveryClient discoveryClient;
-    private UriResolver uriResolver;
-    private MappingsProperties properties;
-    private NettyServiceCaller caller;
-    private ErrorHandler errorHandler;
-    private StrategyFactory strategyFactory;
+	private DiscoveryClient discoveryClient;
+	private UriResolver uriResolver;
+	private MappingsProperties properties;
+	private NettyServiceCaller caller;
+	private ErrorHandler errorHandler;
+	private StrategyFactory strategyFactory;
 
-    public MappingsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
-                              final MappingsProperties properties, final NettyServiceCaller caller,
-                              final ErrorHandler errorHandler, final StrategyFactory strategyFactory) {
-        this.discoveryClient = discoveryClient;
-        this.uriResolver = uriResolver;
-        this.properties = properties;
-        this.caller = caller;
-        this.errorHandler = errorHandler;
-        this.strategyFactory = strategyFactory;
-    }
+	public MappingsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
+							  final MappingsProperties properties, final NettyServiceCaller caller,
+							  final ErrorHandler errorHandler, final StrategyFactory strategyFactory) {
+		this.discoveryClient = discoveryClient;
+		this.uriResolver = uriResolver;
+		this.properties = properties;
+		this.caller = caller;
+		this.errorHandler = errorHandler;
+		this.strategyFactory = strategyFactory;
+	}
 
-    @Override
-    public Observable<Node> aggregateNodes() {
-        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
-                .map(id -> new ImmutablePair<>(id, resolveMappingsUrl(id)))
-                .doOnNext(pair -> logger.info("Creating mappings observable: " + pair))
-                .map(pair -> getMappingNodesFromService(pair.getLeft(), pair.getRight(), auth))
-                .doOnNext(el -> logger.debug("Unmerged mappings observable: " + el))
-                .doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
-                .doOnCompleted(() -> logger.info("Completed getting all mappings observables"))
-                .retry();
-        return Observable.merge(observableObservable)
-                .doOnNext(el -> logger.debug("Merged health node: " + el.getId()))
-                .doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
-                .doOnCompleted(() -> logger.info("Completed merging all mappings observables"));
-    }
+	@Override
+	public Observable<Node> aggregateNodes() {
+		final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
+				.map(id -> new ImmutablePair<>(id, resolveMappingsUrl(id)))
+				.doOnNext(pair -> logger.info("Creating mappings observable: " + pair))
+				.map(pair -> getMappingNodesFromService(pair.getLeft(), pair.getRight(), auth))
+				.doOnNext(el -> logger.debug("Unmerged mappings observable: " + el))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+				.doOnCompleted(() -> logger.info("Completed getting all mappings observables"))
+				.retry();
+		return Observable.merge(observableObservable)
+				.doOnNext(el -> logger.debug("Merged health node: " + el.getId()))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+				.doOnCompleted(() -> logger.info("Completed merging all mappings observables"));
+	}
 
-    private String resolveMappingsUrl(String id) {
-        List<ServiceInstance> instances = discoveryClient.getInstances(id);
-        if (instances.isEmpty()) {
-            throw new IllegalStateException("No instances found for service " + id);
-        } else {
-            return uriResolver.resolveMappingsUrl(instances.get(0));
-        }
-    }
+	private String resolveMappingsUrl(String id) {
+		List<ServiceInstance> instances = discoveryClient.getInstances(id);
+		if (instances.isEmpty()) {
+			throw new IllegalStateException("No instances found for service " + id);
+		} else {
+			return uriResolver.resolveMappingsUrl(instances.get(0));
+		}
+	}
 
-    protected Observable<String> getServiceIdsFromDiscoveryClient() {
-        logger.info("Discovering services for mappings");
-        return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
-                .map(id -> id.toLowerCase())
-                .filter(id -> !id.equals(ZUUL))
-                .doOnNext(s -> logger.debug("Service discovered: " + s))
-                .doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
-                .retry();
-    }
+	protected Observable<String> getServiceIdsFromDiscoveryClient() {
+		logger.info("Discovering services for mappings");
+		return Observable.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
+				.map(id -> id.toLowerCase())
+				.filter(id -> !id.equals(ZUUL))
+				.doOnNext(s -> logger.debug("Service discovered: " + s))
+				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+				.retry();
+	}
 
-    protected Observable<Node> getMappingNodesFromService(String serviceId, String url, Authentication authentication) {
-        HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
-        strategyFactory.getStrategy(SecurityProtocolApplier.class, securityProtocol).apply(request);
-        for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
-            request.withHeader(header.getKey(), header.getValue());
-        }
-        return caller.retrieveJsonFromRequest(serviceId, request)
-                .map(source -> MappingsToNodeConverter.convertToNodes(serviceId, source))
-                .flatMap(el -> el)
-                .filter(node -> !properties.getFilteredServices().contains(node.getId()))
-                .doOnNext(el -> logger.info("Mapping node {} discovered in url: {}", el.getId(), url))
-                .doOnError(e -> logger.error("Error during mapping node fetching: ", e))
-                .doOnCompleted(() -> logger.info("Completed emission of a mapping node observable from url: " + url))
-                .onErrorResumeNext(Observable.empty());
-    }
+	protected Observable<Node> getMappingNodesFromService(String serviceId, String url, final Authentication authentication) {
+		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
+		strategyFactory.getStrategy(SecurityProtocolStrategy.class, securityProtocol).apply(request);
+		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
+			request.withHeader(header.getKey(), header.getValue());
+		}
+		return caller.retrieveJsonFromRequest(serviceId, request)
+				.map(source -> MappingsToNodeConverter.convertToNodes(serviceId, source))
+				.flatMap(el -> el)
+				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
+				.doOnNext(el -> logger.info("Mapping node {} discovered in url: {}", el.getId(), url))
+				.doOnError(e -> logger.error("Error during mapping node fetching: ", e))
+				.doOnCompleted(() -> logger.info("Completed emission of a mapping node observable from url: " + url))
+				.onErrorResumeNext(Observable.empty());
+	}
 }

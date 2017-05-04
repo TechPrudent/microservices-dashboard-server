@@ -1,5 +1,7 @@
 package be.ordina.msdashboard.nodes.aggregators.health;
 
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,28 +17,28 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
  */
 public class HealthProperties {
 
-    public static final String DISK_SPACE = "diskSpace";
+	public static final String DISK_SPACE = "diskSpace";
 
-    private Map<String, String> requestHeaders = new HashMap<>();
+	private Map<String, String> requestHeaders = new HashMap<>();
 
-    private List<String> filteredServices = Arrays.asList(HYSTRIX, TURBINE,
-            DISK_SPACE, CONFIG_SERVER, DISCOVERY, ZUUL);
+	private List<String> filteredServices = Arrays.asList(HYSTRIX, TURBINE,
+			DISK_SPACE, CONFIG_SERVER, DISCOVERY, ZUUL);
 
-    private String security = "none";
+	private String security = SecurityProtocol.NONE.name();
 
-    public void setSecurity(String security) {
-        this.security = security;
-    }
+	public void setSecurity(String security) {
+		this.security = security;
+	}
 
-    public String getSecurity() {
-        return security;
-    }
+	public String getSecurity() {
+		return security;
+	}
 
-    public Map<String, String> getRequestHeaders() {
-        return requestHeaders;
-    }
+	public Map<String, String> getRequestHeaders() {
+		return requestHeaders;
+	}
 
-    public List<String> getFilteredServices() {
-        return filteredServices;
-    }
+	public List<String> getFilteredServices() {
+		return filteredServices;
+	}
 }

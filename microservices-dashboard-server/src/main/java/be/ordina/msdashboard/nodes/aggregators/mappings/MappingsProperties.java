@@ -1,5 +1,7 @@
 package be.ordina.msdashboard.nodes.aggregators.mappings;
 
+import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,25 +15,25 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
  */
 public class MappingsProperties {
 
-    private Map<String, String> requestHeaders = new HashMap<>();
-    private List<String> filteredServices =
-            Arrays.asList(HYSTRIX, TURBINE, CONFIG_SERVER, DISCOVERY, ZUUL);
+	private Map<String, String> requestHeaders = new HashMap<>();
+	private List<String> filteredServices =
+			Arrays.asList(HYSTRIX, TURBINE, CONFIG_SERVER, DISCOVERY, ZUUL);
 
-    private String security = "none";
+	private String security = SecurityProtocol.NONE.name();
 
-    public void setSecurity(String security) {
-        this.security = security;
-    }
+	public void setSecurity(String security) {
+		this.security = security;
+	}
 
-    public String getSecurity() {
-        return security;
-    }
+	public String getSecurity() {
+		return security;
+	}
 
-    public Map<String, String> getRequestHeaders() {
-        return requestHeaders;
-    }
+	public Map<String, String> getRequestHeaders() {
+		return requestHeaders;
+	}
 
-    public List<String> getFilteredServices() {
-        return filteredServices;
-    }
+	public List<String> getFilteredServices() {
+		return filteredServices;
+	}
 }

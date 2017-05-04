@@ -6,9 +6,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @Configuration
 public class OAuth2SecurityTestConfig extends WebMvcConfigurerAdapter {
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new OAuth2AuthenticationInitializerInterceptor());
-    }
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new OAuth2AuthenticationInitializerInterceptor());
+	}
 
 }

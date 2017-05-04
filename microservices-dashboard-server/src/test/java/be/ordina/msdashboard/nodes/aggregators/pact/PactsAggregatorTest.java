@@ -18,8 +18,8 @@ package be.ordina.msdashboard.nodes.aggregators.pact;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeTypes;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
-import be.ordina.msdashboard.security.strategies.DefaultApplier;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolApplier;
+import be.ordina.msdashboard.security.strategies.DefaultStrategy;
+import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
 import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.security.strategy.SecurityProtocol;
 import io.netty.buffer.ByteBuf;
@@ -70,7 +70,7 @@ public class PactsAggregatorTest {
     @Mock
     private StrategyFactory strategyFactory;
     @Mock
-    private DefaultApplier defaultApplier;
+    private DefaultStrategy defaultApplier;
 
     private PactsAggregator pactsAggregator;
 
@@ -115,7 +115,7 @@ public class PactsAggregatorTest {
         ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
         when(pactProperties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
         doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolApplier.class, SecurityProtocol.NONE);
+        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
     }
 
     private Map<String, String> requestHeaders() {
