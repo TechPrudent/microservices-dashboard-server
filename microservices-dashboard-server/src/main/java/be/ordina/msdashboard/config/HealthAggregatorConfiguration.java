@@ -22,9 +22,7 @@ import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
 import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.health.MicroserviceGrouper;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
-import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,7 +30,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the health aggregator.
@@ -41,7 +38,6 @@ import org.springframework.context.annotation.Import;
  * @author Kevin van Houtte
  */
 @Configuration
-@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
 public class HealthAggregatorConfiguration {
 
@@ -53,13 +49,14 @@ public class HealthAggregatorConfiguration {
 	private ErrorHandler errorHandler;
 	@Autowired
 	private UriResolver uriResolver;
-	@Autowired
-	private StrategyFactory strategyFactory;
+	@Autowired(required = false)
+	private SecurityStrategyFactory securityStrategyFactory;
 
 	@Bean
 	@ConditionalOnMissingBean
 	public HealthIndicatorsAggregator healthIndicatorsAggregator(HealthToNodeConverter healthToNodeConverter) {
-		return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(), caller, errorHandler, healthToNodeConverter, strategyFactory);
+		return new HealthIndicatorsAggregator(discoveryClient, uriResolver, healthProperties(),
+				caller, errorHandler, healthToNodeConverter, securityStrategyFactory);
 	}
 
 	@Bean

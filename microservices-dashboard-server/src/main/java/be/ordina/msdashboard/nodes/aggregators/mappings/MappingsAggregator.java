@@ -20,9 +20,8 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.outbound.OutboundSecurityObjectProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -30,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -70,32 +67,43 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
 public class MappingsAggregator implements NodeAggregator {
 
 	private static final Logger logger = LoggerFactory.getLogger(MappingsAggregator.class);
+	private static final String AGGREGATOR_KEY = "mappings";
+	private final DiscoveryClient discoveryClient;
 
-	private DiscoveryClient discoveryClient;
-	private UriResolver uriResolver;
-	private MappingsProperties properties;
-	private NettyServiceCaller caller;
-	private ErrorHandler errorHandler;
-	private StrategyFactory strategyFactory;
+	private final UriResolver uriResolver;
+	private final MappingsProperties properties;
+	private final NettyServiceCaller caller;
+	private final ErrorHandler errorHandler;
+	private SecurityStrategyFactory securityStrategyFactory;
 
+	@Deprecated
 	public MappingsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
 							  final MappingsProperties properties, final NettyServiceCaller caller,
-							  final ErrorHandler errorHandler, final StrategyFactory strategyFactory) {
+							  final ErrorHandler errorHandler) {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
 		this.caller = caller;
 		this.errorHandler = errorHandler;
-		this.strategyFactory = strategyFactory;
+	}
+
+	public MappingsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
+							  final MappingsProperties properties, final NettyServiceCaller caller,
+							  final ErrorHandler errorHandler, final SecurityStrategyFactory securityStrategyFactory) {
+		this(discoveryClient, uriResolver, properties, caller, errorHandler);
+		this.securityStrategyFactory = securityStrategyFactory;
 	}
 
 	@Override
 	public Observable<Node> aggregateNodes() {
-		final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		final Object outboundSecurityObject = getOutboundSecurityObject();
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
 				.map(id -> new ImmutablePair<>(id, resolveMappingsUrl(id)))
 				.doOnNext(pair -> logger.info("Creating mappings observable: " + pair))
-				.map(pair -> getMappingNodesFromService(pair.getLeft(), pair.getRight(), auth))
+				.map(pair -> outboundSecurityObject != null ?
+						getMappingNodesFromService(pair.getLeft(), pair.getRight(), outboundSecurityObject) :
+						getMappingNodesFromService(pair.getLeft(), pair.getRight())
+				)
 				.doOnNext(el -> logger.debug("Unmerged mappings observable: " + el))
 				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.doOnCompleted(() -> logger.info("Completed getting all mappings observables"))
@@ -125,11 +133,14 @@ public class MappingsAggregator implements NodeAggregator {
 				.retry();
 	}
 
-	protected Observable<Node> getMappingNodesFromService(String serviceId, String url, final Authentication authentication) {
+	@Deprecated
+	protected Observable<Node> getMappingNodesFromService(String serviceId, String url) {
+		return getMappingNodesFromService(serviceId, url, null);
+	}
+
+	protected Observable<Node> getMappingNodesFromService(String serviceId, String url, final Object outboundSecurityObject) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
-		strategyFactory.getStrategy(SecurityProtocolStrategy.class, securityProtocol).apply(request);
+		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
@@ -141,5 +152,19 @@ public class MappingsAggregator implements NodeAggregator {
 				.doOnError(e -> logger.error("Error during mapping node fetching: ", e))
 				.doOnCompleted(() -> logger.info("Completed emission of a mapping node observable from url: " + url))
 				.onErrorResumeNext(Observable.empty());
+	}
+
+	private Object getOutboundSecurityObject() {
+		if (securityStrategyFactory != null) {
+			return securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityObjectProvider().getOutboundSecurityObject();
+		} else {
+			return null;
+		}
+	}
+
+	private void applyOutboundSecurityStrategyOnRequest(HttpClientRequest<ByteBuf> request, Object outboundSecurityObject) {
+		if (outboundSecurityObject != null) {
+			securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityStrategy().apply(request, outboundSecurityObject);
+		}
 	}
 }

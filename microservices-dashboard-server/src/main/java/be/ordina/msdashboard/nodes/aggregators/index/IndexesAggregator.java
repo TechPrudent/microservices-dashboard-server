@@ -15,15 +15,17 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.index;
 
+import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
+import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeEvent;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.outbound.OutboundSecurityObjectProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.json.JSONObject;
@@ -32,8 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -48,6 +48,7 @@ import java.util.Map;
 public class IndexesAggregator implements NodeAggregator {
 
 	private static final Logger logger = LoggerFactory.getLogger(IndexesAggregator.class);
+	private static final String AGGREGATOR_KEY = "index";
 
 	private final DiscoveryClient discoveryClient;
 	private final IndexToNodeConverter indexToNodeConverter;
@@ -55,26 +56,37 @@ public class IndexesAggregator implements NodeAggregator {
 	private final IndexProperties properties;
 	private final UriResolver uriResolver;
 	private final NettyServiceCaller caller;
-	private final StrategyFactory strategyFactory;
+	private SecurityStrategyFactory securityStrategyFactory;
 
-	public IndexesAggregator(IndexToNodeConverter indexToNodeConverter, DiscoveryClient discoveryClient,
-							 UriResolver uriResolver, IndexProperties properties,
-							 ApplicationEventPublisher publisher, NettyServiceCaller caller, StrategyFactory strategyFactory) {
+	@Deprecated
+	public IndexesAggregator(final IndexToNodeConverter indexToNodeConverter, final DiscoveryClient discoveryClient,
+							 final UriResolver uriResolver, final IndexProperties properties,
+							 final ApplicationEventPublisher publisher, final NettyServiceCaller caller) {
 		this.indexToNodeConverter = indexToNodeConverter;
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
 		this.publisher = publisher;
 		this.caller = caller;
-		this.strategyFactory = strategyFactory;
+	}
+
+	public IndexesAggregator(final IndexToNodeConverter indexToNodeConverter, final DiscoveryClient discoveryClient,
+							 final UriResolver uriResolver, final IndexProperties properties,
+							 final ApplicationEventPublisher publisher, final NettyServiceCaller caller,
+									  final SecurityStrategyFactory securityStrategyFactory) {
+		this(indexToNodeConverter, discoveryClient, uriResolver, properties, publisher, caller);
+		this.securityStrategyFactory = securityStrategyFactory;
 	}
 
 	@Override
 	public Observable<Node> aggregateNodes() {
-		final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		final Object outboundSecurityObject = getOutboundSecurityObject();
 		return getServicesFromDiscoveryClient()
 				.flatMap(this::getFirstInstanceForService)
-				.flatMap((ServiceInstance serviceInstance) -> getIndexFromServiceInstance(serviceInstance, auth))
+				.flatMap((ServiceInstance serviceInstance) -> outboundSecurityObject != null ?
+						getIndexFromServiceInstance(serviceInstance, outboundSecurityObject) :
+						getIndexFromServiceInstance(serviceInstance)
+				)
 				.doOnNext(el -> logger.debug("Emitting node with id '{}'", el.getId()))
 				.doOnError(e -> {
 					String error = "Error while emitting a node: " + e.getMessage();
@@ -116,13 +128,16 @@ public class IndexesAggregator implements NodeAggregator {
 		return observableServiceInstance;
 	}
 
-	private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance, final Authentication authentication) {
+	@Deprecated
+	private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance) {
+		return getIndexFromServiceInstance(serviceInstance, null);
+	}
+
+	private Observable<Node> getIndexFromServiceInstance(ServiceInstance serviceInstance, final Object outboundSecurityObject) {
 		final String url = uriResolver.resolveHomePageUrl(serviceInstance);
 		final String serviceId = serviceInstance.getServiceId().toLowerCase();
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
-		strategyFactory.getStrategy(SecurityProtocolStrategy.class, securityProtocol).apply(request);
+		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
@@ -135,5 +150,19 @@ public class IndexesAggregator implements NodeAggregator {
 				.doOnError(e -> logger.error("Error while fetching node: ", e))
 				.doOnCompleted(() -> logger.info("Completed emissions of an index node observable for url: " + url))
 				.onErrorResumeNext(Observable.empty());
+	}
+
+	private Object getOutboundSecurityObject() {
+		if (securityStrategyFactory != null) {
+			return securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityObjectProvider().getOutboundSecurityObject();
+		} else {
+			return null;
+		}
+	}
+
+	private void applyOutboundSecurityStrategyOnRequest(HttpClientRequest<ByteBuf> request, Object outboundSecurityObject) {
+		if (outboundSecurityObject != null) {
+			securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityStrategy().apply(request, outboundSecurityObject);
+		}
 	}
 }

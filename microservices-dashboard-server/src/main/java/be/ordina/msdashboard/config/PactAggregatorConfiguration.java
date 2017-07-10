@@ -18,9 +18,7 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
-import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
-import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +28,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the pact aggregator.
@@ -39,17 +36,17 @@ import org.springframework.context.annotation.Import;
  * @author Kevin van Houtte
  */
 @Configuration
-@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 public class PactAggregatorConfiguration {
 
-	@Autowired
-	private StrategyFactory strategyFactory;
+	@Autowired(required = false)
+	private SecurityStrategyFactory securityStrategyFactory;
 
 	@Bean
 	@ConditionalOnProperty("pact-broker.url")
 	@ConditionalOnMissingBean
 	public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-		return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient, strategyFactory);
+		return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher,
+				rxClient, securityStrategyFactory);
 	}
 
 	@Bean

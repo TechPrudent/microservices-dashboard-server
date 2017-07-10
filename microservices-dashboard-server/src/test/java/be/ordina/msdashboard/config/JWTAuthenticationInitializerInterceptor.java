@@ -9,7 +9,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import java.io.IOException;
 
 /**
- * Request interceptor for initialising an JWT context for testing
+ * Request interceptor for initialising a JWT context for testing
  *
  * @author Kevin Van Houtte
  */

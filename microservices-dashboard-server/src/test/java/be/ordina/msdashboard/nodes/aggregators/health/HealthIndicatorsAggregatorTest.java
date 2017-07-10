@@ -20,10 +20,8 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultStrategy;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +36,9 @@ import rx.schedulers.Schedulers;
 
 import java.util.*;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
 import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Arrays.asList;
@@ -74,9 +74,7 @@ public class HealthIndicatorsAggregatorTest {
     @Mock
     private HealthToNodeConverter converter;
     @Mock
-    private StrategyFactory strategyFactory;
-    @Mock
-    private DefaultStrategy defaultApplier;
+    private SecurityStrategyFactory securityStrategyFactory;
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
 
@@ -86,8 +84,7 @@ public class HealthIndicatorsAggregatorTest {
         when(properties.getFilteredServices()).thenReturn(
                 newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
         when(properties.getSecurity()).thenReturn("none");
-        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
     }
 
     @Test
@@ -251,7 +248,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateNodes() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, strategyFactory));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
@@ -271,7 +268,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldEmitErrorOnClassCastException() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, strategyFactory));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
@@ -292,7 +289,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, strategyFactory));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", "error", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
@@ -318,7 +315,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateAllValidNodesOnNullInput() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, strategyFactory));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();

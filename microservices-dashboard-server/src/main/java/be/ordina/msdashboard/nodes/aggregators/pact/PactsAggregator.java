@@ -19,9 +19,7 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import com.jayway.jsonpath.JsonPath;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.client.RxClient;
@@ -32,8 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import rx.Observable;
 
 import java.nio.charset.Charset;
@@ -50,6 +46,7 @@ import static io.reactivex.netty.client.MaxConnectionsBasedStrategy.DEFAULT_MAX_
 public class PactsAggregator implements NodeAggregator {
 
 	private static final Logger logger = LoggerFactory.getLogger(PactsAggregator.class);
+	private static final String AGGREGATOR_KEY = "pacts";
 
 	private final PactProperties properties;
 	private final ApplicationEventPublisher publisher;
@@ -64,7 +61,7 @@ public class PactsAggregator implements NodeAggregator {
 	@Value("${pact-broker.self-href-jsonPath:'$.pacts[*]._links.self[0].href'}")
 	protected String selfHrefJsonPath;
 
-	private StrategyFactory strategyFactory;
+	private SecurityStrategyFactory securityStrategyFactory;
 
 	@Deprecated
 	public PactsAggregator(final PactToNodeConverter pactToNodeConverter,
@@ -76,29 +73,44 @@ public class PactsAggregator implements NodeAggregator {
 				.withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
 	}
 
+	@Deprecated
 	public PactsAggregator(final PactToNodeConverter pactToNodeConverter,
 						   final PactProperties properties, final ApplicationEventPublisher publisher,
-						   final CompositeHttpClient<ByteBuf, ByteBuf> rxClient, final StrategyFactory strategyFactory) {
+						   final CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
 		this.properties = properties;
 		this.publisher = publisher;
 		this.pactToNodeConverter = pactToNodeConverter;
 		this.rxClient = rxClient;
-		this.strategyFactory = strategyFactory;
+	}
+
+	public PactsAggregator(final PactToNodeConverter pactToNodeConverter,
+						   final PactProperties properties, final ApplicationEventPublisher publisher,
+						   final CompositeHttpClient<ByteBuf, ByteBuf> rxClient, final SecurityStrategyFactory securityStrategyFactory) {
+		this(pactToNodeConverter, properties, publisher, rxClient);
+		this.securityStrategyFactory = securityStrategyFactory;
 	}
 
 	@Override
 	public Observable<Node> aggregateNodes() {
-		final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		Observable<String> urls = getPactUrlsFromBroker();
-		return urls.map(url -> getNodesFromPacts(url, auth))
+		final Object outboundSecurityObject = getOutboundSecurityObject();
+		Observable<String> urls = outboundSecurityObject != null ?
+				getPactUrlsFromBroker(outboundSecurityObject) : getPactUrlsFromBroker();
+		return urls.map(url -> outboundSecurityObject != null ?
+				getNodesFromPacts(url, outboundSecurityObject) : getNodesFromPacts(url))
 				.flatMap(el -> el)
 				.doOnNext(el -> logger.info("Merged pact node! " + el.getId()));
 	}
 
+	@Deprecated
 	private Observable<String> getPactUrlsFromBroker() {
+		return getPactUrlsFromBroker(null);
+	}
+
+	private Observable<String> getPactUrlsFromBroker(Object outboundSecurityObject) {
 		logger.info("Discovering pact urls");
 		final String url = pactBrokerUrl + latestPactsUrl;
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
@@ -125,18 +137,26 @@ public class PactsAggregator implements NodeAggregator {
 					publisher.publishEvent(new SystemEvent(error, el));
 				})
 				.onErrorReturn(Throwable::toString)
+				.map(response -> {
+					logger.info("logging response: " + response);
+					return response;
+				})
 				.map(response -> JsonPath.<List<String>>read(response, selfHrefJsonPath))
 				.map(jsonList -> Observable.from(jsonList))
 				.flatMap(el -> (Observable<String>) el.map(obj -> (String) obj))
 				.doOnNext(pactUrl -> logger.info("Pact url discovered: " + pactUrl));
 	}
 
-	private Observable<Node> getNodesFromPacts(final String url, final Authentication authentication) {
+	@Deprecated
+	private Observable<Node> getNodesFromPacts(final String url) {
+		return getNodesFromPacts(url, null);
+	}
+
+	private Observable<Node> getNodesFromPacts(final String url, final Object outboundSecurityObject) {
 		logger.info("Discovering pact urls");
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		SecurityProtocol securityProtocol = SecurityProtocol.valueOf(properties.getSecurity().toUpperCase());
-		strategyFactory.getStrategy(SecurityProtocolStrategy.class, securityProtocol).apply(request);
+
+		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
@@ -166,5 +186,19 @@ public class PactsAggregator implements NodeAggregator {
 				.map(response -> pactToNodeConverter.convert(response, url))
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
 				.doOnNext(node -> logger.info("Pact node discovered in url: " + url));
+	}
+
+	private Object getOutboundSecurityObject() {
+		if (securityStrategyFactory != null) {
+			return securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityObjectProvider().getOutboundSecurityObject();
+		} else {
+			return null;
+		}
+	}
+
+	private void applyOutboundSecurityStrategyOnRequest(HttpClientRequest<ByteBuf> request, Object outboundSecurityObject) {
+		if (outboundSecurityObject != null) {
+			securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityStrategy().apply(request, outboundSecurityObject);
+		}
 	}
 }

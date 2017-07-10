@@ -11,4 +11,6 @@ be.ordina.msdashboard.cache.CacheProperties,\
   be.ordina.msdashboard.config.RedisConfiguration,\
   be.ordina.msdashboard.config.MappingsAggregatorConfiguration,\
   be.ordina.msdashboard.config.PactAggregatorConfiguration,\
-  be.ordina.msdashboard.config.DiscoveryClientConfiguration
+  be.ordina.msdashboard.config.DiscoveryClientConfiguration,\
+  be.ordina.msdashboard.security.config.strategies.ForwardInboundAuthorizationHeaderStrategyConfiguration,\
+  be.ordina.msdashboard.security.config.strategies.ForwardOAuth2TokenStrategyConfiguration

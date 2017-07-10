@@ -15,6 +15,8 @@
  */
 package be.ordina.msdashboard.config;
 
+import be.ordina.msdashboard.security.config.strategies.ForwardInboundAuthorizationHeaderStrategyConfiguration;
+import be.ordina.msdashboard.security.config.strategies.ForwardOAuth2TokenStrategyConfiguration;
 import org.springframework.context.annotation.DeferredImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -33,7 +35,9 @@ public class MicroservicesDashboardServerImportSelector implements DeferredImpor
                 HealthAggregatorConfiguration.class.getCanonicalName(),
                 IndexAggregatorConfiguration.class.getCanonicalName(),
                 MappingsAggregatorConfiguration.class.getCanonicalName(),
-                PactAggregatorConfiguration.class.getCanonicalName()
+                PactAggregatorConfiguration.class.getCanonicalName(),
+                ForwardInboundAuthorizationHeaderStrategyConfiguration.class.getCanonicalName(),
+                ForwardOAuth2TokenStrategyConfiguration.class.getCanonicalName()
         };
     }
 

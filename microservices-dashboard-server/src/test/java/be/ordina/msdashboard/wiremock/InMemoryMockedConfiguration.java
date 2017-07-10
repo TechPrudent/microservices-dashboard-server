@@ -15,36 +15,35 @@
  */
 package be.ordina.msdashboard.wiremock;
 
+import be.ordina.msdashboard.security.config.strategies.ForwardInboundAuthorizationHeaderStrategyConfiguration;
+import be.ordina.msdashboard.security.config.strategies.ForwardOAuth2TokenStrategyConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Separate wiremocks with separate ports are required to keep parallel integration tests from conflicting
+ */
 @Configuration
 public class InMemoryMockedConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(value = "pact-broker.url", havingValue = "https://localhost:8089")
-	protected InMemoryWireMock inMemoryWireMock() {
-		return new InMemoryWireMock();
+	protected InMemoryDefaultWireMock inMemoryWireMock() {
+		return new InMemoryDefaultWireMock();
 	}
 
 	@Bean
-	@ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "basic")
-	protected InMemoryBasicWireMock inMemoryBasicWireMock() {
-		return new InMemoryBasicWireMock();
+	@Conditional(ForwardInboundAuthorizationHeaderStrategyConfiguration.Condition.class)
+	protected InMemoryForwardInboundAuthHeaderWireMock inMemoryForwardInboundAuthHeaderWireMock() {
+		return new InMemoryForwardInboundAuthHeaderWireMock();
 	}
 
 	@Bean
-	@ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "jwt")
-	protected InMemoryJWTWireMock inMemoryJWTWireMock() {
-		return new InMemoryJWTWireMock();
+	@Conditional(ForwardOAuth2TokenStrategyConfiguration.Condition.class)
+	protected InMemoryForwardOAuth2TokenWireMock inMemoryForwardOAuth2TokenWireMock() {
+		return new InMemoryForwardOAuth2TokenWireMock();
 	}
-
-	@Bean
-	@ConditionalOnProperty(value = "msdashboard.health.security", havingValue = "oauth2")
-	protected InMemoryOAuth2WireMock inMemoryOAuth2WireMock() {
-		return new InMemoryOAuth2WireMock();
-	}
-
 
 }

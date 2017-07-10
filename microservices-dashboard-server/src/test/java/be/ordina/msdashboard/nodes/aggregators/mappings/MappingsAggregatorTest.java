@@ -19,10 +19,8 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultStrategy;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import com.google.common.collect.Lists;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.junit.Before;
@@ -43,7 +41,9 @@ import rx.schedulers.Schedulers;
 
 import java.util.*;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
 import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,9 +78,7 @@ public class MappingsAggregatorTest {
     @Mock
     private ErrorHandler errorHandler;
     @Mock
-    private StrategyFactory strategyFactory;
-    @Mock
-    private DefaultStrategy defaultApplier;
+    private SecurityStrategyFactory securityStrategyFactory;
     @SuppressWarnings("rawtypes")
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
@@ -89,9 +87,8 @@ public class MappingsAggregatorTest {
     public void before() {
         when(properties.getFilteredServices()).thenReturn(
                 Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
-        when(properties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
-        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
+        when(properties.getSecurity()).thenReturn(SecurityStrategyFactory.NONE);
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -204,7 +201,7 @@ public class MappingsAggregatorTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void shouldAggregateNodes() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
@@ -225,7 +222,7 @@ public class MappingsAggregatorTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void shouldEmitErrorOnClassCastException() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
@@ -247,7 +244,7 @@ public class MappingsAggregatorTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", "error", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
@@ -274,7 +271,7 @@ public class MappingsAggregatorTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void shouldAggregateAllValidNodesOnNullInput() {
-        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, strategyFactory));
+        aggregator = spy(new MappingsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, securityStrategyFactory));
 
         Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();

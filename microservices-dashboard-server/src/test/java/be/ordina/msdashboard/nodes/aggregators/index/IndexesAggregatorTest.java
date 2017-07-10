@@ -18,10 +18,8 @@ package be.ordina.msdashboard.nodes.aggregators.index;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
-import be.ordina.msdashboard.security.strategies.DefaultStrategy;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import com.google.common.collect.Lists;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.json.JSONObject;
@@ -41,13 +39,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static be.ordina.msdashboard.nodes.aggregators.Constants.*;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.CONFIG_SERVER;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.DISCOVERY;
+import static be.ordina.msdashboard.nodes.aggregators.Constants.HYSTRIX;
 import static be.ordina.msdashboard.nodes.aggregators.health.HealthProperties.DISK_SPACE;
 import static be.ordina.msdashboard.nodes.model.NodeBuilder.node;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link IndexesAggregator}
@@ -71,15 +74,13 @@ public class IndexesAggregatorTest {
         indexProperties = mock(IndexProperties.class);
         caller = mock(NettyServiceCaller.class);
         publisher = mock(ApplicationEventPublisher.class);
-        StrategyFactory strategyFactory = mock(StrategyFactory.class);
-        DefaultStrategy defaultApplier = mock(DefaultStrategy.class);
-        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller, strategyFactory);
+        SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller, securityStrategyFactory);
 
         when(indexProperties.getFilteredServices()).thenReturn(
                 Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
-        when(indexProperties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
-        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
+        when(indexProperties.getSecurity()).thenReturn(SecurityStrategyFactory.NONE);
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
 
     }
 

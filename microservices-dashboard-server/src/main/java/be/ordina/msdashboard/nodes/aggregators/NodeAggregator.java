@@ -20,7 +20,7 @@ import rx.Observable;
 
 /**
  * Interface for retrieving and aggregating nodes.
- * A NodeAggregator will generally call a set of remote sources to retrieve
+ * A NodeAggregator will generally call a set of remote sources to get
  * information which can be processed and converted into {@link Node}s.
  * <p>
  * Observables should be created and returned. Ideally services such as

@@ -18,10 +18,8 @@ package be.ordina.msdashboard.nodes.aggregators.pact;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeTypes;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
-import be.ordina.msdashboard.security.strategies.DefaultStrategy;
-import be.ordina.msdashboard.security.strategies.SecurityProtocolStrategy;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -68,9 +66,7 @@ public class PactsAggregatorTest {
     @Mock
     private CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
     @Mock
-    private StrategyFactory strategyFactory;
-    @Mock
-    private DefaultStrategy defaultApplier;
+    private SecurityStrategyFactory securityStrategyFactory;
 
     private PactsAggregator pactsAggregator;
 
@@ -109,13 +105,12 @@ public class PactsAggregatorTest {
     @Before
     public void setUp() {
         when(pactProperties.getRequestHeaders()).thenReturn(requestHeaders());
-        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher, rxClient, strategyFactory);
+        pactsAggregator = new PactsAggregator(new PactToNodeConverter(), pactProperties, publisher, rxClient, securityStrategyFactory);
         ReflectionTestUtils.setField(pactsAggregator, "selfHrefJsonPath", "$.pacts[*]._links.self.href");
         ReflectionTestUtils.setField(pactsAggregator, "pactBrokerUrl", "http://localhost:8089");
         ReflectionTestUtils.setField(pactsAggregator, "latestPactsUrl", "/pacts/latest");
-        when(pactProperties.getSecurity()).thenReturn(SecurityProtocol.NONE.name());
-        doNothing().when(defaultApplier).apply(any(HttpClientRequest.class));
-        doReturn(defaultApplier).when(strategyFactory).getStrategy(SecurityProtocolStrategy.class, SecurityProtocol.NONE);
+        when(pactProperties.getSecurity()).thenReturn(SecurityStrategyFactory.NONE);
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
     }
 
     private Map<String, String> requestHeaders() {

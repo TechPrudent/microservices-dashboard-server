@@ -15,7 +15,6 @@
  */
 package be.ordina.msdashboard;
 
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
 import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.buffer.ByteBuf;
@@ -39,6 +38,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import rx.plugins.DebugHook;
 import rx.plugins.DebugNotification;
@@ -71,6 +71,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"pact-broker.url=https://localhost:8089",
 				"spring.redis.port=6379"},
 		classes = {MicroservicesDashboardServerApplicationTest.TestMicroservicesDashboardServerApplication.class, InMemoryMockedConfiguration.class})
+@DirtiesContext
 public class MicroservicesDashboardServerApplicationTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(MicroservicesDashboardServerApplicationTest.class);
@@ -176,11 +177,6 @@ public class MicroservicesDashboardServerApplicationTest {
 
 		@Autowired
 		private ApplicationContext applicationContext;
-
-		@Bean
-		public StrategyFactory strategyFactory() {
-			return new StrategyFactory(applicationContext);
-		}
 
 		@Bean
 		public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {

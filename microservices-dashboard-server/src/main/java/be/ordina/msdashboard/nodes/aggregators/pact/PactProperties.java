@@ -1,6 +1,6 @@
 package be.ordina.msdashboard.nodes.aggregators.pact;
 
-import be.ordina.msdashboard.security.strategy.SecurityProtocol;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class PactProperties {
 	private List<String> filteredServices =
 			Arrays.asList(HYSTRIX, TURBINE, CONFIG_SERVER, DISCOVERY, ZUUL);
 
-	private String security = SecurityProtocol.NONE.name();
+	private String security = SecurityStrategyFactory.NONE;
 
 	public void setSecurity(String security) {
 		this.security = security;

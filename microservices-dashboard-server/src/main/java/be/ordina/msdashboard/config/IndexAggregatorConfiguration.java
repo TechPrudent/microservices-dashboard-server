@@ -20,9 +20,7 @@ import be.ordina.msdashboard.nodes.aggregators.index.IndexProperties;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.config.InboundSecurityConfiguration;
-import be.ordina.msdashboard.security.config.OutboundSecurityConfiguration;
-import be.ordina.msdashboard.security.strategies.StrategyFactory;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,7 +31,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * Autoconfiguration for the index aggregator.
@@ -45,21 +42,22 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnSingleCandidate(DiscoveryClient.class)
 @ConditionalOnProperty(value = "msdashboard.index.enabled", matchIfMissing = false)
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
-@Import({OutboundSecurityConfiguration.class, InboundSecurityConfiguration.class})
 public class IndexAggregatorConfiguration {
+
 	@Autowired
 	private DiscoveryClient discoveryClient;
 	@Autowired
 	private NettyServiceCaller caller;
 	@Autowired
 	private UriResolver uriResolver;
-	@Autowired
-	private StrategyFactory strategyFactory;
+	@Autowired(required = false)
+	private SecurityStrategyFactory securityStrategyFactory;
 
 	@Bean
 	@ConditionalOnMissingBean
 	public IndexesAggregator indexesAggregator(IndexToNodeConverter indexToNodeConverter, ApplicationEventPublisher publisher) {
-		return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(), publisher, caller, strategyFactory);
+		return new IndexesAggregator(indexToNodeConverter, discoveryClient, uriResolver, indexProperties(),
+				publisher, caller, securityStrategyFactory);
 	}
 
 	@Bean
