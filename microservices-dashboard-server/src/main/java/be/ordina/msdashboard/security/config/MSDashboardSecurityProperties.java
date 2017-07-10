@@ -34,7 +34,6 @@ public class MSDashboardSecurityProperties {
         return strategies;
     }
 
-    // TODO: Unit test!
     public Map<String, String> getStrategiesByAggregator() {
         Map<String, String> strategiesByAggregator = new HashMap<>();
         for (Map.Entry entry : strategies.entrySet()) {

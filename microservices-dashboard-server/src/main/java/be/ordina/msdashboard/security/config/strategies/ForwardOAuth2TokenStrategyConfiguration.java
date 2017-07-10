@@ -34,6 +34,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * passed to the outgoing aggregator requests as Authorization header.
  * <br>
  * The Conditional expression is used to support both yaml-style properties and property-style properties.
+ * Cfr. https://github.com/spring-projects/spring-boot/issues/7483 (currently unsolved)
  * @author Andreas Evers
  */
 @Conditional(ForwardOAuth2TokenStrategyConfiguration.Condition.class)
@@ -73,13 +74,13 @@ public class ForwardOAuth2TokenStrategyConfiguration {
 
     public class ForwardOAuth2TokenStrategyBeanProvider implements StrategyBeanProvider {
 
+        private OutboundSecurityObjectProvider outboundSecurityObjectProvider;
+        private OutboundSecurityStrategy oAuth2TokenStrategy;
+
         @Override
         public String getType() {
             return "forward-oauth2-token";
         }
-
-        private OutboundSecurityObjectProvider outboundSecurityObjectProvider;
-        private OutboundSecurityStrategy oAuth2TokenStrategy;
 
         public ForwardOAuth2TokenStrategyBeanProvider(OutboundSecurityObjectProvider outboundSecurityObjectProvider,
                                     OAuth2TokenStrategy oAuth2TokenStrategy) {

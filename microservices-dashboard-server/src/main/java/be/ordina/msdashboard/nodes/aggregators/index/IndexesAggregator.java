@@ -15,16 +15,12 @@
  */
 package be.ordina.msdashboard.nodes.aggregators.index;
 
-import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
-import be.ordina.msdashboard.nodes.aggregators.health.HealthProperties;
-import be.ordina.msdashboard.nodes.aggregators.health.HealthToNodeConverter;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.model.NodeEvent;
 import be.ordina.msdashboard.nodes.model.SystemEvent;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
-import be.ordina.msdashboard.security.outbound.OutboundSecurityObjectProvider;
 import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;

@@ -35,6 +35,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * the api with). The authorization header is copied to the outgoing aggregator requests.
  * <br>
  * The Conditional expression is used to support both yaml-style properties and property-style properties.
+ * Cfr. https://github.com/spring-projects/spring-boot/issues/7483 (currently unsolved)
  * @author Andreas Evers
  */
 @Conditional(ForwardInboundAuthorizationHeaderStrategyConfiguration.Condition.class)
@@ -80,13 +81,13 @@ public class ForwardInboundAuthorizationHeaderStrategyConfiguration {
 
     public class ForwardInboundAuthorizationHeaderStrategyBeanProvider implements StrategyBeanProvider {
 
+        private OutboundSecurityObjectProvider outboundSecurityObjectProvider;
+        private OutboundSecurityStrategy authorizationHeaderStrategy;
+
         @Override
         public String getType() {
             return "forward-inbound-auth-header";
         }
-
-        private OutboundSecurityObjectProvider outboundSecurityObjectProvider;
-        private OutboundSecurityStrategy authorizationHeaderStrategy;
 
         public ForwardInboundAuthorizationHeaderStrategyBeanProvider(OutboundSecurityObjectProvider outboundSecurityObjectProvider,
                                     AuthorizationHeaderStrategy authorizationHeaderStrategy) {
