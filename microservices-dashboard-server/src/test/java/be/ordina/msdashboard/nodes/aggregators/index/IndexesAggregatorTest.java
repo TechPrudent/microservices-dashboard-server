@@ -63,7 +63,6 @@ public class IndexesAggregatorTest {
     private DiscoveryClient discoveryClient;
     private IndexToNodeConverter indexToNodeConverter;
     private IndexProperties indexProperties;
-    private ApplicationEventPublisher publisher;
     private NettyServiceCaller caller;
     private IndexesAggregator indexesAggregator;
 
@@ -73,8 +72,8 @@ public class IndexesAggregatorTest {
         indexToNodeConverter = mock(IndexToNodeConverter.class);
         indexProperties = mock(IndexProperties.class);
         caller = mock(NettyServiceCaller.class);
-        publisher = mock(ApplicationEventPublisher.class);
         SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
         indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller, securityStrategyFactory);
 
         when(indexProperties.getFilteredServices()).thenReturn(

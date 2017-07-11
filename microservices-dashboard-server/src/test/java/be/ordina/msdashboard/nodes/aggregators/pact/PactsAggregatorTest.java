@@ -70,16 +70,16 @@ public class PactsAggregatorTest {
 
     private PactsAggregator pactsAggregator;
 
-    String onePactSource = "{\"pacts\": [{\"_links\": {\"self\":"
+    private String onePactSource = "{\"pacts\": [{\"_links\": {\"self\":"
             + " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
             + "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
 
-    String twoPactsSource = "{\"pacts\": [{\"_links\": {\"self\": {\"title\": \"Pact\",\"name\": \"Pact between consumer1 (v1.0.0) and provider1\","
+    private String twoPactsSource = "{\"pacts\": [{\"_links\": {\"self\": {\"title\": \"Pact\",\"name\": \"Pact between consumer1 (v1.0.0) and provider1\","
             + "\"href\": \"http://someserver.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"}}},{\"_links\": {\"self\":"
             + " {\"title\": \"Pact\",\"name\": \"Pact between consumer2 (v1.0.0) and provider2\","
             + "\"href\": \"http://someserver.be:7000/pacts/provider/provider2/consumer/consumer2/version/1.0.0\"}}}]}";
 
-    String pactOne = "{\"provider\":{\"name\":\"provider1\"},\"consumer\":{\"name\":\"consumer1\"},\"interactions\":[{\"description\":"
+    private String pactOne = "{\"provider\":{\"name\":\"provider1\"},\"consumer\":{\"name\":\"consumer1\"},\"interactions\":[{\"description\":"
             + "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
             + "\"/rel://pn:provider1\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
             + "\"application/vnd.pxs.provider1.v1+json;charset=UTF-8\"}},\"response\":"
@@ -90,7 +90,7 @@ public class PactsAggregatorTest {
             + "\"http://someServer.be:7000/pacts/provider/provider1/consumer/consumer1/version/1.0.0\"},\"curies\":[{\"name\":\"pb\",\"href\":"
             + "\"http://el3101.bc:7000/doc/{rel}\",\"templated\":true}]}}";
 
-    String pactTwo = "{\"provider\":{\"name\":\"provider2\"},\"consumer\":{\"name\":\"consumer2\"},\"interactions\":[{\"description\":"
+    private String pactTwo = "{\"provider\":{\"name\":\"provider2\"},\"consumer\":{\"name\":\"consumer2\"},\"interactions\":[{\"description\":"
             + "\"A request to get the data of a customer\",\"request\":{\"method\":\"GET\",\"path\":"
             + "\"/rel://pn:provider2\",\"headers\":{\"globalid\":\"12345\",\"accept\":"
             + "\"application/vnd.pxs.provider2.v1+json;charset=UTF-8\"}},\"response\":"

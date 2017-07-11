@@ -27,9 +27,6 @@ import org.springframework.security.oauth2.provider.authentication.OAuth2Authent
 /**
  * Applies the inbound Spring security context to the outgoing aggregator requests
  *
- * TODO: Make sure Microservices Dashboard also works without Spring Security
- * TODO: Make conditional on oauth security setting enabled
- *
  * @author Andreas Evers
  */
 public class OAuth2TokenStrategy implements OutboundSecurityStrategy<Authentication> {
