@@ -175,9 +175,6 @@ public class MicroservicesDashboardServerApplicationTest {
 
 		private static final Logger logger = LoggerFactory.getLogger(TestMicroservicesDashboardServerApplication.class);
 
-		@Autowired
-		private ApplicationContext applicationContext;
-
 		@Bean
 		public CompositeHttpClient<ByteBuf, ByteBuf> rxClient() {
 			return new CompositeHttpClientBuilder<ByteBuf, ByteBuf>()

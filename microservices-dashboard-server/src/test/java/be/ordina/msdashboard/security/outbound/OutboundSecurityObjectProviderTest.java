@@ -41,7 +41,13 @@ public class OutboundSecurityObjectProviderTest {
         SecurityContextHolder.getContext().getAuthentication();
         AuthorizationHeaderHolder.set("test");
         assertThat(outboundSecurityObjectProvider.getOutboundSecurityObject()).isEqualTo("test");
+        AuthorizationHeaderHolder.set(null);
+    }
 
+    @Test
+    public void getsHeaderFromDefaultAuthentication() throws Exception {
+        SecurityContextHolder.getContext().getAuthentication();
+        assertThat(outboundSecurityObjectProvider.getOutboundSecurityObject()).isEqualTo(authentication);
     }
 
 }

@@ -12,32 +12,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 /**
- * @author Andreas Evers
+ * @author Kevin Van Houtte
  */
 @RunWith(MockitoJUnitRunner.class)
-public class AuthorizationHeaderStrategyTest {
+public class DefaultStrategyTest {
 
-    private AuthorizationHeaderStrategy authorizationHeaderStrategy = new AuthorizationHeaderStrategy();
+    private DefaultStrategy defaultStrategy = new DefaultStrategy();
 
     @Mock
     private HttpClientRequest<ByteBuf> request;
 
     @Test
     public void applies() throws Exception {
-        authorizationHeaderStrategy.apply(request, "abc");
-        verify(request).withHeader("Authorization", "abc");
-    }
-
-    @Test
-    public void doesntApplyWithNullHeader() throws Exception {
-        authorizationHeaderStrategy.apply(request, null);
-        verify(request, times(0)).withHeader("Authorization", "abc");
+        defaultStrategy.apply(request, "abc");
+        assertThat(request.withHeader("Authorization","abc")).isNull();
     }
 
     @Test
     public void verifyGetType() throws Exception {
-        assertThat(authorizationHeaderStrategy.getType()).isEqualTo("forward-inbound-auth-header");
+        assertThat(defaultStrategy.getType()).isEqualTo("none");
     }
-
 
 }
