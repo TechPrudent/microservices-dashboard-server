@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package be.ordina.msdashboard.config;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactProperties;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactToNodeConverter;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,26 +33,31 @@ import org.springframework.context.annotation.Configuration;
  * Autoconfiguration for the pact aggregator.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 @Configuration
 public class PactAggregatorConfiguration {
 
-    @Bean
-    @ConditionalOnProperty("pact-broker.url")
-    @ConditionalOnMissingBean
-    public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-        return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher, rxClient);
-    }
+	@Autowired(required = false)
+	private SecurityStrategyFactory securityStrategyFactory;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public PactToNodeConverter pactToNodeConverter() {
-        return new PactToNodeConverter();
-    }
+	@Bean
+	@ConditionalOnProperty("pact-broker.url")
+	@ConditionalOnMissingBean
+	public PactsAggregator pactsAggregator(PactToNodeConverter pactToNodeConverter, ApplicationEventPublisher publisher, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+		return new PactsAggregator(pactToNodeConverter, pactProperties(), publisher,
+				rxClient, securityStrategyFactory);
+	}
 
-    @ConfigurationProperties("msdashboard.pact")
-    @Bean
-    public PactProperties pactProperties() {
-        return new PactProperties();
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public PactToNodeConverter pactToNodeConverter() {
+		return new PactToNodeConverter();
+	}
+
+	@ConfigurationProperties("msdashboard.pact")
+	@Bean
+	public PactProperties pactProperties() {
+		return new PactProperties();
+	}
 }

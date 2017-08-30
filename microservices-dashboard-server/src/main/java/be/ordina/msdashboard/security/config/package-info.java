@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-package be.ordina.msdashboard;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-public class InMemoryMockedConfiguration {
-
-    @Bean
-    protected InMemoryWireMock inMemoryWireMock() {
-        return new InMemoryWireMock();
-    }
-}
+/**
+ * Security configuration classes
+ */
+package be.ordina.msdashboard.security.config;

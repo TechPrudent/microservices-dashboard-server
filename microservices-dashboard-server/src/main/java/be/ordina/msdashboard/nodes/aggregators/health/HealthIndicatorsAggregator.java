@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.NodeAggregator;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -41,7 +42,7 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
  * In case Spring Boot is not used for a microservice, your service must comply to
  * the health format exposed by Spring Boot under the <code>/health</code> endpoint.
  * Example of a health response:
- *
+ * <p>
  * <pre>
  * {
  *   "status": "UP",
@@ -61,20 +62,24 @@ import static be.ordina.msdashboard.nodes.aggregators.Constants.ZUUL;
  * </pre>
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  * @see <a href="http://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference/htmlsingle/#production-ready">
- *     Spring Boot Actuator</a>
+ * Spring Boot Actuator</a>
  */
 public class HealthIndicatorsAggregator implements NodeAggregator {
 
 	private static final Logger logger = LoggerFactory.getLogger(HealthIndicatorsAggregator.class);
-
+	private static final String AGGREGATOR_KEY = "health";
 	private DiscoveryClient discoveryClient;
+
 	private UriResolver uriResolver;
 	private HealthProperties properties;
 	private NettyServiceCaller caller;
 	private ErrorHandler errorHandler;
 	private HealthToNodeConverter healthToNodeConverter;
+	private SecurityStrategyFactory securityStrategyFactory;
 
+	@Deprecated
 	public HealthIndicatorsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
 									  final HealthProperties properties, final NettyServiceCaller caller,
 									  final ErrorHandler errorHandler, final HealthToNodeConverter healthToNodeConverter) {
@@ -86,12 +91,24 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 		this.healthToNodeConverter = healthToNodeConverter;
 	}
 
+	public HealthIndicatorsAggregator(final DiscoveryClient discoveryClient, final UriResolver uriResolver,
+									  final HealthProperties properties, final NettyServiceCaller caller,
+									  final ErrorHandler errorHandler, final HealthToNodeConverter healthToNodeConverter,
+									  final SecurityStrategyFactory securityStrategyFactory) {
+		this(discoveryClient, uriResolver, properties, caller, errorHandler, healthToNodeConverter);
+		this.securityStrategyFactory = securityStrategyFactory;
+	}
+
 	@Override
 	public Observable<Node> aggregateNodes() {
+		final Object outboundSecurityObject = getOutboundSecurityObject();
 		Observable<Observable<Node>> observableObservable = getServiceIdsFromDiscoveryClient()
 				.map(id -> new ImmutablePair<>(id, resolveHealthCheckUrl(id)))
 				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
-				.map(pair -> getHealthNodesFromService(pair.getLeft(), pair.getRight()))
+				.map(pair -> outboundSecurityObject != null ?
+						getHealthNodesFromService(pair.getLeft(), pair.getRight(), outboundSecurityObject) :
+						getHealthNodesFromService(pair.getLeft(), pair.getRight())
+				)
 				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
 				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.doOnCompleted(() -> logger.info("Completed getting all health observables"))
@@ -122,10 +139,16 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 	}
 
 	protected Observable<Node> getHealthNodesFromService(String serviceId, String url) {
+		return getHealthNodesFromService(serviceId, url, null);
+	}
+
+	protected Observable<Node> getHealthNodesFromService(String serviceId, String url, final Object outboundSecurityObject) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
+		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
 			request.withHeader(header.getKey(), header.getValue());
 		}
+
 		return caller.retrieveJsonFromRequest(serviceId, request)
 				.flatMap(el -> healthToNodeConverter.convertToNodes(serviceId, el))
 				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
@@ -134,5 +157,20 @@ public class HealthIndicatorsAggregator implements NodeAggregator {
 				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))
 				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))
 				.onErrorResumeNext(Observable.empty());
+	}
+
+
+	private Object getOutboundSecurityObject() {
+		if (securityStrategyFactory != null) {
+			return securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityObjectProvider().getOutboundSecurityObject();
+		} else {
+			return null;
+		}
+	}
+
+	private void applyOutboundSecurityStrategyOnRequest(HttpClientRequest<ByteBuf> request, Object outboundSecurityObject) {
+		if (outboundSecurityObject != null) {
+			securityStrategyFactory.getStrategy(AGGREGATOR_KEY).getOutboundSecurityStrategy().apply(request, outboundSecurityObject);
+		}
 	}
 }

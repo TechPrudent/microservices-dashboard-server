@@ -20,14 +20,13 @@ import be.ordina.msdashboard.nodes.aggregators.ErrorHandler;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -74,15 +73,20 @@ public class HealthIndicatorsAggregatorTest {
     private ErrorHandler errorHandler;
     @Mock
     private HealthToNodeConverter converter;
+    @Mock
+    private SecurityStrategyFactory securityStrategyFactory;
     @Captor
     private ArgumentCaptor<HttpClientRequest> requestCaptor;
 
     @Before
-    public void before(){
-    	when(properties.getFilteredServices()).thenReturn(
-    	        newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+    public void before() {
+        MockitoAnnotations.initMocks(this);
+        when(properties.getFilteredServices()).thenReturn(
+                newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+        when(properties.getSecurity()).thenReturn("none");
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
     }
-    
+
     @Test
     public void shouldGetHealthNodesFromService() {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
@@ -94,7 +98,7 @@ public class HealthIndicatorsAggregatorTest {
                 .thenReturn(Observable.from(correctNodes()));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         List<Node> nodes = testSubscriber.getOnNextEvents();
 
         verify(caller, times(1)).retrieveJsonFromRequest(eq("testService"), requestCaptor.capture());
@@ -110,7 +114,7 @@ public class HealthIndicatorsAggregatorTest {
                 .thenThrow(new RuntimeException());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService(eq("testService"), eq("testUrl"), any()).toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertCompleted();
     }
@@ -123,7 +127,7 @@ public class HealthIndicatorsAggregatorTest {
                 .thenReturn(retrievedMapObservable);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
 
@@ -142,7 +146,7 @@ public class HealthIndicatorsAggregatorTest {
                 .thenReturn(retrievedMapObservable);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
 
@@ -156,12 +160,14 @@ public class HealthIndicatorsAggregatorTest {
         when(properties.getRequestHeaders()).thenReturn(requestHeaders());
         Map retrievedMap = new HashMap();
         Observable retrievedMapObservable = Observable.just(retrievedMap);
-        retrievedMapObservable.doOnNext(o -> {throw new RuntimeException();});
+        retrievedMapObservable.doOnNext(o -> {
+            throw new IllegalArgumentException();
+        });
         when(caller.retrieveJsonFromRequest(anyString(), any(HttpClientRequest.class)))
                 .thenReturn(retrievedMapObservable);
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
@@ -182,7 +188,7 @@ public class HealthIndicatorsAggregatorTest {
                 .thenThrow(new RuntimeException("Error1"));
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
-        aggregator.getHealthNodesFromService("testService", "testUrl").toBlocking().subscribe(testSubscriber);
+        aggregator.getHealthNodesFromService("testService", "testUrl", null).toBlocking().subscribe(testSubscriber);
         testSubscriber.getOnNextEvents();
         testSubscriber.assertNoValues();
         testSubscriber.assertCompleted();
@@ -192,7 +198,7 @@ public class HealthIndicatorsAggregatorTest {
                 .containsExactlyElementsOf(requestHeaders().entrySet());
     }
 
-    private Map<String,String> requestHeaders() {
+    private Map<String, String> requestHeaders() {
         Map<String, String> headers = new HashMap<>();
         headers.put("Accept", "application/hal+json");
         headers.put("Accept-Language", "en-us,en;q=0.5");
@@ -200,8 +206,8 @@ public class HealthIndicatorsAggregatorTest {
     }
 
     private Node[] correctNodes() {
-        return new Node[] { new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
-                new Node(DISCOVERY), new Node(CONFIG_SERVER), new Node("Node2") };
+        return new Node[]{new Node("Node1"), new Node(HYSTRIX), new Node(DISK_SPACE),
+                new Node(DISCOVERY), new Node(CONFIG_SERVER), new Node("Node2")};
     }
 
     private Comparator stringEntryComparator() {
@@ -211,7 +217,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldGetServiceIdsFromDiscoveryClient() {
-        when(discoveryClient.getServices()).thenReturn(asList("svc1","SVC2","zuul","svc3"));
+        when(discoveryClient.getServices()).thenReturn(asList("svc1", "SVC2", "zuul", "svc3"));
 
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
         aggregator.getServiceIdsFromDiscoveryClient().toBlocking().subscribe(testSubscriber);
@@ -230,7 +236,7 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldReturnValidServicesOnErroneousDiscovery() {
-        when(discoveryClient.getServices()).thenReturn(asList("svc1",null,"zuul","svc3"));
+        when(discoveryClient.getServices()).thenReturn(asList("svc1", null, "zuul", "svc3"));
 
         TestSubscriber<String> testSubscriber = new TestSubscriber<>();
         aggregator.getServiceIdsFromDiscoveryClient().toBlocking().subscribe(testSubscriber);
@@ -242,9 +248,9 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateNodes() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"));
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(anyString())).then(i -> {
             ServiceInstance serviceInstance = mock(ServiceInstance.class);
@@ -252,7 +258,7 @@ public class HealthIndicatorsAggregatorTest {
             return asList(serviceInstance);
         });
         when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -262,9 +268,9 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldEmitErrorOnClassCastException() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"));
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"));
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(anyString())).then(i -> {
             ServiceInstance serviceInstance = mock(ServiceInstance.class);
@@ -272,7 +278,7 @@ public class HealthIndicatorsAggregatorTest {
             return asList(serviceInstance);
         });
         when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getHealthNodesFromService(anyString(), anyString()); // will give classcastexception
+        doAnswer(i -> Observable.from(asList(i.getArgumentAt(0, String.class)))).when(aggregator).getHealthNodesFromService(anyString(), anyString(), any()); // will give classcastexception
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -283,9 +289,9 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateAllValidNodesOnSingleServiceWithoutInstances() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
-        Observable observable = Observable.from(asList("svc1","error","svc3"))
+        Observable observable = Observable.from(asList("svc1", "error", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
@@ -297,7 +303,7 @@ public class HealthIndicatorsAggregatorTest {
         when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class)))
                 .then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
         doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class)))))
-                .when(aggregator).getHealthNodesFromService(anyString(), anyString());
+                .when(aggregator).getHealthNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);
@@ -309,9 +315,9 @@ public class HealthIndicatorsAggregatorTest {
 
     @Test
     public void shouldAggregateAllValidNodesOnNullInput() {
-        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter));
+        aggregator = spy(new HealthIndicatorsAggregator(discoveryClient, uriResolver, properties, caller, errorHandler, converter, securityStrategyFactory));
 
-        Observable observable = Observable.from(asList("svc1",null,"zuul","svc3"))
+        Observable observable = Observable.from(asList("svc1", null, "zuul", "svc3"))
                 .subscribeOn(Schedulers.io()).publish().autoConnect();
         doReturn(observable).when(aggregator).getServiceIdsFromDiscoveryClient();
         when(discoveryClient.getInstances(startsWith("svc"))).then(i -> {
@@ -321,7 +327,7 @@ public class HealthIndicatorsAggregatorTest {
         });
         doThrow(new RuntimeException()).when(discoveryClient).getInstances(startsWith("zuul"));
         when(uriResolver.resolveHealthCheckUrl(any(ServiceInstance.class))).then(i -> i.getArgumentAt(0, ServiceInstance.class).getServiceId());
-        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString());
+        doAnswer(i -> Observable.from(asList(new Node(i.getArgumentAt(0, String.class))))).when(aggregator).getHealthNodesFromService(anyString(), anyString(), any());
 
         TestSubscriber<Node> testSubscriber = new TestSubscriber<>();
         aggregator.aggregateNodes().toBlocking().subscribe(testSubscriber);

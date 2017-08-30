@@ -18,6 +18,8 @@ package be.ordina.msdashboard.nodes.aggregators.index;
 import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.model.Node;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
+import be.ordina.msdashboard.security.config.DefaultStrategyBeanProvider;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import com.google.common.collect.Lists;
 import io.reactivex.netty.protocol.http.client.HttpClientRequest;
 import org.json.JSONObject;
@@ -45,6 +47,8 @@ import static be.ordina.msdashboard.nodes.model.NodeBuilder.node;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,7 +63,6 @@ public class IndexesAggregatorTest {
     private DiscoveryClient discoveryClient;
     private IndexToNodeConverter indexToNodeConverter;
     private IndexProperties indexProperties;
-    private ApplicationEventPublisher publisher;
     private NettyServiceCaller caller;
     private IndexesAggregator indexesAggregator;
 
@@ -69,11 +72,15 @@ public class IndexesAggregatorTest {
         indexToNodeConverter = mock(IndexToNodeConverter.class);
         indexProperties = mock(IndexProperties.class);
         caller = mock(NettyServiceCaller.class);
-        publisher = mock(ApplicationEventPublisher.class);
-        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller);
-    
-    	when(indexProperties.getFilteredServices()).thenReturn(
-    	        Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+        SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
+        ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+        indexesAggregator = new IndexesAggregator(indexToNodeConverter, discoveryClient, new DefaultUriResolver(), indexProperties, publisher, caller, securityStrategyFactory);
+
+        when(indexProperties.getFilteredServices()).thenReturn(
+                Lists.newArrayList(HYSTRIX, DISK_SPACE, DISCOVERY, CONFIG_SERVER));
+        when(indexProperties.getSecurity()).thenReturn(SecurityStrategyFactory.NONE);
+        doReturn(new DefaultStrategyBeanProvider()).when(securityStrategyFactory).getStrategy(anyString());
+
     }
 
     @Test

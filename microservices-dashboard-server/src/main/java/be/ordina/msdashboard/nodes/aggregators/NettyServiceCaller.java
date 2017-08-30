@@ -42,83 +42,83 @@ import static java.text.MessageFormat.format;
  */
 public class NettyServiceCaller {
 
-    private static final Logger logger = LoggerFactory.getLogger(NettyServiceCaller.class);
+	private static final Logger logger = LoggerFactory.getLogger(NettyServiceCaller.class);
 
-    private final CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
-    private final ErrorHandler errorHandler;
+	private final CompositeHttpClient<ByteBuf, ByteBuf> rxClient;
+	private final ErrorHandler errorHandler;
 
-    @Deprecated
-    public NettyServiceCaller(ErrorHandler errorHandler) {
-        this.errorHandler = errorHandler;
-        this.rxClient = new CompositeHttpClientBuilder<ByteBuf, ByteBuf>().withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
-    }
+	@Deprecated
+	public NettyServiceCaller(ErrorHandler errorHandler) {
+		this.errorHandler = errorHandler;
+		this.rxClient = new CompositeHttpClientBuilder<ByteBuf, ByteBuf>().withMaxConnections(DEFAULT_MAX_CONNECTIONS).build();
+	}
 
-    public NettyServiceCaller(ErrorHandler errorHandler, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-        this.errorHandler = errorHandler;
-        this.rxClient = rxClient;
-    }
+	public NettyServiceCaller(ErrorHandler errorHandler, CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+		this.errorHandler = errorHandler;
+		this.rxClient = rxClient;
+	}
 
-    /**
-     * Calls the remote service using the provided request, applies error handling and
-     * converts the response into a {@link Map}. The entire request and response are
-     * executed and handled in a hot observable.
-     *
-     * @param serviceId the id of the service for which the request is made
-     * @param request the request which has to be executed using RxNetty
-     * @return an {@link Observable} emitting the JSON response as a Map with String keys
-     * and Object values.
-     */
-    public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
-        RxClient.ServerInfo serverInfo = getServerInfoFromRequestOrClient(request, rxClient);
+	/**
+	 * Calls the remote service using the provided request, applies error handling and
+	 * converts the response into a {@link Map}. The entire request and response are
+	 * executed and handled in a hot observable.
+	 *
+	 * @param serviceId the id of the service for which the request is made
+	 * @param request   the request which has to be executed using RxNetty
+	 * @return an {@link Observable} emitting the JSON response as a Map with String keys
+	 * and Object values.
+	 */
+	public Observable<Map<String, Object>> retrieveJsonFromRequest(String serviceId, HttpClientRequest<ByteBuf> request) {
+		RxClient.ServerInfo serverInfo = getServerInfoFromRequestOrClient(request, rxClient);
 
-        return rxClient.submit(serverInfo, request)
-                .publish().autoConnect()
-                .doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {0} with headers {1}: {2}",
-                        request.getUri(), request.getHeaders().entries(), el), el))
-                .filter(r -> {
-                    if (r.getStatus().code() < 400) {
-                        return true;
-                    } else {
-                        errorHandler.handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for url " + request.getUri() + " with headers " + r.getHeaders().entries());
-                        return false;
-                    }
-                })
-                .flatMap(AbstractHttpContentHolder::getContent)
-                .map(data -> data.toString(Charset.defaultCharset()))
-                .map(response -> {
-                    JacksonJsonParser jsonParser = new JacksonJsonParser();
-                    return jsonParser.parseMap(response);
-                })
-                .doOnNext(r -> logger.info("Json retrieved from call: {}", r))
-                .onErrorResumeNext(Observable.empty());
-    }
+		return rxClient.submit(serverInfo, request)
+				.publish().autoConnect()
+				.doOnError(el -> errorHandler.handleNodeError(serviceId, format("Error retrieving node(s) for url {0} with headers {1}: {2}",
+						request.getUri(), request.getHeaders().entries(), el), el))
+				.filter(r -> {
+					if (r.getStatus().code() < 400) {
+						return true;
+					} else {
+						errorHandler.handleNodeWarning(serviceId, "Exception " + r.getStatus() + " for url " + request.getUri() + " with headers " + r.getHeaders().entries());
+						return false;
+					}
+				})
+				.flatMap(AbstractHttpContentHolder::getContent)
+				.map(data -> data.toString(Charset.defaultCharset()))
+				.map(response -> {
+					JacksonJsonParser jsonParser = new JacksonJsonParser();
+					return jsonParser.parseMap(response);
+				})
+				.doOnNext(r -> logger.info("Json retrieved from call: {}", r))
+				.onErrorResumeNext(Observable.empty());
+	}
 
-    public static RxClient.ServerInfo getServerInfoFromRequestOrClient(HttpClientRequest<ByteBuf> request,
-                                                                       CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
-        RxClient.ServerInfo serverInfo = rxClient.getDefaultServer();
+	public static RxClient.ServerInfo getServerInfoFromRequestOrClient(HttpClientRequest<ByteBuf> request,
+																	   CompositeHttpClient<ByteBuf, ByteBuf> rxClient) {
+		RxClient.ServerInfo serverInfo = rxClient.getDefaultServer();
 
-        try {
-            URI uri = new URI(request.getUri());
+		try {
+			URI uri = new URI(request.getUri());
 
-            final String host = uri.getHost();
-            if (null != host) {
-                int port = uri.getPort();
-                if (port < 0) {
-                    String scheme = uri.getScheme();
-                    if (null != scheme) {
-                        if ("http".equals(scheme)) {
-                            port = 80;
-                        } else if ("https".equals(scheme)) {
-                            port = 443;
-                        }
-                    }
-                }
-                serverInfo = new RxClient.ServerInfo(host, port);
-            }
-        } catch (URISyntaxException e) {
-            logger.error("Could not extract server info from request: {0}", e.getMessage());
-        }
+			final String host = uri.getHost();
+			if (null != host) {
+				int port = uri.getPort();
+				if (port < 0) {
+					String scheme = uri.getScheme();
+					if (null != scheme) {
+						if ("http".equals(scheme)) {
+							port = 80;
+						} else if ("https".equals(scheme)) {
+							port = 443;
+						}
+					}
+				}
+				serverInfo = new RxClient.ServerInfo(host, port);
+			}
+		} catch (URISyntaxException e) {
+			logger.error("Could not extract server info from request: {0}", e.getMessage());
+		}
 
-        return serverInfo;
-    }
+		return serverInfo;
+	}
 }

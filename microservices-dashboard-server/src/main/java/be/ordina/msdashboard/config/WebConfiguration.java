@@ -30,6 +30,8 @@ import be.ordina.msdashboard.nodes.stores.NodeStore;
 import be.ordina.msdashboard.nodes.stores.SimpleStore;
 import be.ordina.msdashboard.nodes.uriresolvers.DefaultUriResolver;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.config.MSDashboardSecurityProperties;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
@@ -37,8 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -157,6 +161,23 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     @ConditionalOnMissingBean
     public NodeCache nodeCache() {
         return null;
+    }
+
+    @ConditionalOnProperty("msdashboard.security.enabled")
+    @Configuration
+    public static class SecurityConfiguration {
+
+        @ConditionalOnMissingBean
+        @Bean
+        public SecurityStrategyFactory securityStrategyFactory(ApplicationContext applicationContext) {
+            return new SecurityStrategyFactory(applicationContext, msDashboardSecurityProperties());
+        }
+
+        @ConfigurationProperties("msdashboard.security")
+        @Bean
+        public MSDashboardSecurityProperties msDashboardSecurityProperties() {
+            return new MSDashboardSecurityProperties();
+        }
     }
 
     @Configuration

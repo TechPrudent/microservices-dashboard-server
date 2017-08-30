@@ -10,7 +10,7 @@
 
     <groupId>be.ordina</groupId>
     <artifactId>microservices-dashboard-server</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Microservices Dashboard Server</name>
@@ -38,6 +38,11 @@
             <id>timysewyn</id>
             <name>Tim Ysewyn</name>
             <email>tim.ysewyn@ordina.be</email>
+        </developer>
+        <developer>
+            <id>kevinvanhoutte</id>
+            <name>Kevin Van Houtte</name>
+            <email>kevin.vanhoutte@ordina.be</email>
         </developer>
     </developers>
 
@@ -169,7 +174,23 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-security</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+            <version>2.0.12.RELEASE</version>
+            <optional>true</optional>
+        </dependency>
         <!-- TEST -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -184,6 +205,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>4.2.0.RELEASE</version>
+            <optional>true</optional>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
@@ -275,7 +303,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.8.Final</version>
+            <version>4.1.5.Final</version>
         </dependency>
     </dependencies>
 

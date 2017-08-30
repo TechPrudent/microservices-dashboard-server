@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2016 the original author or authors.
+ * Copyright 2012-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@ import be.ordina.msdashboard.nodes.aggregators.NettyServiceCaller;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.mappings.MappingsProperties;
 import be.ordina.msdashboard.nodes.uriresolvers.UriResolver;
+import be.ordina.msdashboard.security.outbound.SecurityStrategyFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * Autoconfiguration for the mappings aggregator.
  *
  * @author Andreas Evers
+ * @author Kevin van Houtte
  */
 @Configuration
 @ConditionalOnSingleCandidate(DiscoveryClient.class)
@@ -39,24 +43,27 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(DiscoveryClientConfiguration.class)
 public class MappingsAggregatorConfiguration {
 
-    @Autowired
-    private DiscoveryClient discoveryClient;
-    @Autowired
-    private NettyServiceCaller caller;
-    @Autowired
-    private ErrorHandler errorHandler;
-    @Autowired
-    private UriResolver uriResolver;
+	@Autowired
+	private DiscoveryClient discoveryClient;
+	@Autowired
+	private NettyServiceCaller caller;
+	@Autowired
+	private ErrorHandler errorHandler;
+	@Autowired
+	private UriResolver uriResolver;
+	@Autowired(required = false)
+	private SecurityStrategyFactory securityStrategyFactory;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public MappingsAggregator mappingsAggregator() {
-        return new MappingsAggregator(discoveryClient, uriResolver, mappingsProperties(), caller, errorHandler);
-    }
+	@Bean
+	@ConditionalOnMissingBean
+	public MappingsAggregator mappingsAggregator() {
+		return new MappingsAggregator(discoveryClient, uriResolver, mappingsProperties(), caller,
+				errorHandler, securityStrategyFactory);
+	}
 
-    @ConfigurationProperties("msdashboard.mappings")
-    @Bean
-    public MappingsProperties mappingsProperties() {
-        return new MappingsProperties();
-    }
+	@ConfigurationProperties("msdashboard.mappings")
+	@Bean
+	public MappingsProperties mappingsProperties() {
+		return new MappingsProperties();
+	}
 }
