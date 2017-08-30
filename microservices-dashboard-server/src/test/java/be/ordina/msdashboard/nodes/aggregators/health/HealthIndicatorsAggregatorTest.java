@@ -161,7 +161,7 @@ public class HealthIndicatorsAggregatorTest {
         Map retrievedMap = new HashMap();
         Observable retrievedMapObservable = Observable.just(retrievedMap);
         retrievedMapObservable.doOnNext(o -> {
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         });
         when(caller.retrieveJsonFromRequest(anyString(), any(HttpClientRequest.class)))
                 .thenReturn(retrievedMapObservable);

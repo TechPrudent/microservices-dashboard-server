@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Provider for outbound security objects, either an authentication header, or a full-blown Spring Security Authentication object
- * TODO: Should this group two strategies?
+ *
  *
  * @author Andreas Evers
  */
