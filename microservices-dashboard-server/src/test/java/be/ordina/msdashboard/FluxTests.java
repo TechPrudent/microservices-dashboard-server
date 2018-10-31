@@ -22,6 +22,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 import rx.Observable;
 import rx.Subscriber;
 import rx.exceptions.Exceptions;
@@ -33,6 +36,7 @@ import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,9 +52,74 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Andreas Evers
  */
 @Ignore
-public class ObservableTests {
+public class FluxTests {
 
-    private static final Logger logger = LoggerFactory.getLogger(ObservableTests.class);
+    private static final Logger logger = LoggerFactory.getLogger(FluxTests.class);
+
+    @Test //a1 a2 a3 a4 a5 a6 a7 a8 a9
+    public void testingSimpleFlux() {
+        Flux<String> flux = Flux.fromArray(Arrays.array(1, 2, 3, 4, 5, 6, 7, 8, 9)).map(el -> "a" + el);
+        flux.subscribe(System.out::println);
+    }
+
+    @Test //a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a20 a30 a40 a50 a60 a70 a80 a90
+    public void testingCombiningNestedFlux() {
+        Flux<String> flux1 = Flux.fromArray(Arrays.array(1, 2, 3, 4, 5, 6, 7, 8, 9)).map(el -> "a" + el);
+        Flux<String> flux2 = Flux.fromArray(Arrays.array(10, 20, 30, 40, 50, 60, 70, 80, 90)).map(el -> "a" + el);
+        Flux<String> mergedFlux = mergeFlux(flux1, flux2);
+        mergedFlux.subscribe(System.out::println);
+    }
+
+    @Test //a1 a2 a3 a10 a20 a30
+    public void testingCombiningNestedFluxWithStepVerifier() {
+        Flux<String> flux1 = Flux.fromArray(Arrays.array(1, 2, 3)).map(el -> "a" + el);
+        Flux<String> flux2 = Flux.fromArray(Arrays.array(10, 20, 30)).map(el -> "a" + el);
+        StepVerifier.create(
+                mergeFlux(flux1, flux2))
+                .expectNext("a1")
+                .expectNext("a10")
+                .expectNext("a2")
+                .expectNext("a20")
+                .expectNext("a3")
+                .expectNext("a30")
+                .expectComplete()
+                .verify();
+    }
+
+    @Test //no print
+    public void testingCombiningNestedFluxWithInterval() {
+        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).take(10).map(el -> "a" + el).publish().autoConnect();
+        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).take(10).map(el -> "b" + el).publish().autoConnect();
+        Flux<String> mergedFlux = mergeFlux(flux1, flux2);
+        mergedFlux.subscribe(System.out::println);
+    }
+
+    @Test //a0 b0 a1 b1 a2 b2 a3 b3 OR slightly different
+    public void testingCombiningNestedFluxWithIntervalWithStepVerifier() {
+        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).take(4).map(el -> "a" + el);
+        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).take(4).map(el -> "b" + el);
+        StepVerifier.create(mergeFlux(flux1, flux2))
+                .expectNext("a0", "b0", "a1", "b1", "a2", "b2", "a3", "b3")
+                .expectComplete()
+                .verify();
+    }
+
+//    @Test
+//    public void testingCombiningNestedFluxWithInterval() {
+//        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).take(10);
+//        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).take(10);
+//                .publish()  // Turn source into hot Publisher
+//                .autoConnect() // Instructs the hot Publisher to start when at least one `Subscriber` subscribes
+//                .map(el -> { if (el == 4L) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+//                .map(el -> { if ("a6".equals(el)) throw new RuntimeException("Error1"); return "a" + el;}) //Business logic that might fail
+//                .retry() //retry on any error infinitely
+//                .toBlocking()
+//                .subscribe(System.out::println);
+//    }
+
+    private Flux<String> mergeFlux(Flux<String> flux1, Flux<String> flux2) {
+        return Flux.merge(flux1, flux2);
+    }
 
     @Test
     public void testingCombiningNestedObservables() {
