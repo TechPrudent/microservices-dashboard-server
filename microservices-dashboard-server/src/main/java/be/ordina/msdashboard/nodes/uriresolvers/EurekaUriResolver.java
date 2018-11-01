@@ -15,8 +15,11 @@
  */
 package be.ordina.msdashboard.nodes.uriresolvers;
 
+import com.netflix.appinfo.InstanceInfo;
+
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient;
+import org.springframework.cloud.netflix.eureka.InstanceInfoFactory;
 
 /**
  * Resolves urls from a {@link ServiceInstance} using Eureka's
@@ -39,5 +42,12 @@ public class EurekaUriResolver implements UriResolver {
     @Override
     public String resolveMappingsUrl(ServiceInstance instance) {
         return resolveHealthCheckUrl(instance).replaceFirst("health", "mappings");
+    }
+
+    @Override
+    public String resolveInfoUrl(ServiceInstance instance) {
+        InstanceInfo instanceInfo = ((EurekaDiscoveryClient.EurekaServiceInstance) instance).getInstanceInfo();
+
+        return instanceInfo.getHostName() + ":" + instanceInfo.getPort() + "/actuator/info";
     }
 }

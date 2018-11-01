@@ -15,14 +15,21 @@
  */
 package be.ordina.msdashboard;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.assertj.core.util.Arrays;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import rx.Observable;
@@ -35,14 +42,7 @@ import rx.plugins.DebugNotificationListener;
 import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.scheduling.annotation.Async;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -86,12 +86,26 @@ public class FluxTests {
                 .verify();
     }
 
-    @Test //no print
-    public void testingCombiningNestedFluxWithInterval() {
-        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).take(10).map(el -> "a" + el).publish().autoConnect();
-        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).take(10).map(el -> "b" + el).publish().autoConnect();
+    /**
+     * emits a0 b0 a1 b1 a2 b2 a3 b3 a4 b4 a5 b5 a6 b6 a7 b7 a8 b8 a9 b9
+     *
+     * Introduced slight delay in subscription to second flux to force nice alteration between both fluxes
+     *
+     * @throws InterruptedException
+     */
+    @Test //a0 b0 a1 b1 a2 b2 a3 b3 a4 b4 a5 b5 a6 b6 a7 b7 a8 b8 a9 b9
+    public void testingCombiningNestedFluxWithInterval() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(20);
+
+        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).take(10).map(el -> "a" + el);
+        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).delaySubscription(Duration.ofMillis(10)).take(10).map(el -> "b" + el);
         Flux<String> mergedFlux = mergeFlux(flux1, flux2);
-        mergedFlux.subscribe(System.out::println);
+        mergedFlux.subscribe(x -> {
+            latch.countDown();
+            System.out.println(x);
+        });
+
+        latch.await();
     }
 
     @Test //a0 b0 a1 b1 a2 b2 a3 b3 OR slightly different
@@ -121,26 +135,45 @@ public class FluxTests {
         return Flux.merge(flux1, flux2);
     }
 
-    @Test
-    public void testingCombiningNestedObservables() {
-        Observable<String> observable1 = Observable.from(Arrays.array(1, 2, 3, 4, 5, 6, 7, 8, 9)).map(el -> "a" + el);
-        Observable<String> observable2 = Observable.from(Arrays.array(10, 20, 30, 40, 50, 60, 70, 80, 90)).map(el -> "a" + el);
-        Observable<Observable<String>> observableObservable =
-                Observable.from(new Observable[]{observable1, observable2});
-        Observable<String> mergedObservable = Observable.merge(observableObservable);
-        mergedObservable.subscribe(System.out::println);
-    }
+//    @Test
+//    public void testingCombiningNestedObservables() {
+//        Observable<String> observable1 = Observable.from(Arrays.array(1, 2, 3, 4, 5, 6, 7, 8, 9)).map(el -> "a" + el);
+//        Observable<String> observable2 = Observable.from(Arrays.array(10, 20, 30, 40, 50, 60, 70, 80, 90)).map(el -> "a" + el);
+//        Observable<Observable<String>> observableObservable =
+//                Observable.from(new Observable[]{observable1, observable2});
+//        Observable<String> mergedObservable = Observable.merge(observableObservable);
+//        mergedObservable.subscribe(System.out::println);
+//    }
 
+    /**
+     *
+     * Emits 0 1 2 3 4 5 6 7 8 9 with 1 second intervals
+     *
+     * @throws InterruptedException
+     */
     @Test
-    public void testingObservablesWithLatency() throws InterruptedException {
+    public void testingFluxWithLatency() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(10);
-        Observable<Long> observable1 = Observable.interval(1L, SECONDS).take(10);
-        observable1.subscribe((x) -> {
+        Flux<Long> flux1 = Flux.interval(Duration.ofSeconds(1)).take(10);
+        flux1.subscribe(x -> {
             latch.countDown();
             System.out.println(x);
         });
+
         latch.await();
     }
+
+//    @Test
+//    public void testingObservablesWithLatency() throws InterruptedException {
+//        final CountDownLatch latch = new CountDownLatch(10);
+//        Observable<Long> observable1 = Observable.interval(1L, SECONDS).take(10);
+//        observable1.subscribe((x) -> {
+//            latch.countDown();
+//            System.out.println(x);
+//        });
+//        latch.await();
+//    }
+
 
     @Test
     public void testingCombiningNestedObservablesWithLatency() throws InterruptedException {
@@ -182,21 +215,79 @@ public class FluxTests {
         mergedObservable.toBlocking().subscribe(System.out::println);
     }
 
+
+    /**
+     * Blocking a Flux can be done using toIterable or toStream. See documentation at https://projectreactor.io/docs/core/release/reference/#which.blocking
+     * toIterable returns a BlockingIterable.
+     *
+     * @throws InterruptedException
+     */
     @Test
-    public void testingCombiningNestedObservablesWithExplicitSleep() throws InterruptedException {
-        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).take(10);
-        Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(aLong -> {
+    public void testingCombiningNestedFluxesWithExplicitSleepToIterable() throws InterruptedException {
+        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).map(el -> "a" + el).take(10);
+        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).map(el -> "b" + el).doOnEach(el -> {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }).take(10);
-        Observable<Observable<String>> observableObservable =
-                Observable.from(new Observable[] { observable1, observable2 });
-        Observable<String> mergedObservable = Observable.merge(observableObservable);
-        mergedObservable.toBlocking().subscribe(logger::info);
+
+        Flux<Flux<String>> nestedFlux = Flux.fromArray(Arrays.array(flux1, flux2));
+
+        Flux<String> mergedFlux = Flux.merge(nestedFlux);
+
+        Iterable<String> strings = mergedFlux.toIterable();
+
+        strings.forEach(System.out::println);
     }
+
+    /**
+     * In order to have our test execute completely and not having to play with Thread.sleep we can use CountdownLatch.
+     *
+     * @throws InterruptedException
+     */
+    @Test
+    public void testingCombiningNestedFluxesWithExplicitSleepWithCountdownLatch() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(20);
+
+        Flux<String> flux1 = Flux.interval(Duration.ofSeconds(1)).map(el -> "a" + el).take(10);
+        Flux<String> flux2 = Flux.interval(Duration.ofSeconds(1)).map(el -> "b" + el).doOnEach(el -> {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).take(10);
+
+        Flux<Flux<String>> nestedFlux = Flux.fromArray(Arrays.array(flux1, flux2));
+
+        Flux<String> mergedFlux = Flux.merge(nestedFlux);
+
+        mergedFlux.subscribe(val -> {
+            latch.countDown();
+            logger.info(val);
+        });
+
+        latch.await();
+    }
+
+
+//    @Test
+//    public void testingCombiningNestedObservablesWithExplicitSleep() throws InterruptedException {
+//        Observable<String> observable1 = Observable.interval(1L, SECONDS).map(el -> "a" + el).take(10);
+//        Observable<String> observable2 = Observable.interval(1L, SECONDS).map(el -> "b" + el).doOnEach(aLong -> {
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).take(10);
+//        Observable<Observable<String>> observableObservable =
+//                Observable.from(new Observable[] { observable1, observable2 });
+//        Observable<String> mergedObservable = Observable.merge(observableObservable);
+//        mergedObservable.toBlocking().subscribe(logger::info);
+//    }
 
     @Test
     public void testingCombiningNestedObservablesWithBlockingAndLogging() throws InterruptedException {

@@ -39,6 +39,13 @@ public interface UriResolver {
     String resolveHealthCheckUrl(ServiceInstance instance);
 
     /**
+     * Resolves the info url of the given instance
+     * @param instance the instance for which the url has to be resolved
+     * @return the info check url
+     */
+    String resolveInfoUrl(ServiceInstance instance);
+
+    /**
      * Resolves the mappings url of the given instance
      * @param instance the instance for which the url has to be resolved
      * @return the mappings url

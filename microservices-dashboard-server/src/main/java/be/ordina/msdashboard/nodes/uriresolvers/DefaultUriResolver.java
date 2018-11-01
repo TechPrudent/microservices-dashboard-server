@@ -38,4 +38,9 @@ public class DefaultUriResolver implements UriResolver {
     public String resolveMappingsUrl(ServiceInstance instance) {
         return instance.getUri() + "/mappings";
     }
+
+    @Override
+    public String resolveInfoUrl(ServiceInstance instance) {
+        return instance.getUri() + "actuator/info";
+    }
 }

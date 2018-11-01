@@ -16,7 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import reactor.core.publisher.Flux;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -61,34 +65,50 @@ public class InfoAggregator {
 	}
 
 	public void aggregateNodes() {
+//		final Object outboundSecurityObject = getOutboundSecurityObject();
+//		getServiceIdsFromDiscoveryClient()
+//				.map(id -> new ImmutablePair<>(id, resolveHealthCheckUrl(id)))
+//				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
+//				.map(pair -> outboundSecurityObject != null ?
+//						getHealthNodesFromService(pair.getLeft(), pair.getRight(), outboundSecurityObject) :
+//						getHealthNodesFromService(pair.getLeft(), pair.getRight())
+//				)
+//				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
+//				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
+//				.doOnComplete(() -> logger.info("Completed getting all health observables"))
+//				.retry()
+//				.flatMap(node -> node)
+//				.forEach(node -> publisher.publishEvent(node));
+
 		final Object outboundSecurityObject = getOutboundSecurityObject();
+
 		getServiceIdsFromDiscoveryClient()
-				.map(id -> new ImmutablePair<>(id, resolveHealthCheckUrl(id)))
-				.doOnNext(pair -> logger.info("Creating health observable: " + pair))
+				.map(serviceId -> Tuples.of(serviceId, resolveInfoUrl(serviceId)))
+				.doOnNext(pair -> logger.info("Creating info Flux: " + pair))
 				.map(pair -> outboundSecurityObject != null ?
-						getHealthNodesFromService(pair.getLeft(), pair.getRight(), outboundSecurityObject) :
-						getHealthNodesFromService(pair.getLeft(), pair.getRight())
+						getInfoNodesFromService(pair.getT1(), pair.getT2(), outboundSecurityObject) :
+						getInfoNodesFromService(pair.getT1(), pair.getT2())
 				)
 				.doOnNext(el -> logger.debug("Unmerged health observable: " + el))
 				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.doOnComplete(() -> logger.info("Completed getting all health observables"))
 				.retry()
 				.flatMap(node -> node)
-				.forEach(node -> publisher.publishEvent(node));
+				.subscribe(publisher::publishEvent);
 	}
 
-	private String resolveHealthCheckUrl(String id) {
+	private String resolveInfoUrl(String id) {
 		List<ServiceInstance> instances = discoveryClient.getInstances(id);
 		if (instances.isEmpty()) {
 			throw new IllegalStateException("No instances found for service " + id);
 		} else {
-			return uriResolver.resolveHealthCheckUrl(instances.get(0));
+			return uriResolver.resolveInfoUrl(instances.get(0));
 		}
 	}
 
 	protected Flux<String> getServiceIdsFromDiscoveryClient() {
-		logger.info("Discovering services for health");
-		return Flux.from(discoveryClient.getServices()).subscribeOn(Schedulers.io()).publish().autoConnect()
+		logger.info("Discovering services for info");
+		return Flux.fromIterable(discoveryClient.getServices())
 				.map(id -> id.toLowerCase())
 				.filter(id -> !id.equals(ZUUL))
 				.doOnNext(s -> logger.debug("Service discovered: " + s))
@@ -96,11 +116,11 @@ public class InfoAggregator {
 				.retry();
 	}
 
-	protected Flux<Node> getHealthNodesFromService(String serviceId, String url) {
-		return getHealthNodesFromService(serviceId, url, null);
+	protected Flux<Node> getInfoNodesFromService(String serviceId, String url) {
+		return getInfoNodesFromService(serviceId, url, null);
 	}
 
-	protected Flux<Node> getHealthNodesFromService(String serviceId, String url, final Object outboundSecurityObject) {
+	protected Flux<Node> getInfoNodesFromService(String serviceId, String url, final Object outboundSecurityObject) {
 		HttpClientRequest<ByteBuf> request = HttpClientRequest.createGet(url);
 		applyOutboundSecurityStrategyOnRequest(request, outboundSecurityObject);
 		for (Map.Entry<String, String> header : properties.getRequestHeaders().entrySet()) {
