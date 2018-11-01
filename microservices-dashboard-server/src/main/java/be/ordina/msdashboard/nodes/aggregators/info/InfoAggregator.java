@@ -50,7 +50,7 @@ public class InfoAggregator {
 		this.discoveryClient = discoveryClient;
 		this.uriResolver = uriResolver;
 		this.properties = properties;
-		this.caller = caller;
+//		this.caller = caller;
 		this.errorHandler = errorHandler;
 		this.healthToNodeConverter = healthToNodeConverter;
 		this.publisher = publisher;
@@ -85,7 +85,7 @@ public class InfoAggregator {
 		getServiceIdsFromDiscoveryClient()
 				.map(serviceId -> Tuples.of(serviceId, resolveInfoUrl(serviceId)))
 				.doOnNext(pair -> logger.info("Creating info Flux: " + pair))
-				.map(pair -> outboundSecurityObject != null ?
+				.flatMap(pair -> outboundSecurityObject != null ?
 						getInfoNodesFromService(pair.getT1(), pair.getT2(), outboundSecurityObject) :
 						getInfoNodesFromService(pair.getT1(), pair.getT2())
 				)
@@ -93,7 +93,6 @@ public class InfoAggregator {
 				.doOnError(e -> errorHandler.handleSystemError("Error filtering services: " + e.getMessage(), e))
 				.doOnComplete(() -> logger.info("Completed getting all health observables"))
 				.retry()
-				.flatMap(node -> node)
 				.subscribe(publisher::publishEvent);
 	}
 
@@ -127,15 +126,22 @@ public class InfoAggregator {
 			request.withHeader(header.getKey(), header.getValue());
 		}
 
-		WebClient caller = WebClient.create();
-		return caller.retrieveJsonFromRequest(serviceId, request)
-				.flatMap(el -> healthToNodeConverter.convertToNodes(serviceId, el))
-				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
-				//TODO: .map(node -> springCloudEnricher.enrich(node))
-				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
-				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))
-				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))
-				.onErrorResumeNext(Observable.empty());
+        return WebClient
+                .create()
+                .get()
+                .uri(url)
+                .retrieve()
+                .bodyToFlux(Node.class);
+
+
+//		return caller.retrieveJsonFromRequest(serviceId, request)
+//				.flatMap(el -> healthToNodeConverter.convertToNodes(serviceId, el))
+//				.filter(node -> !properties.getFilteredServices().contains(node.getId()))
+//				//TODO: .map(node -> springCloudEnricher.enrich(node))
+//				.doOnNext(el -> logger.info("Health node {} discovered in url: {}", el.getId(), url))
+//				.doOnError(e -> logger.error("Error during healthnode fetching: ", e))
+//				.doOnCompleted(() -> logger.info("Completed emission of a health node observable from url: " + url))
+//				.onErrorResumeNext(Observable.empty());
 	}
 
 
