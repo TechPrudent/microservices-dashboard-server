@@ -15,6 +15,10 @@
  */
 package be.ordina.msdashboard.security;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import be.ordina.msdashboard.EnableMicroservicesDashboardServer;
 import be.ordina.msdashboard.MicroservicesDashboardServerApplicationTest;
 import be.ordina.msdashboard.wiremock.InMemoryMockedConfiguration;
@@ -23,12 +27,18 @@ import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.plugins.DebugHook;
+import rx.plugins.DebugNotification;
+import rx.plugins.DebugNotificationListener;
+import rx.plugins.RxJavaPlugins;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,14 +50,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import rx.plugins.DebugHook;
-import rx.plugins.DebugNotification;
-import rx.plugins.DebugNotificationListener;
-import rx.plugins.RxJavaPlugins;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 import static be.ordina.msdashboard.JsonHelper.load;
 import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
@@ -83,7 +85,7 @@ public class ForwardInboundAuthHeaderStrategyIntegrationTest {
 	private int port = 0;
 
 	@Test
-	public void exposesGraph() throws IOException, InterruptedException {
+	public void exposesGraph() throws IOException, InterruptedException, JSONException {
 		long startTime = System.currentTimeMillis();
 		@SuppressWarnings("rawtypes")
 		ResponseEntity<String> graph = new TestRestTemplate("user", "password")

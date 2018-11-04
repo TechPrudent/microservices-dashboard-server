@@ -15,9 +15,17 @@
  */
 package be.ordina.msdashboard.config;
 
+import java.io.IOException;
+import java.time.Duration;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import be.ordina.msdashboard.cache.CacheProperties;
 import be.ordina.msdashboard.config.RedisConfiguration.RedisOrMockCondition;
 import be.ordina.msdashboard.nodes.stores.RedisStore;
+import redis.embedded.RedisServer;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -32,18 +40,13 @@ import org.springframework.cloud.client.discovery.noop.NoopDiscoveryClientAutoCo
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.embedded.RedisServer;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.io.IOException;
 
 import static redis.embedded.util.OS.WINDOWS;
 import static redis.embedded.util.OSDetector.getOS;
@@ -58,8 +61,8 @@ import static redis.embedded.util.OSDetector.getOS;
 @EnableCaching
 @EnableConfigurationProperties
 @Conditional(RedisOrMockCondition.class)
-@AutoConfigureBefore(WebConfiguration.class)
-@AutoConfigureAfter({ RedisAutoConfiguration.class, NoopDiscoveryClientAutoConfiguration.class})
+@AutoConfigureBefore({RedisAutoConfiguration.class, WebConfiguration.class})
+@AutoConfigureAfter({NoopDiscoveryClientAutoConfiguration.class})
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class RedisConfiguration {
 
@@ -69,12 +72,17 @@ public class RedisConfiguration {
         return new CacheProperties();
     }
 
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        return new JedisConnectionFactory();
+    }
+
     @Bean(name = {"nodeStore", "nodeCache"})
     public RedisStore nodeStore(final RedisConnectionFactory factory) {
         return new RedisStore(redisTemplate(factory), factory);
     }
 
-    @Bean
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(final RedisConnectionFactory factory){
         RedisTemplate<String, Object> virtualNodeTemplate = new RedisTemplate<>();
         virtualNodeTemplate.setConnectionFactory(factory);
@@ -112,14 +120,32 @@ public class RedisConfiguration {
         }
     }
 
+//    @Bean
+//    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
+//        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+//        cacheManager.setDefaultExpiration(cacheProperties().getDefaultExpiration());
+//        RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();
+//        redisCachePrefix.prefix(cacheProperties().getRedisCachePrefix());
+//        cacheManager.setCachePrefix(redisCachePrefix);
+//
+//        return cacheManager;
+//    }
+
     @Bean
-    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
-        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
-        cacheManager.setDefaultExpiration(cacheProperties().getDefaultExpiration());
-        RedisCachePrefix redisCachePrefix = new DefaultRedisCachePrefix();
-        redisCachePrefix.prefix(cacheProperties().getRedisCachePrefix());
-        cacheManager.setCachePrefix(redisCachePrefix);
-        return cacheManager;
+    public RedisCacheManager cacheManager(final RedisConnectionFactory factory) {
+        return RedisCacheManager.builder(factory)
+                .cacheDefaults(redisCacheConfiguration())
+                .transactionAware()
+                .build();
+    }
+
+    @Bean
+    public RedisCacheConfiguration redisCacheConfiguration() {
+        return RedisCacheConfiguration
+                .defaultCacheConfig()
+                .prefixKeysWith(cacheProperties().getRedisCachePrefix())
+                .entryTtl(Duration.ofMinutes(cacheProperties().getDefaultExpiration()))
+                .disableCachingNullValues();
     }
 
     @Bean

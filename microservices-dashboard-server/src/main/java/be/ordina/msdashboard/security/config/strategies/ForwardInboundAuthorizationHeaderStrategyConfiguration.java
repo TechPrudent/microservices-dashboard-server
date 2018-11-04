@@ -20,14 +20,15 @@ import be.ordina.msdashboard.security.inbound.InboundAuthorizationHeaderCaptorFi
 import be.ordina.msdashboard.security.outbound.AuthorizationHeaderStrategy;
 import be.ordina.msdashboard.security.outbound.OutboundSecurityObjectProvider;
 import be.ordina.msdashboard.security.outbound.OutboundSecurityStrategy;
+
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
@@ -42,13 +43,19 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @Configuration
 public class ForwardInboundAuthorizationHeaderStrategyConfiguration {
 
+    private final Environment environment;
+
+    public ForwardInboundAuthorizationHeaderStrategyConfiguration(Environment environment) {
+        this.environment = environment;
+    }
+
     public static class Condition extends SpringBootCondition {
         @Override
         public ConditionOutcome getMatchOutcome(final ConditionContext context,
                                                 final AnnotatedTypeMetadata metadata) {
-            final RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(context.getEnvironment());
-            final String propertiesProperty = resolver.getProperty("msdashboard.security.strategies.forward-inbound-auth-header", String.class);
-            final String yamlProperty = resolver.getProperty("msdashboard.security.strategies.forward-inbound-auth-header[0]", String.class);
+            Environment environment = context.getEnvironment();
+            final String propertiesProperty = environment.getProperty("msdashboard.security.strategies.forward-inbound-auth-header", String.class);
+            final String yamlProperty = environment.getProperty("msdashboard.security.strategies.forward-inbound-auth-header[0]", String.class);
             return new ConditionOutcome(propertiesProperty != null || yamlProperty != null, "Conditional on forward-inbound-auth-header value");
         }
     }

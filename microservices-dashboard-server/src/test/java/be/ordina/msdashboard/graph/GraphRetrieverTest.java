@@ -15,11 +15,17 @@
  */
 package be.ordina.msdashboard.graph;
 
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.Map;
+
 import be.ordina.msdashboard.nodes.aggregators.health.HealthIndicatorsAggregator;
 import be.ordina.msdashboard.nodes.aggregators.index.IndexesAggregator;
 import be.ordina.msdashboard.nodes.aggregators.pact.PactsAggregator;
 import be.ordina.msdashboard.nodes.stores.NodeStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,23 +35,19 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import rx.Observable;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Map;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 import static be.ordina.msdashboard.JsonHelper.load;
 import static be.ordina.msdashboard.JsonHelper.removeBlankNodes;
-import static be.ordina.msdashboard.nodes.model.NodeTypes.MICROSERVICE;
-import static be.ordina.msdashboard.nodes.model.NodeTypes.RESOURCE;
 import static be.ordina.msdashboard.graph.GraphProperties.DB;
 import static be.ordina.msdashboard.graph.GraphProperties.JMS;
 import static be.ordina.msdashboard.graph.GraphProperties.REST;
 import static be.ordina.msdashboard.graph.GraphProperties.SOAP;
 import static be.ordina.msdashboard.nodes.model.NodeBuilder.node;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.MICROSERVICE;
+import static be.ordina.msdashboard.nodes.model.NodeTypes.RESOURCE;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +81,7 @@ public class GraphRetrieverTest {
 	}
 
 	@Test
-	public void retrieveGraph() throws FileNotFoundException, UnsupportedEncodingException {
+	public void retrieveGraph() throws FileNotFoundException, UnsupportedEncodingException, JSONException {
 		when(healthIndicatorsAggregator.aggregateNodes())
 				.thenReturn(Observable.from(newHashSet(
 						node().withId("service1").havingLinkedToNodeIds(newHashSet("backend1")).build(),

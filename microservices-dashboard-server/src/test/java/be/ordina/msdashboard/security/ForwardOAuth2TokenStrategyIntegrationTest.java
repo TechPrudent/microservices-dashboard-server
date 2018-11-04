@@ -24,6 +24,7 @@ import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -94,7 +95,7 @@ public class ForwardOAuth2TokenStrategyIntegrationTest {
 	private int port = 0;
 
 	@Test
-	public void exposesGraph() throws IOException, InterruptedException {
+	public void exposesGraph() throws IOException, InterruptedException, JSONException {
 
 		long startTime = System.currentTimeMillis();
 		@SuppressWarnings("rawtypes")

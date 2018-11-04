@@ -2,7 +2,8 @@ package be.ordina.msdashboard.security.config.strategies;
 
 import be.ordina.msdashboard.security.config.strategies.ForwardInboundAuthorizationHeaderStrategyConfiguration.Condition;
 import org.junit.Test;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -49,7 +50,9 @@ public class ForwardInboundAuthHeaderStrategyConfigurationTest {
 
     private AnnotationConfigApplicationContext load(Class<?> config, String... env) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        EnvironmentTestUtils.addEnvironment(context, env);
+
+        TestPropertyValues.of(env).applyTo(context);
+
         context.register(config);
         context.refresh();
         return context;

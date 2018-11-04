@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.4.5.RELEASE</version>
+        <version>2.1.0.RELEASE</version>
     </parent>
 
     <groupId>be.ordina</groupId>
@@ -47,11 +47,12 @@
     </developers>
 
     <properties>
-        <spring.boot.admin.version>1.4.6</spring.boot.admin.version>
-        <spring.cloud.version>Camden.SR6</spring.cloud.version>
+        <spring.boot.admin.version>2.0.4</spring.boot.admin.version>
+        <spring.cloud.version>Greenwich.M1</spring.cloud.version>
         <java.version>1.8</java.version>
         <powermock.version>1.6.5</powermock.version>
         <spring.boot.version>${project.parent.version}</spring.boot.version>
+        <jedis.version>2.9.0</jedis.version>
     </properties>
 
     <scm>
@@ -174,8 +175,9 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-eureka</artifactId>
-            <scope>provided</scope>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <!--<scope>provided</scope>-->
+            <version>2.1.0.M1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>aws-java-sdk</artifactId>
@@ -185,7 +187,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-hystrix</artifactId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+            <version>2.1.0.M1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -222,6 +225,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.lettuce</groupId>
+                    <artifactId>lettuce-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -309,7 +323,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20160810</version>
+            <version>20180813</version>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
@@ -382,6 +396,10 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

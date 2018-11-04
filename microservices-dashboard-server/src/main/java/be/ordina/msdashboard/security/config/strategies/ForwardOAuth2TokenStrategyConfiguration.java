@@ -19,14 +19,15 @@ import be.ordina.msdashboard.security.config.StrategyBeanProvider;
 import be.ordina.msdashboard.security.outbound.OAuth2TokenStrategy;
 import be.ordina.msdashboard.security.outbound.OutboundSecurityObjectProvider;
 import be.ordina.msdashboard.security.outbound.OutboundSecurityStrategy;
+
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
@@ -45,9 +46,9 @@ public class ForwardOAuth2TokenStrategyConfiguration {
         @Override
         public ConditionOutcome getMatchOutcome(final ConditionContext context,
                                                 final AnnotatedTypeMetadata metadata) {
-            final RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(context.getEnvironment());
-            final String propertiesProperty = resolver.getProperty("msdashboard.security.strategies.forward-oauth2-token", String.class);
-            final String yamlProperty = resolver.getProperty("msdashboard.security.strategies.forward-oauth2-token[0]", String.class);
+            Environment environment = context.getEnvironment();
+            final String propertiesProperty = environment.getProperty("msdashboard.security.strategies.forward-oauth2-token", String.class);
+            final String yamlProperty = environment.getProperty("msdashboard.security.strategies.forward-oauth2-token[0]", String.class);
             return new ConditionOutcome(propertiesProperty != null || yamlProperty != null, "Conditional on forward-oauth2-token value");
         }
     }

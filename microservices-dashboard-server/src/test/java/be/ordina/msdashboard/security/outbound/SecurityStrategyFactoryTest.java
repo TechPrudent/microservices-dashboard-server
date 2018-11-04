@@ -1,5 +1,8 @@
 package be.ordina.msdashboard.security.outbound;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import be.ordina.msdashboard.security.config.MSDashboardSecurityProperties;
 import be.ordina.msdashboard.security.config.StrategyBeanProvider;
 import org.junit.Before;
@@ -8,13 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -107,7 +108,9 @@ public class SecurityStrategyFactoryTest {
 
     private AnnotationConfigApplicationContext load(Class<?> config, String... env) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        EnvironmentTestUtils.addEnvironment(context, env);
+
+        TestPropertyValues.of(env).applyTo(context);
+
         context.register(config);
         context.refresh();
         return context;

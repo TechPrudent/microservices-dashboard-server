@@ -21,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.reactivex.netty.pipeline.ssl.DefaultFactories;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClient;
 import io.reactivex.netty.protocol.http.client.CompositeHttpClientBuilder;
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -78,7 +80,7 @@ public class MicroservicesDashboardServerApplicationTest {
 	private int port = 0;
 
 	@Test
-	public void exposesGraph() throws IOException, InterruptedException {
+	public void exposesGraph() throws IOException, InterruptedException, JSONException {
 
 		long startTime = System.currentTimeMillis();
 		@SuppressWarnings("rawtypes")
@@ -165,9 +167,8 @@ public class MicroservicesDashboardServerApplicationTest {
 		assertThat(links.stream().anyMatch(link -> link.get("source") == s && link.get("target") == t)).isTrue();
 	}
 
-	@Configuration
+	@SpringBootApplication
 	@EnableDiscoveryClient
-	@EnableAutoConfiguration
 	@EnableMicroservicesDashboardServer
 	public static class TestMicroservicesDashboardServerApplication {
 
