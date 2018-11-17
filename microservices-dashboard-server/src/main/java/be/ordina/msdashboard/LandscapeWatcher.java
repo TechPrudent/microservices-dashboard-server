@@ -1,26 +1,20 @@
 package be.ordina.msdashboard;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 import be.ordina.msdashboard.events.NewServiceDiscovered;
 import be.ordina.msdashboard.events.NewServiceInstanceDiscovered;
 import be.ordina.msdashboard.events.ServiceDeregistered;
 import be.ordina.msdashboard.events.ServiceInstanceDeregistered;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+
+import java.net.URI;
+import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -38,6 +32,7 @@ public class LandscapeWatcher {
 
 	private final DiscoveryClient discoveryClient;
 	private final ApplicationEventPublisher publisher;
+
 	private final Map<String, List<ServiceInstance>> serviceInstances = new HashMap<>();
 
 	private List<String> services = new ArrayList<>();
@@ -47,14 +42,14 @@ public class LandscapeWatcher {
 		this.publisher = publisher;
 	}
 
-	@EventListener({ApplicationStartedEvent.class})
+	@EventListener({ ApplicationStartedEvent.class })
 	public void discoverLandscape() {
 		logger.debug("Discovering landscape");
 		this.services = this.discoveryClient.getServices();
 		processNewServices(this.services);
 	}
 
-	@EventListener({HeartbeatEvent.class})
+	@EventListener({ HeartbeatEvent.class })
 	public void checkForChangesInLandscape() {
 		logger.debug("Checking for changes in landscape");
 		List<String> retrievedServices = this.discoveryClient.getServices();
@@ -66,9 +61,9 @@ public class LandscapeWatcher {
 
 	private List<ServiceInstance> getInstances(String service) {
 		return this.discoveryClient.getInstances(service)
-				.stream()
-				.map(ServiceInstanceWrapper::new)
-				.collect(toList());
+			.stream()
+			.map(ServiceInstanceWrapper::new)
+			.collect(toList());
 	}
 
 	private void processNewServices(Collection<String> newServices) {
@@ -117,7 +112,11 @@ public class LandscapeWatcher {
 		});
 	}
 
-	private static final class ServiceInstanceWrapper implements ServiceInstance {
+	public Map<String, List<ServiceInstance>> getServiceInstances() {
+		return serviceInstances;
+	}
+
+	private static class ServiceInstanceWrapper implements ServiceInstance {
 
 		private final ServiceInstance delegate;
 
@@ -162,22 +161,23 @@ public class LandscapeWatcher {
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
 			ServiceInstance that = (ServiceInstance) o;
 			return this.delegate.getPort() == that.getPort() &&
-					this.delegate.isSecure() == that.isSecure() &&
-					Objects.equals(this.delegate.getServiceId(), that.getServiceId()) &&
-					Objects.equals(this.delegate.getHost(), that.getHost());
+				this.delegate.isSecure() == that.isSecure() &&
+				Objects.equals(this.delegate.getServiceId(), that.getServiceId()) &&
+				Objects.equals(this.delegate.getHost(), that.getHost());
 		}
 
 		@Override
 		public int hashCode() {
 			return Objects.hash(this.delegate.getServiceId(),
-					this.delegate.getHost(),
-					this.delegate.getPort(),
-					this.delegate.isSecure());
+				this.delegate.getHost(),
+				this.delegate.getPort(),
+				this.delegate.isSecure());
 		}
 	}
-
 }
